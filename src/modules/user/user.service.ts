@@ -26,10 +26,11 @@ export class UserService {
     private userBeFriendRepository: UserBeFriendRepository
   ) {}
 
-  async create(user: UserRegisterDto) {
+  async create(user: UserRegisterDto, verifyCode: number) {
     const newUser = this.userRepository.create(user)
     const salt = await Bcrypt.genSalt()
     newUser.password = await Bcrypt.hash(newUser.password, salt)
+    newUser.verifyCode = verifyCode
 
     return await this.userRepository.save(newUser)
   }

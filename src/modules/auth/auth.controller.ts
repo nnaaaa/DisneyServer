@@ -17,6 +17,7 @@ import { AuthService } from './auth.service'
 import { TokenPayload } from './dtos/TokenPayload.dto'
 import { UserLoginDto } from './dtos/userLogin.dto'
 import { UserRegisterDto } from './dtos/userRegister.dto'
+import { VerifyAuthUserDto } from './dtos/verifyAuthUser.dto'
 import { FacebookGuard } from './guards/facebook.guard'
 import { LocalGuard } from './guards/local.guard'
 import { RefreshTokenGuard } from './guards/refresh.guard'
@@ -43,14 +44,20 @@ export class AuthController {
 
   @Post('register')
   @ApiBody({ required: true, type: UserRegisterDto })
-  async register(
-    @Body() createUserDto: UserRegisterDto,
+  async register(@Body() createUserDto: UserRegisterDto) {
+    const digitCode = await this.authService.createAuthUser(createUserDto)
+    return digitCode
+  }
+
+  @Post('verify')
+  async verify(
+    @Body() verifyAuthUserDto: VerifyAuthUserDto,
     @Res({ passthrough: true }) res: Response
   ) {
-    const newUser = await this.authService.createAuthUser(createUserDto)
-    const accessToken = await this.authService.getAccessToken(newUser.userId)
-    const refreshToken = await this.authService.getRefreshToken(newUser.userId)
-    await this.authService.storeRefreshToken(newUser.userId, refreshToken)
+    const user = await this.authService.verifyAuthUser(verifyAuthUserDto)
+    const accessToken = await this.authService.getAccessToken(user.userId)
+    const refreshToken = await this.authService.getRefreshToken(user.userId)
+    await this.authService.storeRefreshToken(user.userId, refreshToken)
     res.setHeader('accessToken', accessToken)
     res.setHeader('refreshToken', refreshToken)
   }

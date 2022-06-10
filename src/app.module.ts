@@ -11,6 +11,7 @@ import { RoleModule } from './modules/role/role.module'
 import { EmojiModule } from './modules/emoji/emoji.module'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'path'
+import { MailModule } from './modules/mail/mail.module'
 import * as Joi from 'joi'
 
 @Module({
@@ -27,8 +28,11 @@ import * as Joi from 'joi'
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
-        SERVER_HOST: Joi.string().default('http://localhost:3000'),
+        SERVER_HOSTING: Joi.string().default('http://localhost:3000'),
         TOKEN_SECRET_KEY: Joi.string().required(),
+        EMAIL_HOST: Joi.string().required(),
+        EMAIL_ACCOUNT: Joi.string().required(),
+        EMAIL_PASSWORD: Joi.string().required(),
         FACEBOOK_ID: Joi.string().required(),
         FACEBOOK_SECRET: Joi.string().required(),
       }),
@@ -44,6 +48,7 @@ import * as Joi from 'joi'
     ChannelModule,
     RoleModule,
     EmojiModule,
+    MailModule,
   ],
   providers: [],
 })

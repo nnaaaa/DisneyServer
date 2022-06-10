@@ -39,6 +39,11 @@ export class UserEntity {
   @Column({ default: true, type: 'bool' })
   isOnline: boolean
 
+  @Column({ default: false, type: 'bool' })
+  isVerify: boolean
+  @Column({ type: 'bigint' })
+  verifyCode: number
+
   @OneToMany(
     () => UserBeFriendEntity,
     (beFriend) => beFriend.leftUser || beFriend.rightUser

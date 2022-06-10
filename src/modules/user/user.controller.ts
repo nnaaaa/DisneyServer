@@ -11,7 +11,7 @@ import { ApiBearerAuth } from '@nestjs/swagger'
 import { AuthUser } from 'src/decorators/auth-user.decorator'
 import { UserEntity } from 'src/entities/user.entity'
 import { JwtGuard } from 'src/modules/auth/guards/jwt.guard'
-import { UserSocketEvent } from 'src/shared/socket.event'
+import { UserSocketEvent } from 'src/shared/socket.event.constant'
 import { UserGateway } from './user.gateway'
 import { UserService } from './user.service'
 

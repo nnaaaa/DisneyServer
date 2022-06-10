@@ -10,7 +10,9 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
   const configService: ConfigService = app.get(ConfigService)
 
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(
+    new ValidationPipe({ transform: true, disableErrorMessages: false })
+  )
 
   const config = new DocumentBuilder()
     .setTitle('Disney Server')
@@ -24,7 +26,7 @@ async function bootstrap() {
 
   console.info(
     `Documentation: http://${configService.get<string>(
-      'SERVER_HOST'
+      'SERVER_HOSTING'
     )}/${versionAPI}`
   )
 
