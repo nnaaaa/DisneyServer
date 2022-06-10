@@ -1,0 +1,33 @@
+import { ValidationPipe } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { NestFactory } from '@nestjs/core'
+import { NestExpressApplication } from '@nestjs/platform-express'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { join } from 'path'
+import { AppModule } from './app.module'
+
+async function bootstrap() {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule)
+  const configService: ConfigService = app.get(ConfigService)
+
+  app.useGlobalPipes(new ValidationPipe())
+
+  const config = new DocumentBuilder()
+    .setTitle('Disney Server')
+    .setDescription('Disney API description')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build()
+  const versionAPI = 'api/v1'
+  const document = SwaggerModule.createDocument(app, config)
+  SwaggerModule.setup(versionAPI, app, document)
+
+  console.info(
+    `Documentation: http://${configService.get<string>(
+      'SERVER_HOST'
+    )}/${versionAPI}`
+  )
+
+  await app.listen(3000)
+}
+bootstrap()
