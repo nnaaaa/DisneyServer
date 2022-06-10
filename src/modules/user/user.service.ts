@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { UserEntity } from 'src/entities/user.entity'
@@ -17,6 +18,11 @@ import { FindOptionsWhere } from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { AddFriendDto } from './dtos/addFriend.dto'
 import * as Bcrypt from 'bcrypt'
+import {
+  NewPassordWithSMSDto,
+  NewPasswordDto,
+  NewPasswordWithComparation,
+} from '../auth/dtos/forgetPassword.dto'
 
 @Injectable()
 export class UserService {
@@ -30,7 +36,7 @@ export class UserService {
     const newUser = this.userRepository.create(user)
     const salt = await Bcrypt.genSalt()
     newUser.password = await Bcrypt.hash(newUser.password, salt)
-    newUser.verifyCode = verifyCode
+    newUser.registerVerifyCode = verifyCode
 
     return await this.userRepository.save(newUser)
   }
@@ -59,6 +65,28 @@ export class UserService {
 
   async findAll() {
     return this.userRepository.find()
+  }
+
+  async changePassword(newPasswordDto: NewPasswordDto, user: UserEntity) {
+    const updatePassword = async () => {
+      const salt = await Bcrypt.genSalt()
+      user.password = await Bcrypt.hash(newPasswordDto.newPassword, salt)
+      user.changePwdVerfiyCode = null
+      this.userRepository.save(user)
+    }
+
+    if (newPasswordDto.constructor.name === NewPasswordWithComparation.name) {
+      if (
+        Bcrypt.compareSync(
+          (newPasswordDto as NewPasswordWithComparation).oldPassword,
+          user.password
+        )
+      ) {
+        await updatePassword()
+      } else throw new UnauthorizedException()
+    } else if (newPasswordDto.constructor.name === NewPassordWithSMSDto.name) {
+      await updatePassword()
+    } else throw new BadRequestException()
   }
 
   async addFriend(addFriendDto: AddFriendDto) {

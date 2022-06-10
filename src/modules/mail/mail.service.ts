@@ -24,4 +24,22 @@ export class MailService {
       },
     })
   }
+
+  async changePasswordConfirm(account: string, digitCode: number) {
+    await this.mailerService.sendMail({
+      to: account,
+      subject: 'Let confirm to change your password',
+      template: join(__dirname, 'templates/changePwdConfirm.pug'),
+      attachments: [
+        {
+          filename: 'logo.jpg',
+          path: join(__dirname, 'templates/logo.jpg'),
+          cid: 'logo',
+        },
+      ],
+      context: {
+        digitCode,
+      },
+    })
+  }
 }

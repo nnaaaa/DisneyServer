@@ -14,6 +14,12 @@ import { Response } from 'express'
 import { AuthUser } from 'src/decorators/auth-user.decorator'
 import { UserEntity } from 'src/entities/user.entity'
 import { AuthService } from './auth.service'
+import {
+  ForgetPasswordDto,
+  NewPassordWithSMSDto,
+  NewPasswordDto,
+  NewPasswordWithComparation,
+} from './dtos/forgetPassword.dto'
 import { TokenPayload } from './dtos/TokenPayload.dto'
 import { UserLoginDto } from './dtos/userLogin.dto'
 import { UserRegisterDto } from './dtos/userRegister.dto'
@@ -36,17 +42,17 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ) {
     const accessToken = await this.authService.getAccessToken(user.userId)
+    res.setHeader('accessToken', accessToken)
+
     const refreshToken = await this.authService.getRefreshToken(user.userId)
     await this.authService.storeRefreshToken(user.userId, refreshToken)
-    res.setHeader('accessToken', accessToken)
     res.setHeader('refreshToken', refreshToken)
   }
 
   @Post('register')
   @ApiBody({ required: true, type: UserRegisterDto })
   async register(@Body() createUserDto: UserRegisterDto) {
-    const digitCode = await this.authService.createAuthUser(createUserDto)
-    return digitCode
+    await this.authService.createAuthUser(createUserDto)
   }
 
   @Post('verify')
@@ -54,12 +60,31 @@ export class AuthController {
     @Body() verifyAuthUserDto: VerifyAuthUserDto,
     @Res({ passthrough: true }) res: Response
   ) {
-    const user = await this.authService.verifyAuthUser(verifyAuthUserDto)
+    const user = await this.authService.verifyAuthUserToRegister(
+      verifyAuthUserDto
+    )
+
     const accessToken = await this.authService.getAccessToken(user.userId)
+    res.setHeader('accessToken', accessToken)
+
     const refreshToken = await this.authService.getRefreshToken(user.userId)
     await this.authService.storeRefreshToken(user.userId, refreshToken)
-    res.setHeader('accessToken', accessToken)
     res.setHeader('refreshToken', refreshToken)
+  }
+
+  @Post('forgetPassword')
+  async forgetPassword(@Body() forgetPasswordDto: ForgetPasswordDto) {
+    await this.authService.createAuthChangePassword(forgetPasswordDto)
+  }
+
+  @Post('newPassword')
+  async newPassword(@Body() newPasswordDto: NewPassordWithSMSDto) {
+    await this.authService.verifyAuthUserToChangePassword(newPasswordDto)
+  }
+
+  @Post('changePassword')
+  async changePassword(@Body() newPasswordDto: NewPasswordWithComparation) {
+    await this.authService.changeUserPassword(newPasswordDto)
   }
 
   @Get('facebook')

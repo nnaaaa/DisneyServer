@@ -6,12 +6,17 @@ export class VerifyAuthUserDto {
   @IsNotEmpty()
   @ApiProperty({
     description: 'Account',
-    example: 'test@test.com',
+    example: 'example@gamil.com',
     required: true,
   })
   public readonly account: string
 
   @IsNotEmpty()
   @IsNumberString()
+  @ApiProperty({
+    description: 'Digit Code',
+    example: '123456',
+    required: true,
+  })
   public readonly digitCode: number
 }

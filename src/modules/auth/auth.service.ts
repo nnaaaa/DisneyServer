@@ -3,11 +3,18 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { Algorithm } from 'src/shared/algorithms'
 import { MailService } from '../mail/mail.service'
 import { UserService } from '../user/user.service'
+import {
+  ForgetPasswordDto,
+  NewPassordWithSMSDto,
+  NewPasswordDto,
+  NewPasswordWithComparation,
+} from './dtos/forgetPassword.dto'
 import { UserRegisterDto } from './dtos/userRegister.dto'
 import { VerifyAuthUserDto } from './dtos/verifyAuthUser.dto'
 
@@ -22,6 +29,7 @@ export class AuthService {
   async getAccessToken(userId: string) {
     return this.jwtService.sign({ userId }, { expiresIn: '1d' })
   }
+
   async getRefreshToken(userId: string) {
     return this.jwtService.sign({ userId }, { expiresIn: '30d' })
   }
@@ -37,23 +45,57 @@ export class AuthService {
     await this.userService.create(userRegisterDto, digitCode)
 
     await this.mailService.registerConfirm(userRegisterDto, digitCode)
-
-    return digitCode
   }
 
-  async verifyAuthUser(verifyAuthUserDto: VerifyAuthUserDto) {
-    const { account, digitCode } = verifyAuthUserDto
+  async createAuthChangePassword({ account }: ForgetPasswordDto) {
+    const digitCode = Algorithm.generateSMS(6)
+
+    await this.userService.updateOne(
+      { account },
+      { changePwdVerfiyCode: digitCode }
+    )
+
+    await this.mailService.changePasswordConfirm(account, digitCode)
+  }
+
+  async verifyAuthUserToChangePassword(
+    newPassordWithSMSDto: NewPassordWithSMSDto
+  ) {
+    const { digitCode, account } = newPassordWithSMSDto
+
+    if (!digitCode) throw new ForbiddenException()
 
     const user = await this.userService.findOne({ account })
 
-    if (!user) throw new ForbiddenException()
+    if (!user) throw new NotFoundException()
 
-    if (user.verifyCode !== digitCode)
-      throw new NotFoundException()
+    if (user.changePwdVerfiyCode && user.changePwdVerfiyCode === digitCode)
+      await this.userService.changePassword(newPassordWithSMSDto, user)
+  }
 
-    await this.userService.updateOne({ account }, { isVerify: true })
-    
+  async verifyAuthUserToRegister({ account, digitCode }: VerifyAuthUserDto) {
+    const user = await this.userService.findOne({ account })
+
+    if (!user) throw new NotFoundException()
+
+    if (!user.registerVerifyCode) throw new ForbiddenException()
+
+    if (user.registerVerifyCode !== digitCode) throw new UnauthorizedException()
+
+    await this.userService.updateOne({ account }, { registerVerifyCode: null })
+
     return user
+  }
+
+  async changeUserPassword(
+    newPassordWithComparation: NewPasswordWithComparation
+  ) {
+    const { account } = newPassordWithComparation
+
+    const user = await this.userService.findOne({ account })
+
+    if (!user) throw new NotFoundException()
+    await this.userService.changePassword(newPassordWithComparation, user)
   }
 
   async storeRefreshToken(userId: string, refreshToken: string) {

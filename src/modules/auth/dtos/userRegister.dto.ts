@@ -6,7 +6,7 @@ export class UserRegisterDto {
   @IsNotEmpty()
   @ApiProperty({
     description: 'Account',
-    example: 'test@test.com',
+    example: 'example@gamil.com',
     required: true,
   })
   public readonly account: string
