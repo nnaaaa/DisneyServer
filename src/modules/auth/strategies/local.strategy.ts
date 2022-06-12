@@ -1,6 +1,10 @@
-import * as Bcrypt from 'bcrypt'
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
+import * as Bcrypt from 'bcrypt'
 import { Strategy } from 'passport-local'
 import { UserService } from 'src/modules/user/user.service'
 
@@ -12,7 +16,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
   async validate(account: string, password: string) {
     const user = await this.useService.findOne({ account })
-    if (!user) throw new UnauthorizedException()
+    if (!user) throw new NotFoundException()
 
     const isMatch = await Bcrypt.compare(password, user.password)
     if (!isMatch) throw new UnauthorizedException()

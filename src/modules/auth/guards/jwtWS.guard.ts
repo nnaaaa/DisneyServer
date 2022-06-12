@@ -1,16 +1,23 @@
 import {
   CanActivate,
   ExecutionContext,
+  forwardRef,
   Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import { JwtService } from '@nestjs/jwt'
+import { WsException } from '@nestjs/websockets'
 import { UserService } from 'src/modules/user/user.service'
+import { AuthService } from '../auth.service'
+import { TokenPayload } from '../dtos/TokenPayload.dto'
 
 @Injectable()
 export class JwtWsGuard implements CanActivate {
-  constructor(@Inject(UserService) private userService: UserService) {}
+  constructor(
+    @Inject(UserService) private userService: UserService,
+    @Inject(JwtService) private jwtService: JwtService
+  ) {}
 
   async canActivate(context: ExecutionContext) {
     try {
@@ -19,15 +26,19 @@ export class JwtWsGuard implements CanActivate {
         !client.handshake.headers ||
         !client.handshake.headers.authorization
       ) {
-        throw new UnauthorizedException()
+        throw new WsException('No token')
       }
       const accessToken = client.handshake.headers.authorization
         .replace('Bearer', '')
         .trim()
 
-      // const user = await this.userService.findOne({ userId: payload.userId });
-      // if (!user) throw new UnauthorizedException();
-      const users = await this.userService.findAll()
+      if (!accessToken) throw new WsException('No token')
+      const tokenPayload: TokenPayload = this.jwtService.verify(accessToken)
+      
+      const user = await this.userService.findOne({ userId: tokenPayload.userId })
+      if (!user) throw new WsException('Not found user')
+
+      client.user = user
       return true
     } catch {
       return false

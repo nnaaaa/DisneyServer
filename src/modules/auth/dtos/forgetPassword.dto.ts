@@ -33,7 +33,7 @@ export class NewPassordWithSMSDto extends NewPasswordDto {
   public readonly digitCode: number
 }
 
-export class NewPasswordWithComparation extends NewPasswordDto {
+export class NewPasswordWithComparationDto extends NewPasswordDto {
   @IsNotEmpty()
   @ApiProperty({
     description: 'Old Password',

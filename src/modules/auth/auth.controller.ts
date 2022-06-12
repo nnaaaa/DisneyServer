@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Req,
   Res,
   UseGuards,
@@ -17,8 +18,7 @@ import { AuthService } from './auth.service'
 import {
   ForgetPasswordDto,
   NewPassordWithSMSDto,
-  NewPasswordDto,
-  NewPasswordWithComparation,
+  NewPasswordWithComparationDto,
 } from './dtos/forgetPassword.dto'
 import { TokenPayload } from './dtos/TokenPayload.dto'
 import { UserLoginDto } from './dtos/userLogin.dto'
@@ -50,12 +50,11 @@ export class AuthController {
   }
 
   @Post('register')
-  @ApiBody({ required: true, type: UserRegisterDto })
   async register(@Body() createUserDto: UserRegisterDto) {
     await this.authService.createAuthUser(createUserDto)
   }
 
-  @Post('verify')
+  @Put('verify')
   async verify(
     @Body() verifyAuthUserDto: VerifyAuthUserDto,
     @Res({ passthrough: true }) res: Response
@@ -77,13 +76,13 @@ export class AuthController {
     await this.authService.createAuthChangePassword(forgetPasswordDto)
   }
 
-  @Post('newPassword')
+  @Put('newPassword')
   async newPassword(@Body() newPasswordDto: NewPassordWithSMSDto) {
     await this.authService.verifyAuthUserToChangePassword(newPasswordDto)
   }
 
-  @Post('changePassword')
-  async changePassword(@Body() newPasswordDto: NewPasswordWithComparation) {
+  @Put('changePassword')
+  async changePassword(@Body() newPasswordDto: NewPasswordWithComparationDto) {
     await this.authService.changeUserPassword(newPasswordDto)
   }
 
@@ -103,7 +102,7 @@ export class AuthController {
     // res.setHeader('refreshToken', refreshToken)
   }
 
-  @Post('refresh')
+  @Get('refresh')
   @ApiBearerAuth()
   @UseGuards(RefreshTokenGuard)
   async refreshToken(

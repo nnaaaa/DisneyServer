@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -12,8 +11,7 @@ import { UserService } from '../user/user.service'
 import {
   ForgetPasswordDto,
   NewPassordWithSMSDto,
-  NewPasswordDto,
-  NewPasswordWithComparation,
+  NewPasswordWithComparationDto,
 } from './dtos/forgetPassword.dto'
 import { UserRegisterDto } from './dtos/userRegister.dto'
 import { VerifyAuthUserDto } from './dtos/verifyAuthUser.dto'
@@ -25,6 +23,10 @@ export class AuthService {
     private userService: UserService,
     private mailService: MailService
   ) {}
+
+  verifyToken(token: string) {
+    return this.jwtService.verify(token)
+  }
 
   async getAccessToken(userId: string) {
     return this.jwtService.sign({ userId }, { expiresIn: '1d' })
@@ -88,7 +90,7 @@ export class AuthService {
   }
 
   async changeUserPassword(
-    newPassordWithComparation: NewPasswordWithComparation
+    newPassordWithComparation: NewPasswordWithComparationDto
   ) {
     const { account } = newPassordWithComparation
 

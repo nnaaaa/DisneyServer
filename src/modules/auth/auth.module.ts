@@ -6,6 +6,7 @@ import { MailModule } from '../mail/mail.module'
 import { MailService } from '../mail/mail.service'
 import { UserModule } from '../user/user.module'
 import { UserService } from '../user/user.service'
+import { UtilityModule } from '../utility/utility.module'
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
 import { FacebookStrategy } from './strategies/facebook.strategy'
@@ -15,12 +16,7 @@ import { RefreshTokenStrategy } from './strategies/refresh.strategy'
 
 @Module({
   imports: [
-    JwtModule.registerAsync({
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get('TOKEN_SECRET_KEY'),
-      }),
-      inject: [ConfigService],
-    }),
+    UtilityModule,
     PassportModule,
     UserModule,
     MailModule,

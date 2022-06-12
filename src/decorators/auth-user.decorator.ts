@@ -8,3 +8,12 @@ export const AuthUser = createParamDecorator(
     return data ? user?.[data] : user
   }
 )
+
+export const AuthWSUser = createParamDecorator(
+  (data: string, ctx: ExecutionContext) => {
+    const client = ctx.switchToWs().getClient()
+    const user = client.user
+
+    return data ? user?.[data] : user
+  }
+)

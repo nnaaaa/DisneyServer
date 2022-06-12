@@ -1,6 +1,7 @@
 import {
   ForbiddenException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
@@ -30,8 +31,8 @@ export class RefreshTokenStrategy extends PassportStrategy(
     if (!refreshToken) throw new ForbiddenException()
 
     const user = await this.userService.findOne({ userId: payload.userId })
-    if (!user) throw new UnauthorizedException()
-    if (user.refreshToken !== refreshToken) throw new ForbiddenException()
+    if (!user) throw new NotFoundException()
+    if (user.refreshToken !== refreshToken) throw new UnauthorizedException()
 
     return payload
   }

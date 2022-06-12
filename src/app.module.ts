@@ -12,6 +12,7 @@ import { EmojiModule } from './modules/emoji/emoji.module'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'path'
 import { MailModule } from './modules/mail/mail.module'
+import { UtilityModule } from './modules/utility/utility.module';
 import * as Joi from 'joi'
 
 @Module({
@@ -49,6 +50,7 @@ import * as Joi from 'joi'
     RoleModule,
     EmojiModule,
     MailModule,
+    UtilityModule,
   ],
   providers: [],
 })

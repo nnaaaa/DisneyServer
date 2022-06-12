@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
+import * as Bcrypt from 'bcrypt'
 import { UserEntity } from 'src/entities/user.entity'
 import {
   FriendStatus,
@@ -16,12 +17,10 @@ import { UserRepository } from 'src/repositories/user.repository'
 import { UserBeFriendRepository } from 'src/repositories/userBeFriend.repository'
 import { FindOptionsWhere } from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
-import { AddFriendDto } from './dtos/addFriend.dto'
-import * as Bcrypt from 'bcrypt'
 import {
   NewPassordWithSMSDto,
   NewPasswordDto,
-  NewPasswordWithComparation,
+  NewPasswordWithComparationDto,
 } from '../auth/dtos/forgetPassword.dto'
 
 @Injectable()
@@ -75,10 +74,12 @@ export class UserService {
       this.userRepository.save(user)
     }
 
-    if (newPasswordDto.constructor.name === NewPasswordWithComparation.name) {
+    if (
+      newPasswordDto.constructor.name === NewPasswordWithComparationDto.name
+    ) {
       if (
         Bcrypt.compareSync(
-          (newPasswordDto as NewPasswordWithComparation).oldPassword,
+          (newPasswordDto as NewPasswordWithComparationDto).oldPassword,
           user.password
         )
       ) {
@@ -89,8 +90,7 @@ export class UserService {
     } else throw new BadRequestException()
   }
 
-  async addFriend(addFriendDto: AddFriendDto) {
-    const { userId, friendId } = addFriendDto
+  async addFriend(userId: string, friendId: string) {
     if (userId === friendId) throw new BadRequestException()
 
     const user = await this.findOne({ userId })
