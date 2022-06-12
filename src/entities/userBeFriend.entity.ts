@@ -12,12 +12,14 @@ export class UserBeFriendEntity {
   @PrimaryColumn('varchar')
   id: string
 
+  @Column({ type: 'enum', enum: FriendStatus, default: FriendStatus.PENDING })
+  status: FriendStatus
+
+  /** @relationship */
   @ManyToOne(() => UserEntity, (user) => user.friends)
   leftUser: UserEntity
 
   @ManyToOne(() => UserEntity, (user) => user.friends)
   rightUser: UserEntity
 
-  @Column({ type: 'enum', enum: FriendStatus, default: FriendStatus.PENDING })
-  status: FriendStatus
 }

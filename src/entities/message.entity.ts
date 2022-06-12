@@ -22,19 +22,22 @@ export class MesssageEntity {
   @Column({ type: 'simple-array' })
   images: string[]
 
+  @CreateDateColumn()
+  createAt: Date
+
+  @UpdateDateColumn()
+  updateAt: Date
+
+  /** @relationship */
   @ManyToOne(() => ChannelEntity, (type) => type.messages)
   channel: ChannelEntity
 
   @ManyToOne(() => UserEntity, (type) => type.sentMessages)
   sender: UserEntity
 
-  // uni-direction
+  /** @unidirection */
   @OneToOne(() => MesssageEntity)
   replyTo: MesssageEntity
 
-  @CreateDateColumn()
-  createAt: Date
-
-  @UpdateDateColumn()
-  updateAt: Date
+  
 }

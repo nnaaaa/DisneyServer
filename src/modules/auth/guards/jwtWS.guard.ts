@@ -1,15 +1,11 @@
 import {
   CanActivate,
-  ExecutionContext,
-  forwardRef,
-  Inject,
-  Injectable,
-  UnauthorizedException,
+  ExecutionContext, Inject,
+  Injectable
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { WsException } from '@nestjs/websockets'
 import { UserService } from 'src/modules/user/user.service'
-import { AuthService } from '../auth.service'
 import { TokenPayload } from '../dtos/TokenPayload.dto'
 
 @Injectable()

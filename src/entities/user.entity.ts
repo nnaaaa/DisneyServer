@@ -9,6 +9,7 @@ import { AbstractEntity } from './abstract.entity'
 import { MesssageEntity } from './message.entity'
 import { UserBeFriendEntity } from './userBeFriend.entity'
 import { UserJoinChannelEntity } from './userJoinChannel.entity'
+import { UserJoinGuildEntity } from './userJoinGuild.entity'
 
 @Entity('user')
 export class UserEntity extends AbstractEntity<UserEntity>{
@@ -68,4 +69,7 @@ export class UserEntity extends AbstractEntity<UserEntity>{
 
   @OneToMany(() => UserJoinChannelEntity, (type) => type.user)
   joinedChannels: UserJoinChannelEntity[]
+
+  @OneToMany(() => UserJoinGuildEntity, (type) => type.user)
+  joinedGuilds: UserJoinGuildEntity[]
 }

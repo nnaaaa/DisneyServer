@@ -1,5 +1,6 @@
 import { ClassSerializerInterceptor, Logger, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common'
 import {
+  ConnectedSocket,
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
@@ -24,7 +25,7 @@ export class UserGateway {
   @UseGuards(JwtWsGuard)
   @SubscribeMessage('getProfile')
   @UseInterceptors(ClassSerializerInterceptor)
-  async get(@AuthWSUser() authUser: UserEntity) {
+  async get(@ConnectedSocket() client, @AuthWSUser() authUser: UserEntity) {
     try {
       await this.userService.updateOne(
         { userId: authUser.userId },
@@ -51,6 +52,48 @@ export class UserGateway {
       this.server.emit(
         `${UserSocketEvent.ADD_FRIEND}/${beFriend.rightUser.userId}`,
         beFriend
+      )
+      this.server.emit(
+        `${UserSocketEvent.ADD_FRIEND}/${beFriend.leftUser.userId}`,
+        beFriend
+      )
+    }
+    catch (e) {
+      this.logger.error(e)
+    }
+  }
+
+  @UseGuards(JwtWsGuard)
+  @SubscribeMessage('acceptFriend')
+  async acceptFriend(@MessageBody() friendId: string, @AuthWSUser() authUser: UserEntity) {
+    try {
+      const beFriend = await this.userService.acceptFriend(authUser.userId, friendId)
+      this.server.emit(
+        `${UserSocketEvent.ACCEPT_FRIEND}/${beFriend.rightUser.userId}`,
+        beFriend
+      )
+      this.server.emit(
+        `${UserSocketEvent.ACCEPT_FRIEND}/${beFriend.leftUser.userId}`,
+        beFriend
+      )
+    }
+    catch (e) {
+      this.logger.error(e)
+    }
+  }
+
+  @UseGuards(JwtWsGuard)
+  @SubscribeMessage('blockFriend')
+  async block(@MessageBody() friendId: string, @AuthWSUser() authUser: UserEntity) {
+    try {
+      const blockedFriend = await this.userService.blockFriend(authUser.userId, friendId)
+      this.server.emit(
+        `${UserSocketEvent.BLOCK_FRIEND}/${blockedFriend.rightUser.userId}`,
+        blockedFriend
+      )
+      this.server.emit(
+        `${UserSocketEvent.BLOCK_FRIEND}/${blockedFriend.leftUser.userId}`,
+        blockedFriend
       )
     }
     catch (e) {
