@@ -1,7 +1,9 @@
 import {
   Column,
-  Entity, ManyToOne, OneToMany,
-  PrimaryGeneratedColumn
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm'
 import { ChannelCategoryEntity } from './channelCategory.entity'
 import { MesssageEntity } from './message.entity'
@@ -23,6 +25,6 @@ export class ChannelEntity {
   @OneToMany(() => UserJoinChannelEntity, (type) => type.user)
   members: UserEntity[]
 
-  @ManyToOne(() => ChannelCategoryEntity,type=>type.channels)
+  @ManyToOne(() => ChannelCategoryEntity, (type) => type.channels)
   category: ChannelCategoryEntity
 }

@@ -46,16 +46,20 @@ export class AuthService {
 
     await this.userService.create(userRegisterDto, digitCode)
 
-    // await this.mailService.registerConfirm(userRegisterDto, digitCode)
+    await this.mailService.registerConfirm(userRegisterDto, digitCode)
   }
 
   async createAuthChangePassword({ account }: ForgetPasswordDto) {
     const digitCode = Algorithm.generateSMS(6)
 
-    await this.userService.updateOne(
-      { account },
-      { changePwdVerfiyCode: digitCode }
-    )
+    const user = await this.userService.findOne({ account },{userId:true,account:true,registerVerifyCode:true,changePwdVerfiyCode:true})
+    
+    if (!user) throw new NotFoundException()
+
+    if (user.registerVerifyCode) throw new UnauthorizedException()
+
+    user.changePwdVerfiyCode = digitCode
+    await this.userService.save(user)
 
     await this.mailService.changePasswordConfirm(account, digitCode)
   }
@@ -67,7 +71,10 @@ export class AuthService {
 
     if (!digitCode) throw new ForbiddenException()
 
-    const user = await this.userService.findOne({ account })
+    const user = await this.userService.findOne(
+      { account },
+      { userId: true, password: true, changePwdVerfiyCode: true }
+    )
 
     if (!user) throw new NotFoundException()
 
@@ -76,7 +83,10 @@ export class AuthService {
   }
 
   async verifyAuthUserToRegister({ account, digitCode }: VerifyAuthUserDto) {
-    const user = await this.userService.findOne({ account })
+    const user = await this.userService.findOne(
+      { account },
+      { userId: true, registerVerifyCode: true }
+    )
 
     if (!user) throw new NotFoundException()
 
@@ -94,9 +104,15 @@ export class AuthService {
   ) {
     const { account } = newPassordWithComparation
 
-    const user = await this.userService.findOne({ account })
+    const user = await this.userService.findOne(
+      { account },
+      { userId: true, password: true,registerVerifyCode:true }
+    )
 
     if (!user) throw new NotFoundException()
+
+    if (user.registerVerifyCode) throw new UnauthorizedException()
+
     await this.userService.changePassword(newPassordWithComparation, user)
   }
 

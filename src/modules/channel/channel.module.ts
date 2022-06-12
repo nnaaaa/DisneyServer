@@ -8,6 +8,6 @@ import { ChannelService } from './channel.service'
 @Module({
   imports: [TypeOrmModule.forFeature([ChannelEntity, UserJoinChannelEntity])],
   providers: [ChannelGateway, ChannelService],
-  exports: [TypeOrmModule]
+  exports: [TypeOrmModule],
 })
-export class ChannelModule { }
+export class ChannelModule {}

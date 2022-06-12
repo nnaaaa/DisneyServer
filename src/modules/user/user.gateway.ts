@@ -1,15 +1,25 @@
-import { ClassSerializerInterceptor, Logger, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common'
+import {
+  ClassSerializerInterceptor,
+  Logger,
+  UseGuards,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common'
 import {
   ConnectedSocket,
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
-  WebSocketServer
+  WebSocketServer,
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
 import { AuthWSUser } from 'src/decorators/auth-user.decorator'
 import { UserEntity } from 'src/entities/user.entity'
-import { ChannelSocketEvent, UserSocketEvent } from 'src/shared/socket.event.constant'
+import {
+  ChannelSocketEvent,
+  UserSocketEvent,
+} from 'src/shared/socket.event.constant'
 import { JwtWsGuard } from '../auth/guards/jwtWS.guard'
 import { UpdateProfileDto } from './dtos/updateProfile.dto'
 import { UserService } from './user.service'
@@ -20,12 +30,11 @@ export class UserGateway {
   @WebSocketServer()
   public readonly server: Server
 
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService) {}
 
   @UseGuards(JwtWsGuard)
   @SubscribeMessage('getProfile')
-  @UseInterceptors(ClassSerializerInterceptor)
-  async get(@ConnectedSocket() client, @AuthWSUser() authUser: UserEntity) {
+  async get(@AuthWSUser() authUser: UserEntity) {
     try {
       await this.userService.updateOne(
         { userId: authUser.userId },
@@ -37,18 +46,24 @@ export class UserGateway {
       for (const friend of user.friends)
         this.server.emit(`${UserSocketEvent.ONLINE}/${friend.id}`)
 
-      return new UserEntity(user)
-    }
-    catch (e) {
+      return user
+    } catch (e) {
       this.logger.error(e)
     }
   }
 
   @UseGuards(JwtWsGuard)
   @SubscribeMessage('addFriend')
-  async addFriend(@MessageBody() friendId: string, @AuthWSUser() authUser: UserEntity) {
+  @UseInterceptors(ClassSerializerInterceptor)
+  async addFriend(
+    @MessageBody() friendId: string,
+    @AuthWSUser() authUser: UserEntity
+  ) {
     try {
-      const beFriend = await this.userService.addFriend(authUser.userId, friendId)
+      const beFriend = await this.userService.addFriend(
+        authUser.userId,
+        friendId
+      )
       this.server.emit(
         `${UserSocketEvent.ADD_FRIEND}/${beFriend.rightUser.userId}`,
         beFriend
@@ -57,17 +72,23 @@ export class UserGateway {
         `${UserSocketEvent.ADD_FRIEND}/${beFriend.leftUser.userId}`,
         beFriend
       )
-    }
-    catch (e) {
+      return beFriend
+    } catch (e) {
       this.logger.error(e)
     }
   }
 
   @UseGuards(JwtWsGuard)
   @SubscribeMessage('acceptFriend')
-  async acceptFriend(@MessageBody() friendId: string, @AuthWSUser() authUser: UserEntity) {
+  async acceptFriend(
+    @MessageBody() friendId: string,
+    @AuthWSUser() authUser: UserEntity
+  ) {
     try {
-      const beFriend = await this.userService.acceptFriend(authUser.userId, friendId)
+      const beFriend = await this.userService.acceptFriend(
+        authUser.userId,
+        friendId
+      )
       this.server.emit(
         `${UserSocketEvent.ACCEPT_FRIEND}/${beFriend.rightUser.userId}`,
         beFriend
@@ -76,17 +97,22 @@ export class UserGateway {
         `${UserSocketEvent.ACCEPT_FRIEND}/${beFriend.leftUser.userId}`,
         beFriend
       )
-    }
-    catch (e) {
+    } catch (e) {
       this.logger.error(e)
     }
   }
 
   @UseGuards(JwtWsGuard)
   @SubscribeMessage('blockFriend')
-  async block(@MessageBody() friendId: string, @AuthWSUser() authUser: UserEntity) {
+  async block(
+    @MessageBody() friendId: string,
+    @AuthWSUser() authUser: UserEntity
+  ) {
     try {
-      const blockedFriend = await this.userService.blockFriend(authUser.userId, friendId)
+      const blockedFriend = await this.userService.blockFriend(
+        authUser.userId,
+        friendId
+      )
       this.server.emit(
         `${UserSocketEvent.BLOCK_FRIEND}/${blockedFriend.rightUser.userId}`,
         blockedFriend
@@ -95,8 +121,7 @@ export class UserGateway {
         `${UserSocketEvent.BLOCK_FRIEND}/${blockedFriend.leftUser.userId}`,
         blockedFriend
       )
-    }
-    catch (e) {
+    } catch (e) {
       this.logger.error(e)
     }
   }
@@ -105,7 +130,8 @@ export class UserGateway {
   @SubscribeMessage('updateProfile')
   @UsePipes(new ValidationPipe())
   async update(
-    @AuthWSUser() authUser: UserEntity, @MessageBody() newProfile: UpdateProfileDto
+    @AuthWSUser() authUser: UserEntity,
+    @MessageBody() newProfile: UpdateProfileDto
   ) {
     try {
       await this.userService.updateOne({ userId: authUser.userId }, newProfile)
@@ -116,8 +142,7 @@ export class UserGateway {
         this.server.emit(
           `${ChannelSocketEvent.MEMBER_ONLINE}/${joinedChannel.channel}`
         )
-    }
-    catch (e) {
+    } catch (e) {
       this.logger.error(e)
     }
   }

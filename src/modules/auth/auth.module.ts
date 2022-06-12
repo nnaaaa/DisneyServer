@@ -15,12 +15,7 @@ import { LocalStrategy } from './strategies/local.strategy'
 import { RefreshTokenStrategy } from './strategies/refresh.strategy'
 
 @Module({
-  imports: [
-    UtilityModule,
-    PassportModule,
-    UserModule,
-    MailModule,
-  ],
+  imports: [UtilityModule, PassportModule, UserModule, MailModule],
   providers: [
     UserService,
     MailService,

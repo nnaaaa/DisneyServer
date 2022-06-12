@@ -1,6 +1,8 @@
 import {
-  CacheInterceptor, Controller, UseGuards,
-  UseInterceptors
+  CacheInterceptor,
+  Controller,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common'
 import { ApiBearerAuth } from '@nestjs/swagger'
 import { JwtGuard } from 'src/modules/auth/guards/jwt.guard'
@@ -9,6 +11,4 @@ import { JwtGuard } from 'src/modules/auth/guards/jwt.guard'
 @UseInterceptors(CacheInterceptor)
 @ApiBearerAuth()
 @UseGuards(JwtGuard)
-export class UserController {
-  
-}
+export class UserController {}

@@ -21,5 +21,4 @@ export class UserBeFriendEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.friends)
   rightUser: UserEntity
-
 }

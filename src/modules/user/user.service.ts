@@ -15,7 +15,11 @@ import {
 import { UserRegisterDto } from 'src/modules/auth/dtos/userRegister.dto'
 import { UserRepository } from 'src/repositories/user.repository'
 import { UserBeFriendRepository } from 'src/repositories/userBeFriend.repository'
-import { FindOptionsWhere } from 'typeorm'
+import {
+  FindOptionsSelect,
+  FindOptionsSelectByString,
+  FindOptionsWhere,
+} from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import {
   NewPassordWithSMSDto,
@@ -31,11 +35,15 @@ export class UserService {
     private userBeFriendRepository: UserBeFriendRepository
   ) {}
 
+  async save(user: UserEntity) {
+    return await this.userRepository.save(user)
+  }
+
   async create(user: UserRegisterDto, verifyCode: number) {
     const newUser = this.userRepository.create(user)
     const salt = await Bcrypt.genSalt()
     newUser.password = await Bcrypt.hash(newUser.password, salt)
-    // newUser.registerVerifyCode = verifyCode
+    newUser.registerVerifyCode = verifyCode
 
     return await this.userRepository.save(newUser)
   }
@@ -51,7 +59,10 @@ export class UserService {
     }
   }
 
-  async findOne(findCondition: FindOptionsWhere<UserEntity>) {
+  async findOne(
+    findCondition: FindOptionsWhere<UserEntity>,
+    selectFields: FindOptionsSelect<UserEntity> = {}
+  ) {
     return await this.userRepository.findOne({
       relations: {
         friends: true,
@@ -59,6 +70,7 @@ export class UserService {
         sentMessages: true,
       },
       where: findCondition,
+      select: selectFields,
     })
   }
 
@@ -96,12 +108,12 @@ export class UserService {
     const friend = await this.findOne({ userId: friendId })
     if (!user || !friend) throw new NotFoundException()
 
-    const combineKey = this.getBefriendCombineKey(userId,friendId)
+    const combineKey = this.getBefriendCombineKey(userId, friendId)
 
     const beFriendInThePast = await this.userBeFriendRepository.findOne({
       relations: {
         leftUser: true,
-        rightUser: true
+        rightUser: true,
       },
       where: { id: combineKey },
     })
@@ -114,8 +126,7 @@ export class UserService {
     if (user.userId > friend.userId) {
       userBeFriend.leftUser = user
       userBeFriend.rightUser = friend
-    }
-    else {
+    } else {
       userBeFriend.leftUser = friend
       userBeFriend.rightUser = user
     }
@@ -123,8 +134,11 @@ export class UserService {
   }
 
   async addFriend(userId: string, friendId: string) {
-    const { user, friend, beFriendInThePast } = await this.findBeFriend(userId, friendId)
-    
+    const { user, friend, beFriendInThePast } = await this.findBeFriend(
+      userId,
+      friendId
+    )
+
     if (beFriendInThePast) {
       beFriendInThePast.status = FriendStatus.PENDING
       return await this.userBeFriendRepository.save(beFriendInThePast)
@@ -136,7 +150,7 @@ export class UserService {
 
   async acceptFriend(userId: string, friendId: string) {
     const { beFriendInThePast } = await this.findBeFriend(userId, friendId)
-    
+
     if (!beFriendInThePast) throw new NotFoundException()
 
     beFriendInThePast.status = FriendStatus.ACCEPTED
@@ -144,8 +158,11 @@ export class UserService {
   }
 
   async blockFriend(userId: string, friendId: string) {
-    const { user,friend,beFriendInThePast } = await this.findBeFriend(userId, friendId)
-    
+    const { user, friend, beFriendInThePast } = await this.findBeFriend(
+      userId,
+      friendId
+    )
+
     if (!beFriendInThePast) {
       beFriendInThePast.status = FriendStatus.BLOCKED
       return await this.userBeFriendRepository.save(beFriendInThePast)

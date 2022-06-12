@@ -15,7 +15,10 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(account: string, password: string) {
-    const user = await this.useService.findOne({ account })
+    const user = await this.useService.findOne(
+      { account },
+      { userId: true, account: true, password: true, registerVerifyCode: true }
+    )
     if (!user) throw new NotFoundException()
 
     const isMatch = await Bcrypt.compare(password, user.password)

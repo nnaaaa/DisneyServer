@@ -38,6 +38,4 @@ export class MesssageEntity {
   /** @unidirection */
   @OneToOne(() => MesssageEntity)
   replyTo: MesssageEntity
-
-  
 }

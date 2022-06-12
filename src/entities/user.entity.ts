@@ -2,8 +2,9 @@ import { Exclude } from 'class-transformer'
 import {
   Column,
   CreateDateColumn,
-  Entity, OneToMany,
-  PrimaryGeneratedColumn
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm'
 import { AbstractEntity } from './abstract.entity'
 import { MesssageEntity } from './message.entity'
@@ -12,7 +13,7 @@ import { UserJoinChannelEntity } from './userJoinChannel.entity'
 import { UserJoinGuildEntity } from './userJoinGuild.entity'
 
 @Entity('user')
-export class UserEntity extends AbstractEntity<UserEntity>{
+export class UserEntity extends AbstractEntity<UserEntity> {
   @PrimaryGeneratedColumn('uuid')
   userId: string
 
@@ -34,29 +35,27 @@ export class UserEntity extends AbstractEntity<UserEntity>{
   @Column({ default: true, type: 'bool' })
   isOnline: boolean
 
-
   /**
    * @exclude fields can't be send to client have to slice
    * **/
-  @Exclude()
-  @Column()
+  // @Exclude()
+  @Column({ select: false })
   password: string
 
-  @Exclude()
-  @Column({ default: null })
+  // @Exclude()
+  @Column({ nullable: true, select: false })
   refreshToken: string
 
-  @Exclude()
-  @Column({ type: 'bigint', nullable: true })
+  // @Exclude()
+  @Column({ type: 'bigint', nullable: true, select: false })
   registerVerifyCode: number
 
-  @Exclude()
-  @Column({ type: 'bigint', nullable: true })
+  // @Exclude()
+  @Column({ type: 'bigint', nullable: true, select: false })
   changePwdVerfiyCode: number
 
-
   /**
-   * @relationship 
+   * @relationship
    * **/
   @OneToMany(
     () => UserBeFriendEntity,

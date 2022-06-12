@@ -10,10 +10,7 @@ import { UserService } from './user.service'
 @Module({
   imports: [
     UtilityModule,
-    TypeOrmModule.forFeature([
-      UserEntity,
-      UserBeFriendEntity,
-    ]),
+    TypeOrmModule.forFeature([UserEntity, UserBeFriendEntity]),
   ],
   providers: [UserService, UserGateway],
   controllers: [UserController],

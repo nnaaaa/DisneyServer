@@ -1,7 +1,8 @@
 import {
   CanActivate,
-  ExecutionContext, Inject,
-  Injectable
+  ExecutionContext,
+  Inject,
+  Injectable,
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { WsException } from '@nestjs/websockets'
@@ -30,8 +31,10 @@ export class JwtWsGuard implements CanActivate {
 
       if (!accessToken) throw new WsException('No token')
       const tokenPayload: TokenPayload = this.jwtService.verify(accessToken)
-      
-      const user = await this.userService.findOne({ userId: tokenPayload.userId })
+
+      const user = await this.userService.findOne({
+        userId: tokenPayload.userId,
+      })
       if (!user) throw new WsException('Not found user')
 
       client.user = user

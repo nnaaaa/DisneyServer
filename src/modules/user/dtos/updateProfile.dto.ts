@@ -11,7 +11,6 @@ export class UpdateProfileDto extends OmitType(UserEntity, [
   'lastLogin',
   'refreshToken',
 ]) {
-
   avatarUrl: string
 
   name: string
