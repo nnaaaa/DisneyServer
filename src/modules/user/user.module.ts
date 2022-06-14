@@ -14,6 +14,6 @@ import { UserService } from './user.service'
   ],
   providers: [UserService, UserGateway],
   controllers: [UserController],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, UserService],
 })
 export class UserModule {}

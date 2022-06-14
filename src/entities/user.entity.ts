@@ -1,4 +1,5 @@
 import { Exclude } from 'class-transformer'
+import { Constant } from 'src/shared/constant'
 import {
   Column,
   CreateDateColumn,
@@ -23,10 +24,7 @@ export class UserEntity extends AbstractEntity<UserEntity> {
   @Column()
   name: string
 
-  @Column({
-    default:
-      'https://i.pinimg.com/474x/7c/8f/47/7c8f476123d28d103efe381543274c25.jpg',
-  })
+  @Column({ default: Constant.defaultUserAvatar })
   avatarUrl: string
 
   @CreateDateColumn()
@@ -59,16 +57,17 @@ export class UserEntity extends AbstractEntity<UserEntity> {
    * **/
   @OneToMany(
     () => UserBeFriendEntity,
-    (beFriend) => beFriend.leftUser || beFriend.rightUser
+    (beFriend) => beFriend.leftUser || beFriend.rightUser,
+    { cascade: true }
   )
   friends: UserBeFriendEntity[]
 
-  @OneToMany(() => MesssageEntity, (type) => type.sender)
+  @OneToMany(() => MesssageEntity, (type) => type.sender,{ cascade: true })
   sentMessages: MesssageEntity[]
 
-  @OneToMany(() => UserJoinChannelEntity, (type) => type.user)
+  @OneToMany(() => UserJoinChannelEntity, (type) => type.user,{ cascade: true })
   joinedChannels: UserJoinChannelEntity[]
 
-  @OneToMany(() => UserJoinGuildEntity, (type) => type.user)
+  @OneToMany(() => UserJoinGuildEntity, (type) => type.user,{ cascade: true })
   joinedGuilds: UserJoinGuildEntity[]
 }

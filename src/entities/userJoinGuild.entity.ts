@@ -1,4 +1,5 @@
 import {
+  Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
@@ -15,10 +16,20 @@ export class UserJoinGuildEntity {
   @CreateDateColumn()
   joinAt: Date
 
-  /** @relationship */
-  @ManyToOne(() => UserEntity, (type) => type.joinedChannels)
-  user: string
+  @Column()
+  nickname: string
 
-  @ManyToOne(() => GuildEntity, (type) => type.members)
-  guild: string
+  @Column({ nullable: true })
+  avatarUrl: string
+
+  /** @relationship */
+  @ManyToOne(() => UserEntity, (type) => type.joinedGuilds, {
+    onDelete: 'CASCADE',
+  })
+  user: UserEntity
+
+  @ManyToOne(() => GuildEntity, (type) => type.members, {
+    onDelete: 'CASCADE'
+  })
+  guild: GuildEntity
 }
