@@ -16,9 +16,9 @@ export class UserBeFriendEntity {
   status: FriendStatus
 
   /** @relationship */
-  @ManyToOne(() => UserEntity, (user) => user.friends)
+  @ManyToOne(() => UserEntity, (user) => user.friends, { onDelete: 'CASCADE' })
   leftUser: UserEntity
 
-  @ManyToOne(() => UserEntity, (user) => user.friends)
+  @ManyToOne(() => UserEntity, (user) => user.friends, { onDelete: 'CASCADE' })
   rightUser: UserEntity
 }

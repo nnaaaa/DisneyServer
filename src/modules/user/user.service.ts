@@ -15,11 +15,7 @@ import {
 import { UserRegisterDto } from 'src/modules/auth/dtos/userRegister.dto'
 import { UserRepository } from 'src/repositories/user.repository'
 import { UserBeFriendRepository } from 'src/repositories/userBeFriend.repository'
-import {
-  FindOptionsSelect,
-  FindOptionsSelectByString,
-  FindOptionsWhere,
-} from 'typeorm'
+import { FindOptionsSelect, FindOptionsWhere } from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import {
   NewPassordWithSMSDto,
@@ -29,6 +25,14 @@ import {
 
 @Injectable()
 export class UserService {
+  public readonly beFriendRelations = {
+    leftUser: true,
+    rightUser: true,
+  }
+  public readonly userRelations = {
+    friends: this.beFriendRelations,
+  }
+
   constructor(
     @InjectRepository(UserEntity) private userRepository: UserRepository,
     @InjectRepository(UserBeFriendEntity)
@@ -43,9 +47,9 @@ export class UserService {
     const newUser = this.userRepository.create(user)
     const salt = await Bcrypt.genSalt()
     newUser.password = await Bcrypt.hash(newUser.password, salt)
-    newUser.registerVerifyCode = verifyCode
+    // newUser.registerVerifyCode = verifyCode
 
-    return await this.userRepository.save(newUser)
+    return await this.save(newUser)
   }
 
   async updateOne(
@@ -64,11 +68,7 @@ export class UserService {
     selectFields: FindOptionsSelect<UserEntity> = {}
   ) {
     return await this.userRepository.findOne({
-      relations: {
-        friends: true,
-        joinedChannels: true,
-        sentMessages: true,
-      },
+      relations: this.userRelations,
       where: findCondition,
       select: selectFields,
     })
@@ -79,7 +79,7 @@ export class UserService {
       const salt = await Bcrypt.genSalt()
       user.password = await Bcrypt.hash(newPasswordDto.newPassword, salt)
       user.changePwdVerfiyCode = null
-      this.userRepository.save(user)
+      this.save(user)
     }
 
     if (
@@ -101,6 +101,9 @@ export class UserService {
   private getBefriendCombineKey(userId: string, friendId: string) {
     return userId > friendId ? userId + friendId : friendId + userId
   }
+  private async saveBeFriend(beFriend: UserBeFriendEntity) {
+    return await this.userBeFriendRepository.save(beFriend)
+  }
   private async findBeFriend(userId: string, friendId: string) {
     if (userId === friendId) throw new BadRequestException()
 
@@ -111,10 +114,7 @@ export class UserService {
     const combineKey = this.getBefriendCombineKey(userId, friendId)
 
     const beFriendInThePast = await this.userBeFriendRepository.findOne({
-      relations: {
-        leftUser: true,
-        rightUser: true,
-      },
+      relations: this.beFriendRelations,
       where: { id: combineKey },
     })
     return { user, friend, beFriendInThePast }
@@ -145,7 +145,7 @@ export class UserService {
     }
 
     const userBeFriend = await this.createBeFriend(user, friend)
-    return await this.userBeFriendRepository.save(userBeFriend)
+    return await this.saveBeFriend(userBeFriend)
   }
 
   async acceptFriend(userId: string, friendId: string) {
@@ -154,7 +154,7 @@ export class UserService {
     if (!beFriendInThePast) throw new NotFoundException()
 
     beFriendInThePast.status = FriendStatus.ACCEPTED
-    return await this.userBeFriendRepository.save(beFriendInThePast)
+    return await this.saveBeFriend(beFriendInThePast)
   }
 
   async blockFriend(userId: string, friendId: string) {
@@ -165,11 +165,11 @@ export class UserService {
 
     if (!beFriendInThePast) {
       beFriendInThePast.status = FriendStatus.BLOCKED
-      return await this.userBeFriendRepository.save(beFriendInThePast)
+      return await this.saveBeFriend(beFriendInThePast)
     }
 
     const userBeFriend = await this.createBeFriend(user, friend)
     userBeFriend.status = FriendStatus.BLOCKED
-    return await this.userBeFriendRepository.save(userBeFriend)
+    return await this.saveBeFriend(userBeFriend)
   }
 }

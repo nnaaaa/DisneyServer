@@ -29,13 +29,17 @@ export class MesssageEntity {
   updateAt: Date
 
   /** @relationship */
-  @ManyToOne(() => ChannelEntity, (type) => type.messages)
+  @ManyToOne(() => ChannelEntity, (type) => type.messages, {
+    onDelete: 'CASCADE',
+  })
   channel: ChannelEntity
 
-  @ManyToOne(() => UserEntity, (type) => type.sentMessages)
+  @ManyToOne(() => UserEntity, (type) => type.sentMessages, {
+    onDelete: 'CASCADE',
+  })
   sender: UserEntity
 
   /** @unidirection */
-  @OneToOne(() => MesssageEntity)
+  @OneToOne(() => MesssageEntity, { cascade: true })
   replyTo: MesssageEntity
 }

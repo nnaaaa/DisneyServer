@@ -1,20 +1,23 @@
+import { Constant } from 'src/shared/constant'
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { ChannelCategoryEntity } from './channelCategory.entity'
-import { UserEntity } from './user.entity'
 import { UserJoinGuildEntity } from './userJoinGuild.entity'
 
 @Entity()
 export class GuildEntity {
   @PrimaryGeneratedColumn('uuid')
-  guildlId: string
+  guildId: string
 
   @Column()
   name: string
 
-  /** @relationship */
-  @OneToMany(() => UserJoinGuildEntity, (type) => type.user)
-  members: UserEntity[]
+  @Column({ default: Constant.defaultGuildAvatar })
+  avatarUrl: string
 
-  @OneToMany(() => ChannelCategoryEntity, (type) => type.guild)
+  /** @relationship */
+  @OneToMany(() => UserJoinGuildEntity, (type) => type.guild, { cascade: true })
+  members: UserJoinGuildEntity[]
+
+  @OneToMany(() => ChannelCategoryEntity, (type) => type.guild, { cascade: true })
   categories: ChannelCategoryEntity[]
 }

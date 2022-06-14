@@ -1,32 +1,15 @@
-import { ApiProperty, OmitType } from '@nestjs/swagger'
-import { IsEmpty, IsNotEmpty } from 'class-validator'
-import { UserEntity } from 'src/entities/user.entity'
+import { IsBoolean, IsOptional, IsString, IsUrl } from 'class-validator'
 
-export class UpdateProfileDto extends OmitType(UserEntity, [
-  'userId',
-  'account',
-  'password',
-  'changePwdVerfiyCode',
-  'registerVerifyCode',
-  'lastLogin',
-  'refreshToken',
-]) {
+export class UpdateProfileDto {
+  @IsOptional()
+  @IsUrl()
   avatarUrl: string
 
+  @IsOptional()
+  @IsString()
   name: string
 
+  @IsOptional()
+  @IsBoolean()
   isOnline: boolean
-
-  @IsEmpty()
-  password: string
-  @IsEmpty()
-  account: string
-  @IsEmpty()
-  userId: string
-  @IsEmpty()
-  changePwdVerfiyCode: number
-  @IsEmpty()
-  registerVerifyCode: number
-  @IsEmpty()
-  accorefreshTokenunt: string
 }

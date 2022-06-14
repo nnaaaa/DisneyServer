@@ -42,18 +42,26 @@ export class AuthService {
     })
     if (user) throw new ForbiddenException()
 
-    const digitCode = Algorithm.generateSMS(6)
+    const digitCode = Algorithm.generateDigit(6)
 
     await this.userService.create(userRegisterDto, digitCode)
 
-    await this.mailService.registerConfirm(userRegisterDto, digitCode)
+    // await this.mailService.registerConfirm(userRegisterDto, digitCode)
   }
 
   async createAuthChangePassword({ account }: ForgetPasswordDto) {
-    const digitCode = Algorithm.generateSMS(6)
+    const digitCode = Algorithm.generateDigit(6)
 
-    const user = await this.userService.findOne({ account },{userId:true,account:true,registerVerifyCode:true,changePwdVerfiyCode:true})
-    
+    const user = await this.userService.findOne(
+      { account },
+      {
+        userId: true,
+        account: true,
+        registerVerifyCode: true,
+        changePwdVerfiyCode: true,
+      }
+    )
+
     if (!user) throw new NotFoundException()
 
     if (user.registerVerifyCode) throw new UnauthorizedException()
@@ -106,7 +114,7 @@ export class AuthService {
 
     const user = await this.userService.findOne(
       { account },
-      { userId: true, password: true,registerVerifyCode:true }
+      { userId: true, password: true, registerVerifyCode: true }
     )
 
     if (!user) throw new NotFoundException()

@@ -16,9 +16,13 @@ export class UserJoinChannelEntity {
   joinAt: Date
 
   /** @relationship */
-  @ManyToOne(() => UserEntity, (type) => type.joinedChannels)
+  @ManyToOne(() => UserEntity, (type) => type.joinedChannels, {
+    onDelete: 'CASCADE',
+  })
   user: string
 
-  @ManyToOne(() => ChannelEntity, (type) => type.members)
+  @ManyToOne(() => ChannelEntity, (type) => type.members, {
+    onDelete: 'CASCADE',
+  })
   channel: string
 }

@@ -7,7 +7,6 @@ import {
 } from 'typeorm'
 import { ChannelCategoryEntity } from './channelCategory.entity'
 import { MesssageEntity } from './message.entity'
-import { UserEntity } from './user.entity'
 import { UserJoinChannelEntity } from './userJoinChannel.entity'
 
 @Entity()
@@ -19,12 +18,14 @@ export class ChannelEntity {
   name: string
 
   /** @relationship */
-  @OneToMany(() => MesssageEntity, (type) => type.channel)
+  @OneToMany(() => MesssageEntity, (type) => type.channel, { cascade: true })
   messages: MesssageEntity[]
 
-  @OneToMany(() => UserJoinChannelEntity, (type) => type.user)
-  members: UserEntity[]
+  @OneToMany(() => UserJoinChannelEntity, (type) => type.user, { cascade: true })
+  members: UserJoinChannelEntity[]
 
-  @ManyToOne(() => ChannelCategoryEntity, (type) => type.channels)
+  @ManyToOne(() => ChannelCategoryEntity, (type) => type.channels, {
+    onDelete: 'CASCADE',
+  })
   category: ChannelCategoryEntity
 }

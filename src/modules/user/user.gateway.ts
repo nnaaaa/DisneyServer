@@ -72,7 +72,6 @@ export class UserGateway {
         `${UserSocketEvent.ADD_FRIEND}/${beFriend.leftUser.userId}`,
         beFriend
       )
-      return beFriend
     } catch (e) {
       this.logger.error(e)
     }
