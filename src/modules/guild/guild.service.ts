@@ -1,74 +1,32 @@
-import {
-    Inject,
-    Injectable,
-    InternalServerErrorException,
-} from '@nestjs/common'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { GuildEntity } from 'src/entities/guild.entity'
 import { UserEntity } from 'src/entities/user.entity'
-import { UserJoinGuildEntity } from 'src/entities/userJoinGuild.entity'
 import { GuildRepository } from 'src/repositories/guild.repository'
-import { UserJoinGuildRepository } from 'src/repositories/userJoinGuild.repository'
+import { Constant } from 'src/shared/constant'
 import { FindOptionsRelations, FindOptionsWhere } from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { ChannelCategoryService } from '../channel-category/channel-category.service'
-import { ChannelService } from '../channel/channel.service'
+import { GuildMemberService } from '../guild-member/guild-member.service'
+import { RoleService } from '../role/role.service'
+import { ChannelService } from './../channel/channel.service'
 import { CreateGuildDto } from './dtos/createGuild.dto'
 
 @Injectable()
 export class GuildService {
-    public readonly joinGuildRelations: FindOptionsRelations<UserJoinGuildEntity> =
-        {
-            user: true,
-        }
     public readonly guildRelations: FindOptionsRelations<GuildEntity> = {
-        members: this.joinGuildRelations,
-        categories: { channels: true },
+        members: this.guildMemberService.guildMemberRelations,
+        categories: this.channelCtgService.channelCtgRelations,
+        roles: this.roleService.roleRelations,
     }
 
     constructor(
         private channelCtgService: ChannelCategoryService,
         private channelService: ChannelService,
-        @InjectRepository(GuildEntity) private guildRepository: GuildRepository,
-        @InjectRepository(UserJoinGuildEntity)
-        private userJoinGuildRepository: UserJoinGuildRepository
-    ) { }
-
-    async saveJoinGuild(joinGuild: UserJoinGuildEntity) {
-        return await this.userJoinGuildRepository.save(joinGuild)
-    }
-    async createJoinGuild(guild: GuildEntity, user: UserEntity) {
-        const joinGuild = this.userJoinGuildRepository.create({ guild, user })
-        joinGuild.nickname = user.name
-        joinGuild.avatarUrl = user.avatarUrl
-
-        return joinGuild
-    }
-    async updateOneJoinGuild(
-        findCondition: FindOptionsWhere<UserJoinGuildEntity>,
-        updateCondition: QueryDeepPartialEntity<UserJoinGuildEntity>
-    ) {
-        try {
-            await this.userJoinGuildRepository
-                .createQueryBuilder()
-                .update(updateCondition)
-                .where(findCondition)
-                .execute()
-        } catch (e) {
-            throw new InternalServerErrorException(e)
-        }
-    }
-    async deleteJoinGuild(findCondition: FindOptionsWhere<UserJoinGuildEntity>) {
-        try {
-            const joinGuild = await this.userJoinGuildRepository.findOneBy(
-                findCondition
-            )
-            await this.userJoinGuildRepository.remove(joinGuild)
-            return joinGuild
-        } catch (e) {
-            throw new InternalServerErrorException(e)
-        }
-    }
+        private roleService: RoleService,
+        private guildMemberService: GuildMemberService,
+        @InjectRepository(GuildEntity) private guildRepository: GuildRepository
+    ) {}
 
     async saveGuild(guild: GuildEntity) {
         return await this.guildRepository.save(guild)
@@ -82,7 +40,7 @@ export class GuildService {
         })
         return guild
     }
-    async findOneGuild(findCondition: FindOptionsWhere<GuildEntity>) {
+    async findOneGuildWithRelation(findCondition: FindOptionsWhere<GuildEntity>) {
         return await this.guildRepository.findOne({
             relations: this.guildRelations,
             where: findCondition,
@@ -91,7 +49,6 @@ export class GuildService {
 
     async findManyGuild(findCondition: FindOptionsWhere<GuildEntity>) {
         return await this.guildRepository.find({
-            relations: this.guildRelations,
             where: findCondition,
         })
     }
@@ -112,38 +69,92 @@ export class GuildService {
 
     async deleteGuild(findCondition: FindOptionsWhere<GuildEntity>) {
         try {
-            await this.guildRepository
-                .createQueryBuilder()
-                .delete()
-                .where(findCondition)
-                .execute()
+            const guild = await this.findOneGuildWithRelation(findCondition)
+
+            let removeChildren = []
+            for (const ctg of guild.categories) {
+                removeChildren.push(
+                    this.channelService.delete({
+                        category: { categoryId: ctg.categoryId },
+                    })
+                )
+            }
+            removeChildren = removeChildren.concat([
+                this.channelCtgService.delete({
+                    guild: { guildId: guild.guildId },
+                }),
+                this.guildMemberService.delete({
+                    guild: { guildId: guild.guildId },
+                }),
+                this.roleService.delete({ guild: { guildId: guild.guildId } }),
+            ])
+            await Promise.all(removeChildren)
+
+            await this.guildRepository.remove(guild)
         } catch (e) {
             throw new InternalServerErrorException(e)
         }
     }
 
-    async createTemplateGuild(
-        createGuildDto: CreateGuildDto,
-        creator: UserEntity
-    ) {
+    async createTemplateGuild(createGuildDto: CreateGuildDto, creator: UserEntity) {
         const guild = await this.createGuild(createGuildDto, creator)
         const savedGuild = await this.saveGuild(guild)
 
-        const joinGuild = await this.createJoinGuild(savedGuild, creator)
+        const joinedGuild = await this.guildMemberService.create(savedGuild, creator)
+        const savedJoinedGuild = await this.guildMemberService.save(joinedGuild)
+        const role = await this.roleService.createTempleteRole(
+            savedGuild,
+            savedJoinedGuild
+        )
 
-        const templateCategory1 =
-            await this.channelCtgService.createTemplateCategory(
-                { name: 'Category 1' },
-                savedGuild
-            )
-        const templateCategory2 =
-            await this.channelCtgService.createTemplateCategory(
-                { name: 'Category 2' },
-                savedGuild
-            )
+        const category1 = await this.channelCtgService.create(
+            { name: 'Category 1' },
+            savedGuild
+        )
+        const category2 = await this.channelCtgService.create(
+            { name: 'Category 2' },
+            savedGuild
+        )
 
-        savedGuild.categories = [templateCategory1, templateCategory2]
-        savedGuild.members = [joinGuild]
+        const savedCategory1 = await this.channelCtgService.save(category1)
+        const savedCategory2 = await this.channelCtgService.save(category2)
+
+        const channelLobby1 = await this.channelService.create(
+            { name: 'lobby' },
+            category1
+        )
+        channelLobby1.roles = [role]
+        channelLobby1.members = [savedJoinedGuild]
+
+        const channelDoc1 = await this.channelService.create(
+            { name: 'document' },
+            category1
+        )
+        channelDoc1.roles = [role]
+        channelDoc1.members = [savedJoinedGuild]
+
+        const channelLobby2 = await this.channelService.create(
+            { name: 'lobby' },
+            category2
+        )
+        channelLobby2.roles = [role]
+        channelLobby2.members = [savedJoinedGuild]
+
+        const channelDoc2 = await this.channelService.create(
+            { name: 'document' },
+            category2
+        )
+        channelDoc2.roles = [role]
+        channelDoc2.members = [savedJoinedGuild]
+
+        category1.channels = [channelLobby1, channelDoc1]
+        category2.channels = [channelLobby2, channelDoc2]
+
+        savedGuild.categories = [savedCategory1, savedCategory2]
+
+        savedGuild.members = [savedJoinedGuild]
+
+        savedGuild.roles = [role]
 
         const savedGuildTheSecond = await this.saveGuild(savedGuild)
 
@@ -151,13 +162,30 @@ export class GuildService {
     }
 
     async joinGuild(guildId: string, user: UserEntity) {
-        const guild = await this.findOneGuild({ guildId })
+        const guild = await this.findOneGuildWithRelation({ guildId })
 
-        const joinGuild = await this.createJoinGuild(guild, user)
+        const defaultRoleInThisGuild = await this.roleService.findOneWithReletion({
+            guild: { guildId },
+            name: Constant.everyOneRoleName,
+        })
+
+        const joinGuild = await this.guildMemberService.create(guild, user)
+
+        joinGuild.roles = [defaultRoleInThisGuild]
 
         guild.members.push(joinGuild)
 
+        const savedJoinGuild = await this.guildMemberService.save(joinGuild)
         const savedGuild = await this.saveGuild(guild)
-        return { guild: savedGuild, newMember: joinGuild }
+        
+        return { guild: savedGuild, newMember: savedJoinGuild }
+    }
+    async leaveGuild(userId: string, guildId: string) {
+        const joinGuild = await this.guildMemberService.delete({
+            user: { userId },
+            guild: { guildId },
+        })
+
+        return joinGuild
     }
 }

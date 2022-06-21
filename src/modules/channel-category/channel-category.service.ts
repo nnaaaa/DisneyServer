@@ -17,24 +17,7 @@ export class ChannelCategoryService {
         private channelService: ChannelService,
         @InjectRepository(ChannelCategoryEntity)
         private channelCtgRepository: ChannelCategoryRepository
-    ) { }
-
-    async createTemplateCategory(
-        createChannelCtgDto: CreateChannelCtgDto,
-        guild: GuildEntity
-    ) {
-        const category = await this.create(createChannelCtgDto, guild)
-        const savedCategory = await this.save(category)
-
-        const channel = await this.channelService.createChannel(
-            { name: 'lobby' },
-            savedCategory
-        )
-
-        savedCategory.channels = [channel]
-
-        return savedCategory
-    }
+    ) {}
 
     async save(category: ChannelCategoryEntity) {
         return await this.channelCtgRepository.save(category)
@@ -48,7 +31,7 @@ export class ChannelCategoryService {
         })
         return category
     }
-    async findOne(findCondition: FindOptionsWhere<ChannelCategoryEntity>) {
+    async findOneWithRelation(findCondition: FindOptionsWhere<ChannelCategoryEntity>) {
         return await this.channelCtgRepository.findOne({
             relations: this.channelCtgRelations,
             where: findCondition,
@@ -78,13 +61,46 @@ export class ChannelCategoryService {
 
     async delete(findCondition: FindOptionsWhere<ChannelCategoryEntity>) {
         try {
-            await this.channelCtgRepository
-                .createQueryBuilder()
-                .delete()
-                .where(findCondition)
-                .execute()
+            const category = await this.findOneWithRelation(findCondition)
+
+            const removeChildren = []
+            for (const channel of category.channels)
+                removeChildren.push(this.channelService.delete({ channelId: channel.channelId }))
+            
+            await Promise.all(removeChildren)
+            
+            await this.channelCtgRepository.remove(category)
+
         } catch (e) {
             throw new InternalServerErrorException(e)
         }
     }
+
+    // async createTemplateCategory(
+    //     createChannelCtgDto: CreateChannelCtgDto,
+    //     guild: GuildEntity,
+    //     member: GuildMemberEntity,
+    //     role: RoleEntity
+    // ) {
+    //     const category = await this.create(createChannelCtgDto, guild)
+    //     const savedCategory = await this.save(category)
+
+    //     const channel1 = await this.channelService.createTemplateChannel(
+    //         { name: 'lobby' },
+    //         savedCategory,
+    //         member,
+    //         role
+    //     )
+
+    //     const channel2 = await this.channelService.createTemplateChannel(
+    //         { name: 'document' },
+    //         savedCategory,
+    //         member,
+    //         role
+    //     )
+
+    //     savedCategory.channels = [channel1, channel2]
+
+    //     return savedCategory
+    // }
 }

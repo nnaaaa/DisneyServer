@@ -2,23 +2,23 @@ import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm'
 import { UserEntity } from './user.entity'
 
 export enum FriendStatus {
-  ACCEPTED = 'accepted',
-  PENDING = 'pending',
-  BLOCKED = 'blocked',
+    ACCEPTED = 'accepted',
+    PENDING = 'pending',
+    BLOCKED = 'blocked',
 }
 
 @Entity()
 export class UserBeFriendEntity {
-  @PrimaryColumn('varchar')
-  id: string
+    @PrimaryColumn('varchar')
+    id: string
 
-  @Column({ type: 'enum', enum: FriendStatus, default: FriendStatus.PENDING })
-  status: FriendStatus
+    @Column({ type: 'enum', enum: FriendStatus, default: FriendStatus.PENDING })
+    status: FriendStatus
 
-  /** @relationship */
-  @ManyToOne(() => UserEntity, (user) => user.friends, { onDelete: 'CASCADE' })
-  leftUser: UserEntity
+    /** @relationship */
+    @ManyToOne(() => UserEntity, (user) => user.friends, { onDelete: 'CASCADE' })
+    leftUser: UserEntity
 
-  @ManyToOne(() => UserEntity, (user) => user.friends, { onDelete: 'CASCADE' })
-  rightUser: UserEntity
+    @ManyToOne(() => UserEntity, (user) => user.friends, { onDelete: 'CASCADE' })
+    rightUser: UserEntity
 }

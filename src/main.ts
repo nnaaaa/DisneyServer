@@ -7,29 +7,23 @@ import { join } from 'path'
 import { AppModule } from './app.module'
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule)
-  const configService: ConfigService = app.get(ConfigService)
+    const app = await NestFactory.create<NestExpressApplication>(AppModule)
+    const configService: ConfigService = app.get(ConfigService)
 
-  app.useGlobalPipes(
-    new ValidationPipe({ transform: true, disableErrorMessages: false })
-  )
+    app.useGlobalPipes(
+        new ValidationPipe({ transform: true, disableErrorMessages: false })
+    )
 
-  const config = new DocumentBuilder()
-    .setTitle('Disney Server')
-    .setDescription('Disney API description')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build()
-  const versionAPI = 'api/v1'
-  const document = SwaggerModule.createDocument(app, config)
-  SwaggerModule.setup(versionAPI, app, document)
+    const config = new DocumentBuilder()
+        .setTitle('Disney Server')
+        .setDescription('Disney API description')
+        .setVersion('1.0')
+        .addBearerAuth()
+        .build()
+    const versionAPI = 'api/v1'
+    const document = SwaggerModule.createDocument(app, config)
+    SwaggerModule.setup(versionAPI, app, document)
 
-  console.info(
-    `Documentation: http://${configService.get<string>(
-      'SERVER_HOSTING'
-    )}/${versionAPI}`
-  )
-
-  await app.listen(3000)
+    await app.listen(configService.get('PORT'))
 }
 bootstrap()

@@ -7,16 +7,16 @@ import { TokenPayload } from '../dtos/TokenPayload.dto'
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(configService: ConfigService, private userService: UserService) {
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
-      secretOrKey: configService.get<string>('TOKEN_SECRET_KEY'),
-    })
-  }
-  async validate(payload: TokenPayload) {
-    const user = await this.userService.findOne({ userId: payload.userId })
-    if (!user) throw new NotFoundException()
-    return user
-  }
+    constructor(configService: ConfigService, private userService: UserService) {
+        super({
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            ignoreExpiration: false,
+            secretOrKey: configService.get<string>('TOKEN_SECRET_KEY'),
+        })
+    }
+    async validate(payload: TokenPayload) {
+        const user = await this.userService.findOne({ userId: payload.userId })
+        if (!user) throw new NotFoundException()
+        return user
+    }
 }

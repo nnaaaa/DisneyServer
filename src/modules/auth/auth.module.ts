@@ -15,17 +15,17 @@ import { LocalStrategy } from './strategies/local.strategy'
 import { RefreshTokenStrategy } from './strategies/refresh.strategy'
 
 @Module({
-  imports: [UtilityModule, PassportModule, UserModule, MailModule],
-  providers: [
-    UserService,
-    MailService,
-    ConfigService,
-    AuthService,
-    LocalStrategy,
-    JwtStrategy,
-    RefreshTokenStrategy,
-    FacebookStrategy,
-  ],
-  controllers: [AuthController],
+    imports: [UtilityModule, PassportModule, UserModule, MailModule],
+    providers: [
+        UserService,
+        MailService,
+        ConfigService,
+        AuthService,
+        LocalStrategy,
+        JwtStrategy,
+        RefreshTokenStrategy,
+        FacebookStrategy,
+    ],
+    controllers: [AuthController],
 })
 export class AuthModule {}

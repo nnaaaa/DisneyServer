@@ -3,6 +3,6 @@ import { Server } from 'socket.io'
 
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'message' })
 export class MessageGateway {
-  @WebSocketServer()
-  server: Server
+    @WebSocketServer()
+    server: Server
 }

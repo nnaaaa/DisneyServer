@@ -1,31 +1,43 @@
 import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
+    Column,
+    Entity,
+    JoinTable,
+    ManyToMany,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
 } from 'typeorm'
 import { ChannelCategoryEntity } from './channelCategory.entity'
 import { MesssageEntity } from './message.entity'
-import { UserJoinChannelEntity } from './userJoinChannel.entity'
+import { RoleEntity } from './role.entity'
+import { UserEntity } from './user.entity'
+import { GuildMemberEntity } from './guildMember.entity'
 
 @Entity()
 export class ChannelEntity {
-  @PrimaryGeneratedColumn('uuid')
-  channelId: string
+    @PrimaryGeneratedColumn('uuid')
+    channelId: string
 
-  @Column()
-  name: string
+    @Column()
+    name: string
 
-  /** @relationship */
-  @OneToMany(() => MesssageEntity, (type) => type.channel, { cascade: true })
-  messages: MesssageEntity[]
+    @Column({ default: false, type: 'bool' })
+    isPrivate: boolean
 
-  @OneToMany(() => UserJoinChannelEntity, (type) => type.user, { cascade: true })
-  members: UserJoinChannelEntity[]
+    /** @relationship */
+    @OneToMany(() => MesssageEntity, (type) => type.channel, { cascade: true })
+    messages: MesssageEntity[]
 
-  @ManyToOne(() => ChannelCategoryEntity, (type) => type.channels, {
-    onDelete: 'CASCADE',
-  })
-  category: ChannelCategoryEntity
+    @ManyToMany(() => GuildMemberEntity, (type) => type.joinedChannels, {
+        cascade: true,
+    })
+    @JoinTable()
+    members: GuildMemberEntity[]
+
+    @ManyToOne(() => ChannelCategoryEntity, (type) => type.channels)
+    category: ChannelCategoryEntity
+
+    @ManyToMany(() => RoleEntity, (type) => type.channels, { cascade: true })
+    @JoinTable()
+    roles: RoleEntity[]
 }

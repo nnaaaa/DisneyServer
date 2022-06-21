@@ -1,21 +1,15 @@
-import {
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUrl,
-  IsUUID,
-} from 'class-validator'
+import { IsNotEmpty, IsOptional, IsString, IsUrl, IsUUID } from 'class-validator'
 
 export class UpdateGuildDto {
-  @IsNotEmpty()
-  @IsUUID()
-  guildId: string
+    @IsNotEmpty()
+    @IsUUID()
+    guildId: string
 
-  @IsOptional()
-  @IsString()
-  name: string
+    @IsOptional()
+    @IsString()
+    name?: string
 
-  @IsUrl()
-  @IsOptional()
-  avatarUrl: string
+    @IsUrl()
+    @IsOptional()
+    avatarUrl?: string
 }

@@ -1,4 +1,4 @@
-import { UserJoinGuildEntity } from 'src/entities/userJoinGuild.entity'
+import { GuildMemberEntity } from 'src/entities/guildMember.entity'
 import { Repository } from 'typeorm'
 
-export class UserJoinGuildRepository extends Repository<UserJoinGuildEntity> {}
+export class GuildMemberRepository extends Repository<GuildMemberEntity> {}

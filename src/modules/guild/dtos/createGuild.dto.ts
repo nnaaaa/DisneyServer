@@ -1,11 +1,11 @@
 import { IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator'
 
 export class CreateGuildDto {
-  @IsNotEmpty()
-  @IsString()
-  name: string
+    @IsNotEmpty()
+    @IsString()
+    name: string
 
-  @IsUrl()
-  @IsOptional()
-  avatarUrl: string
+    @IsUrl()
+    @IsOptional()
+    avatarUrl?: string
 }
