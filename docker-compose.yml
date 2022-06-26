@@ -1,20 +1,28 @@
-version: "3.7"
+version: "3.9"
 
 services:
-  server:
-    build: ./server
-    command: npm start
+  gateway:
+    build: ./Gateway
+    command: npm run start:dev
+    volumes:
+      - ./Gateway:/app/Gateway
+      - /app/Gateway/node_modules
     ports:
-      - 5000:5000
+      - ${GATEWAY_PORT}:${GATEWAY_PORT}
     environment:
-      MYSQL_HOST: database
-      MYSQL_USER: root
-      MYSQL_PASSWORD: dummyguys
-      MYSQL_DB: disney
+      DB_HOST: gateway-database
+      DB_PORT: ${GATEWAY_DB_PORT}
+      DB_USER: root
+      DB_PASSWORD: dummyguys
+      DB_DB: disney
+      MESSAGE_BROKER_PORT: ${KAFKA_DOCKER_PORT}
+      MESSAGE_BROKER_HOST: message-broker
     depends_on:
-      - database
+      - message-broker
+      - gateway-database
+      - message-server
 
-  database:
+  gateway-database:
     image: mysql:5.7
     volumes:
       - mysql-data:/var/lib/mysql
@@ -22,17 +30,97 @@ services:
       MYSQL_ROOT_PASSWORD: dummyguys
       MYSQL_DATABASE: disney
 
-  phpmyadmin:
+  gateway-database-manager:
     image: phpmyadmin/phpmyadmin:4.7
     ports:
-      - 8082:80
+      - ${GATEWAY_DB_MANAGER_PORT}:80
     environment:
       MYSQL_ROOT_PASSWORD: dummyguys
-      PMA_HOST: database 
+      PMA_HOST: gateway-database
+      PMA_PORT: ${GATEWAY_DB_PORT}
       PMA_USER: root
       PMA_PASSWORD: dummyguys
+    depends_on:
+      - gateway-database
+
+  message-server:
+    build: ./MessageService
+    command: npm run start:dev
+    volumes:
+      - ./MessageService:/app/MessageService
+      - /app/MessageService/node_modules
+    environment:
+      DB_HOST: message-database
+      DB_PORT: ${MESSAGE_DB_PORT}
+      DB_USER: root
+      DB_PASSWORD: dummyguys
+      DB_DB: disney
+      MESSAGE_BROKER_PORT: ${KAFKA_DOCKER_PORT}
+      MESSAGE_BROKER_HOST: message-broker
+    depends_on:
+      - message-broker
+      - message-database
+  
+  message-database:
+    image: mongo:4.2.21-bionic
+    ports:
+      - ${MESSAGE_DB_PORT}:${MESSAGE_DB_PORT}
+    volumes:
+      - mongodb:/data/db
+      - mongoconfig:/data/configdb
+    environment:
+      MONGO_INITDB_DATABASE: disney
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: dummyguys
+
+  message-database-manager:
+    image: mongo-express:1.0.0-alpha.4
+    ports:
+      - ${MESSAGE_DB_MANAGER_PORT}:${MESSAGE_DB_MANAGER_PORT}
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: dummyguys
+      ME_CONFIG_MONGODB_SERVER: message-database
+      ME_CONFIG_MONGODB_PORT: ${MESSAGE_DB_PORT}
+    depends_on:
+      - message-database
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_DOCKER_PORT}
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:${ZOOKEEPER_DOCKER_PORT}
+  
+  message-broker:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:${ZOOKEEPER_DOCKER_PORT}
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://message-broker:${KAFKA_DOCKER_PORT},PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    stdin_open: true
+    depends_on:
+      - message-broker
+    ports:
+      - 9000:9000
+    environment: 
+      SERVER_PORT: 9000
+      KAFKA_BROKERCONNECT: message-broker:${KAFKA_DOCKER_PORT}
 
 volumes:
   mysql-data:
+  mongodb:
+  mongoconfig:
 
 
