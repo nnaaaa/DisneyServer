@@ -57,7 +57,7 @@ export class UserService {
             let user = await this.findOne(findCondition)
 
             if (!user) throw new NotFoundException()
-            
+
             user = Object.assign(user, updateCondition)
             return await this.userRepository.save(user)
         } catch (e) {

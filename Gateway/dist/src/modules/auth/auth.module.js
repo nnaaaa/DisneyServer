@@ -32,13 +32,13 @@ AuthModule = __decorate([
                 {
                     name: services_1.ServiceName.MESSAGE,
                     useFactory: services_1.Service.messageFactory,
-                    inject: [config_1.ConfigService]
-                }
+                    inject: [config_1.ConfigService],
+                },
             ]),
             utility_module_1.UtilityModule,
             passport_1.PassportModule,
             user_module_1.UserModule,
-            mail_module_1.MailModule
+            mail_module_1.MailModule,
         ],
         providers: [
             user_service_1.UserService,

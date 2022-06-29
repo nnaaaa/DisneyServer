@@ -1,3 +1,3 @@
 export declare class Algorithm {
-    static generateDigit(length: number): number;
+    static generateDigit(length: number): number
 }

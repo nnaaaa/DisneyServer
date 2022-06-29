@@ -9,7 +9,7 @@ import { MessageService } from './message.service';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Message.name, schema: MessageSchema }]),
-    UserModule
+    UserModule,
   ],
   controllers: [MessageController],
   providers: [MessageService, UserService],

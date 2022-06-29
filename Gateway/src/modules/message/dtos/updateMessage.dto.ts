@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator'
 
 export class UpdateMessageDto {
     @IsUUID()
@@ -7,9 +7,9 @@ export class UpdateMessageDto {
 
     @IsString()
     @IsOptional()
-    content: string;
+    content: string
 
     @IsArray()
     @IsOptional()
-    images: string;
+    images: string
 }

@@ -34,7 +34,13 @@ RoleModule = __decorate([
             guild_member_module_1.GuildMemberModule,
             typeorm_1.TypeOrmModule.forFeature([role_entity_1.RoleEntity]),
         ],
-        providers: [guild_member_service_1.GuildMemberService, role_service_1.RoleService, role_gateway_1.RoleGateway, channel_gateway_1.ChannelGateway, guild_gateway_1.GuildGateway],
+        providers: [
+            guild_member_service_1.GuildMemberService,
+            role_service_1.RoleService,
+            role_gateway_1.RoleGateway,
+            channel_gateway_1.ChannelGateway,
+            guild_gateway_1.GuildGateway,
+        ],
         exports: [typeorm_1.TypeOrmModule, role_service_1.RoleService],
     })
 ], RoleModule);

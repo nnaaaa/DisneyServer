@@ -2,15 +2,16 @@ import { Default } from 'src/shared/default'
 import {
     Column,
     CreateDateColumn,
-    Entity, OneToMany,
-    PrimaryGeneratedColumn
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
 } from 'typeorm'
 import { GuildMemberEntity } from './guildMember.entity'
 import { MesssageEntity } from './message.entity'
 import { UserBeFriendEntity } from './userBeFriend.entity'
 
 @Entity('user')
-export class UserEntity{
+export class UserEntity {
     @PrimaryGeneratedColumn('uuid')
     userId: string
 

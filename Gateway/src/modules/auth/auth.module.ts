@@ -22,13 +22,13 @@ import { RefreshTokenStrategy } from './strategies/refresh.strategy'
             {
                 name: ServiceName.MESSAGE,
                 useFactory: Service.messageFactory,
-                inject: [ConfigService]
-            }
+                inject: [ConfigService],
+            },
         ]),
         UtilityModule,
         PassportModule,
         UserModule,
-        MailModule
+        MailModule,
     ],
     providers: [
         UserService,

@@ -1,10 +1,12 @@
-import { ConfigService } from "@nestjs/config";
-import { ClientProvider, Transport } from "@nestjs/microservices";
+import { ConfigService } from '@nestjs/config'
+import { ClientProvider, Transport } from '@nestjs/microservices'
 
-export class Service{
+export class Service {
     static messageFactory(configService: ConfigService): ClientProvider {
-        const messageBrokerUrl = `${configService.get('MESSAGE_BROKER_HOST')}:${configService.get('MESSAGE_BROKER_PORT')}`
-        
+        const messageBrokerUrl = `${configService.get(
+            'MESSAGE_BROKER_HOST'
+        )}:${configService.get('MESSAGE_BROKER_PORT')}`
+
         return {
             transport: Transport.KAFKA,
             options: {
@@ -12,13 +14,13 @@ export class Service{
                     brokers: [messageBrokerUrl],
                 },
                 consumer: {
-                    groupId: 'message-consumer'
-                }
-            }
+                    groupId: 'message-consumer',
+                },
+            },
         }
     }
 }
 
-export enum ServiceName{
-    MESSAGE = 'MESSAGE_SERVICE'
+export enum ServiceName {
+    MESSAGE = 'MESSAGE_SERVICE',
 }

@@ -26,10 +26,10 @@ import { UserModule } from './modules/user/user.module';
     MongooseModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         uri: `mongodb://${configService.get('DB_USER')}:${configService.get(
-          'DB_PASSWORD'
+          'DB_PASSWORD',
         )}@${configService.get('DB_HOST')}:${configService.get(
-          'DB_PORT'
-          )}/${configService.get('DB_DB')}?authSource=admin`,
+          'DB_PORT',
+        )}/${configService.get('DB_DB')}?authSource=admin`,
         useNewUrlParser: true,
         connectionFactory: (connection: Connection) => {
           connection.plugin(require('mongoose-autopopulate'));

@@ -26,8 +26,8 @@ import { UserService } from './user.service'
             {
                 name: ServiceName.MESSAGE,
                 useFactory: Service.messageFactory,
-                inject: [ConfigService]
-            }
+                inject: [ConfigService],
+            },
         ]),
     ],
     providers: [GuildMemberService, UserService, UserGateway, ChannelGateway],

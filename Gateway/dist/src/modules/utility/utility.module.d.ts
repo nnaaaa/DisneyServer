@@ -1,2 +1,1 @@
-export declare class UtilityModule {
-}
+export declare class UtilityModule {}

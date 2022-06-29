@@ -33,7 +33,8 @@ let MessageService = class MessageService {
         return await this.messageRepository.save(message);
     }
     create(createMessageDto, channel, author) {
-        const newMessage = this.messageRepository.create(Object.assign(Object.assign({ images: [] }, createMessageDto), { author, channel }));
+        const newMessage = this.messageRepository.create(Object.assign(Object.assign({ images: [] }, createMessageDto), { author,
+            channel }));
         return newMessage;
     }
     async findOne(findCondition) {

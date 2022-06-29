@@ -6,14 +6,13 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { AppModule } from './app.module'
 
 async function bootstrap() {
-
     const app = await NestFactory.create<NestExpressApplication>(AppModule)
     const configService: ConfigService = app.get(ConfigService)
 
     app.useGlobalPipes(
         new ValidationPipe({ transform: true, disableErrorMessages: false })
     )
-    
+
     const config = new DocumentBuilder()
         .setTitle('Disney Server')
         .setDescription('Disney API description')

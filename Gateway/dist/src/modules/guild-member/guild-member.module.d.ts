@@ -1,2 +1,1 @@
-export declare class GuildMemberModule {
-}
+export declare class GuildMemberModule {}

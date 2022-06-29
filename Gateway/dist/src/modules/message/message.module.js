@@ -28,8 +28,8 @@ MessageModule = __decorate([
                 {
                     name: services_1.ServiceName.MESSAGE,
                     useFactory: services_1.Service.messageFactory,
-                    inject: [config_1.ConfigService]
-                }
+                    inject: [config_1.ConfigService],
+                },
             ]),
             utility_module_1.UtilityModule,
             channel_module_1.ChannelModule,

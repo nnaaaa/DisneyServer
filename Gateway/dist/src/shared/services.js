@@ -12,9 +12,9 @@ class Service {
                     brokers: [messageBrokerUrl],
                 },
                 consumer: {
-                    groupId: 'message-consumer'
-                }
-            }
+                    groupId: 'message-consumer',
+                },
+            },
         };
     }
 }

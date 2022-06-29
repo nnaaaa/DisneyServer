@@ -1,10 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AbstractEntity = void 0;
+'use strict'
+Object.defineProperty(exports, '__esModule', { value: true })
+exports.AbstractEntity = void 0
 class AbstractEntity {
     constructor(partial) {
-        Object.assign(this, partial);
+        Object.assign(this, partial)
     }
 }
-exports.AbstractEntity = AbstractEntity;
+exports.AbstractEntity = AbstractEntity
 //# sourceMappingURL=abstract.entity.js.map

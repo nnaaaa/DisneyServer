@@ -27,7 +27,9 @@ export class MessageService {
   }
 
   async updateOne(updateMessageDto: UpdateMessageDto) {
-    const message = await this.messageModel.findByIdAndUpdate(updateMessageDto._id);
+    const message = await this.messageModel.findByIdAndUpdate(
+      updateMessageDto._id,
+    );
     return message;
   }
 

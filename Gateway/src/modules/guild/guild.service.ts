@@ -26,7 +26,7 @@ export class GuildService {
         private roleService: RoleService,
         private guildMemberService: GuildMemberService,
         @InjectRepository(GuildEntity) private guildRepository: GuildRepository
-    ) { }
+    ) {}
 
     async saveGuild(guild: GuildEntity) {
         return await this.guildRepository.save(guild)

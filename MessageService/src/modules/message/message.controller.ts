@@ -8,8 +8,8 @@ import { MessageService } from './message.service';
 
 @Controller()
 export class MessageController {
-  constructor(private readonly messageService: MessageService) { }
-  
+  constructor(private readonly messageService: MessageService) {}
+
   @MessagePattern(MessagePatternEvent.CREATE)
   @UsePipes(new ValidationPipe({ whitelist: true }))
   async create(@Payload('value') createMessageDto: CreateMessageDto) {
@@ -19,14 +19,12 @@ export class MessageController {
   @MessagePattern(MessagePatternEvent.UPDATE)
   @UsePipes(new ValidationPipe({ whitelist: true }))
   async update(@Payload('value') userUpdateDto: UpdateMessageDto) {
-    const message = await this.messageService.updateOne(userUpdateDto)
-    return message
+    const message = await this.messageService.updateOne(userUpdateDto);
+    return message;
   }
-
 
   @EventPattern(MessagePatternEvent.DELETE)
   async delete(@Payload() _id: string) {
     await this.messageService.deleteOne(_id);
   }
-
 }

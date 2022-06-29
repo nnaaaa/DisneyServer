@@ -23,7 +23,13 @@ import { RoleService } from './role.service'
         GuildMemberModule,
         TypeOrmModule.forFeature([RoleEntity]),
     ],
-    providers: [GuildMemberService, RoleService, RoleGateway, ChannelGateway,GuildGateway],
+    providers: [
+        GuildMemberService,
+        RoleService,
+        RoleGateway,
+        ChannelGateway,
+        GuildGateway,
+    ],
     exports: [TypeOrmModule, RoleService],
 })
 export class RoleModule {}

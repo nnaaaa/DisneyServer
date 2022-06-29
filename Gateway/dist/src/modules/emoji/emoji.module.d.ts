@@ -1,2 +1,1 @@
-export declare class EmojiModule {
-}
+export declare class EmojiModule {}

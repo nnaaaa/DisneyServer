@@ -29,7 +29,7 @@ export class RoleGateway {
         private roleService: RoleService,
         private channelGateway: ChannelGateway,
         private guildGateway: GuildGateway
-    ) { }
+    ) {}
 
     @UseGuards(JwtWsGuard)
     @UsePipes(new ValidationPipe())
@@ -83,7 +83,6 @@ export class RoleGateway {
     async addToMember(@MessageBody() memberRoleDto: MemberRoleDto) {
         try {
             const { member, role } = await this.roleService.addToMember(memberRoleDto)
-            
 
             this.updateNotify(role)
 
@@ -98,8 +97,10 @@ export class RoleGateway {
     @SubscribeMessage(RoleSocketEvent.REMOVE_FROM_MEMBER)
     async removeFromMember(@MessageBody() memberRoleDto: MemberRoleDto) {
         try {
-            const { member, role } = await this.roleService.removeFromMember(memberRoleDto)
-            
+            const { member, role } = await this.roleService.removeFromMember(
+                memberRoleDto
+            )
+
             this.updateNotify(role)
 
             this.guildGateway.memberUpdateNotify(member)
@@ -129,8 +130,10 @@ export class RoleGateway {
     @SubscribeMessage(RoleSocketEvent.REMOVE_FROM_CHANNEL)
     async removeFromChannel(@MessageBody() channelRoleDto: ChannelRoleDto) {
         try {
-            const { role, channel } = await this.roleService.removeFromChannel(channelRoleDto)
-            
+            const { role, channel } = await this.roleService.removeFromChannel(
+                channelRoleDto
+            )
+
             this.updateNotify(role)
 
             this.channelGateway.updateNotify(channel)

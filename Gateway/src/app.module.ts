@@ -31,7 +31,7 @@ import * as Joi from 'joi'
             }),
             inject: [ConfigService],
         }),
-    
+
         ConfigModule.forRoot({
             isGlobal: true,
             validationSchema: Joi.object({

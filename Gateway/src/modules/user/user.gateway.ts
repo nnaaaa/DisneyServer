@@ -1,4 +1,4 @@
-import { instanceToPlain } from 'class-transformer';
+import { instanceToPlain } from 'class-transformer'
 import {
     ClassSerializerInterceptor,
     Inject,

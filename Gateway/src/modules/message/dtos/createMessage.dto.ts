@@ -1,11 +1,11 @@
-import { IsArray, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsOptional, IsString } from 'class-validator'
 
 export class CreateMessageDto {
     @IsString()
     @IsOptional()
-    content: string;
+    content: string
 
     @IsArray()
     @IsOptional()
-    images: string[];
+    images: string[]
 }

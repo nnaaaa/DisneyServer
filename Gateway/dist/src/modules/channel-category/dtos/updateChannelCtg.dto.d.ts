@@ -1,4 +1,4 @@
 export declare class UpdateChannelCtgDto {
-    categoryId: string;
-    name?: string;
+    categoryId: string
+    name?: string
 }

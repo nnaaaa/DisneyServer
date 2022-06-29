@@ -37,6 +37,6 @@ export class MesssageEntity {
     author: UserEntity
 
     /** @unidirection */
-    @OneToOne(() => MesssageEntity, { cascade: true,nullable:true })
+    @OneToOne(() => MesssageEntity, { cascade: true, nullable: true })
     replyTo: MesssageEntity
 }

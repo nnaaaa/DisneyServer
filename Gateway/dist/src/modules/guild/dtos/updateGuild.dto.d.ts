@@ -1,5 +1,5 @@
 export declare class UpdateGuildDto {
-    guildId: string;
-    nickname?: string;
-    avatarUrl?: string;
+    guildId: string
+    nickname?: string
+    avatarUrl?: string
 }

@@ -1,4 +1,4 @@
-export enum UserPatternEvent{
+export enum UserPatternEvent {
     CREATE = 'user-create',
     UPDATE = 'user-update',
 }
@@ -8,4 +8,3 @@ export enum MessagePatternEvent {
     UPDATE = 'message-update',
     DELETE = 'message-delete',
 }
-  

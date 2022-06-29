@@ -115,7 +115,6 @@ export class RoleService {
         await this.save(role)
 
         return { role, member }
-
     }
 
     async addToChannel({ roleId, channelId }: ChannelRoleDto) {

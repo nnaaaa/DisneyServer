@@ -76,9 +76,6 @@ export class ChannelGateway {
     }
 
     updateNotify(channel: ChannelEntity) {
-        this.server.emit(
-            `${ChannelSocketEmit.UPDATE}/${channel.channelId}`,
-            channel
-        )
+        this.server.emit(`${ChannelSocketEmit.UPDATE}/${channel.channelId}`, channel)
     }
 }

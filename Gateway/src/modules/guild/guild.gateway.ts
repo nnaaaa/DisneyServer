@@ -156,7 +156,10 @@ export class GuildGateway {
             }
 
             // emit to all channel which user have joined
-            this.channelGateway.channelMemberNotify(ChannelSocketEmit.USER_JOIN, newMember)
+            this.channelGateway.channelMemberNotify(
+                ChannelSocketEmit.USER_JOIN,
+                newMember
+            )
 
             return { guild, member: newMember }
         } catch (e) {
@@ -174,7 +177,10 @@ export class GuildGateway {
                 guildId
             )
             // emit to guild
-            this.server.emit(`${GuildSocketEmit.MEMBER_LEAVE}/${memberLeaveGuild.guildMemberId}`, memberLeaveGuild)
+            this.server.emit(
+                `${GuildSocketEmit.MEMBER_LEAVE}/${memberLeaveGuild.guildMemberId}`,
+                memberLeaveGuild
+            )
 
             // emit to all channel which user have joined
             this.channelGateway.channelMemberNotify(

@@ -17,8 +17,8 @@ import { MessageService } from './message.service'
             {
                 name: ServiceName.MESSAGE,
                 useFactory: Service.messageFactory,
-                inject: [ConfigService]
-            }
+                inject: [ConfigService],
+            },
         ]),
         UtilityModule,
         ChannelModule,
@@ -26,6 +26,4 @@ import { MessageService } from './message.service'
     ],
     providers: [MessageService, MessageGateway],
 })
-export class MessageModule { }
-
-
+export class MessageModule {}

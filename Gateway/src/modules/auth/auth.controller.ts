@@ -9,7 +9,7 @@ import {
     Req,
     Res,
     UseGuards,
-    UseInterceptors
+    UseInterceptors,
 } from '@nestjs/common'
 import { ClientKafka } from '@nestjs/microservices'
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
@@ -23,7 +23,7 @@ import { AuthService } from './auth.service'
 import {
     ForgetPasswordDto,
     NewPassordWithSMSDto,
-    NewPasswordWithComparationDto
+    NewPasswordWithComparationDto,
 } from './dtos/forgetPassword.dto'
 import { TokenPayload } from './dtos/tokenPayload.dto'
 import { UserLoginDto } from './dtos/userLogin.dto'
@@ -37,7 +37,10 @@ import { RefreshTokenGuard } from './guards/refresh.guard'
 @UseInterceptors(CacheInterceptor)
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService, @Inject(ServiceName.MESSAGE) private messageClient: ClientKafka) { }
+    constructor(
+        private authService: AuthService,
+        @Inject(ServiceName.MESSAGE) private messageClient: ClientKafka
+    ) {}
 
     @Post('login')
     @ApiBody({ required: true, type: UserLoginDto })
@@ -93,14 +96,11 @@ export class AuthController {
 
     @Get('facebook')
     @UseGuards(FacebookGuard)
-    async facebookLogin(): Promise<any> { }
+    async facebookLogin(): Promise<any> {}
 
     @Get('facebook/redirect')
     @UseGuards(FacebookGuard)
-    async facebookLoginRedirect(
-        @Req() req,
-        @Res() res
-    ): Promise<any> {
+    async facebookLoginRedirect(@Req() req, @Res() res): Promise<any> {
         const { accessToken, refreshToken, profile } = req.user
         res.setHeader('accessToken', accessToken)
         // const tokens = await this.authService.getTokens(user.userId)

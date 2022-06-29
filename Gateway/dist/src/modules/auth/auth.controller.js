@@ -151,7 +151,8 @@ AuthController = __decorate([
     (0, common_1.UseInterceptors)(common_1.CacheInterceptor),
     (0, common_1.Controller)('auth'),
     __param(1, (0, common_1.Inject)(services_1.ServiceName.MESSAGE)),
-    __metadata("design:paramtypes", [auth_service_1.AuthService, microservices_1.ClientKafka])
+    __metadata("design:paramtypes", [auth_service_1.AuthService,
+        microservices_1.ClientKafka])
 ], AuthController);
 exports.AuthController = AuthController;
 //# sourceMappingURL=auth.controller.js.map

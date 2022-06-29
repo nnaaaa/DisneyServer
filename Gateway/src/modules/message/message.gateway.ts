@@ -1,14 +1,14 @@
-
-import { Inject, Logger, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
-import { ClientKafka } from '@nestjs/microservices'
-import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets'
-import { plainToInstance } from 'class-transformer'
-import { mergeMap } from 'rxjs'
+import { Logger, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
+import {
+    MessageBody,
+    SubscribeMessage,
+    WebSocketGateway,
+    WebSocketServer,
+    WsException,
+} from '@nestjs/websockets'
 import { Server } from 'socket.io'
 import { AuthWSUser } from 'src/decorators/auth-user.decorator'
-import { Message } from 'src/entities/messageService/message.model'
 import { UserEntity } from 'src/entities/user.entity'
-import { ServiceName } from 'src/shared/services'
 import { MessageSocketEvent } from 'src/shared/socket.event'
 import { JwtWsGuard } from '../auth/guards/jwtWS.guard'
 import { ChannelService } from '../channel/channel.service'
@@ -26,7 +26,7 @@ export class MessageGateway {
     constructor(
         private messageService: MessageService,
         private channelService: ChannelService
-    ) { }
+    ) {}
 
     @UseGuards(JwtWsGuard)
     @SubscribeMessage(MessageSocketEvent.CREATE)
@@ -38,8 +38,12 @@ export class MessageGateway {
     ) {
         try {
             const channel = await this.channelService.findOne({ channelId })
-            
-            const newMessage = this.messageService.create(createMessageDto, channel, authUser)
+
+            const newMessage = this.messageService.create(
+                createMessageDto,
+                channel,
+                authUser
+            )
 
             const savedMessage = await this.messageService.save(newMessage)
 
@@ -53,13 +57,14 @@ export class MessageGateway {
     @UseGuards(JwtWsGuard)
     @SubscribeMessage(MessageSocketEvent.UPDATE)
     @UsePipes(new ValidationPipe())
-    async update(
-        @MessageBody() updateMessageDto: UpdateMessageDto
-    ) {
+    async update(@MessageBody() updateMessageDto: UpdateMessageDto) {
         try {
             this.messageService.updateOne(updateMessageDto)
 
-            this.server.emit(`${MessageSocketEvent.UPDATE}/${updateMessageDto.messageId}`,updateMessageDto)
+            this.server.emit(
+                `${MessageSocketEvent.UPDATE}/${updateMessageDto.messageId}`,
+                updateMessageDto
+            )
         } catch (e) {
             this.logger.error(e)
             throw new WsException(e)
@@ -69,14 +74,11 @@ export class MessageGateway {
     @UseGuards(JwtWsGuard)
     @SubscribeMessage(MessageSocketEvent.DELETE)
     @UsePipes(new ValidationPipe())
-    async delete(
-        @MessageBody() messageId: string
-    ) {
+    async delete(@MessageBody() messageId: string) {
         try {
             this.messageService.deleteOne({ messageId })
-            
-            this.server.emit(`${MessageSocketEvent.DELETE}/${messageId}`, messageId)
 
+            this.server.emit(`${MessageSocketEvent.DELETE}/${messageId}`, messageId)
         } catch (e) {
             this.logger.error(e)
             throw new WsException(e)

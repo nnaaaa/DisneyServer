@@ -20,7 +20,7 @@ MessageModule = __decorate([
     (0, common_1.Module)({
         imports: [
             mongoose_1.MongooseModule.forFeature([{ name: message_model_1.Message.name, schema: message_model_1.MessageSchema }]),
-            user_module_1.UserModule
+            user_module_1.UserModule,
         ],
         controllers: [message_controller_1.MessageController],
         providers: [message_service_1.MessageService, user_service_1.UserService],

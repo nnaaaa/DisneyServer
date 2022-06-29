@@ -1,3 +1,3 @@
 export declare class CreateChannelCtgDto {
-    name: string;
+    name: string
 }

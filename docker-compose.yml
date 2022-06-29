@@ -60,7 +60,7 @@ services:
     depends_on:
       - message-broker
       - message-database
-  
+
   message-database:
     image: mongo:4.2.21-bionic
     ports:
@@ -92,7 +92,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - 22181:${ZOOKEEPER_DOCKER_PORT}
-  
+
   message-broker:
     image: confluentinc/cp-kafka:latest
     depends_on:
@@ -114,7 +114,7 @@ services:
       - message-broker
     ports:
       - 9000:9000
-    environment: 
+    environment:
       SERVER_PORT: 9000
       KAFKA_BROKERCONNECT: message-broker:${KAFKA_DOCKER_PORT}
 
@@ -122,5 +122,3 @@ volumes:
   mysql-data:
   mongodb:
   mongoconfig:
-
-

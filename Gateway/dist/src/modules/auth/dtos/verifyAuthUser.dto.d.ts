@@ -1,4 +1,4 @@
 export declare class VerifyAuthUserDto {
-    readonly account: string;
-    readonly digitCode: number;
+    readonly account: string
+    readonly digitCode: number
 }
