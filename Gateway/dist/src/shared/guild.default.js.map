@@ -1,1 +1,1 @@
-{"version":3,"file":"guild.default.js","sourceRoot":"","sources":["../../../src/shared/guild.default.ts"],"names":[],"mappings":";;;AAAA,MAAa,YAAY;;AAAzB,oCAQC;AAPU,uBAAU,GACb,yEAAyE,CAAA;AACtE,wBAAW,GACd,oJAAoJ,CAAA;AAEjJ,sBAAS,GAAG,SAAS,CAAA;AACrB,6BAAgB,GAAG,WAAW,CAAA"}
+{"version":3,"file":"guild.default.js","sourceRoot":"","sources":["../../../src/shared/guild.default.ts"],"names":[],"mappings":";;;AAAA,MAAa,OAAO;;AAApB,0BAQC;AAPU,kBAAU,GACb,yEAAyE,CAAA;AACtE,mBAAW,GACd,oJAAoJ,CAAA;AAEjJ,iBAAS,GAAG,SAAS,CAAA;AACrB,wBAAgB,GAAG,WAAW,CAAA"}

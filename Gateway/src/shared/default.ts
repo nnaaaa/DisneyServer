@@ -1,4 +1,4 @@
-export class GuildDefault {
+export class Default {
     static userAvatar =
         'https://i.pinimg.com/474x/7c/8f/47/7c8f476123d28d103efe381543274c25.jpg'
     static guildAvatar =

@@ -37,8 +37,8 @@ let AuthService = class AuthService {
         if (user)
             throw new common_1.ForbiddenException();
         const digitCode = algorithms_1.Algorithm.generateDigit(6);
-        await this.userService.create(userRegisterDto, digitCode);
-        await this.mailService.registerConfirm(userRegisterDto, digitCode);
+        this.mailService.registerConfirm(userRegisterDto, digitCode);
+        return await this.userService.create(userRegisterDto, digitCode);
     }
     async createAuthChangePassword({ account }) {
         const digitCode = algorithms_1.Algorithm.generateDigit(6);

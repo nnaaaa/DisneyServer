@@ -46,6 +46,8 @@ let UserService = class UserService {
     async updateOne(findCondition, updateCondition) {
         try {
             let user = await this.findOne(findCondition);
+            if (!user)
+                throw new common_1.NotFoundException();
             user = Object.assign(user, updateCondition);
             return await this.userRepository.save(user);
         }

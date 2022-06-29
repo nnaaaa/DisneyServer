@@ -9,26 +9,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
-const typeorm_1 = require("@nestjs/typeorm");
+const mongoose_1 = require("@nestjs/mongoose");
 const Joi = require("joi");
 const message_module_1 = require("./modules/message/message.module");
+const user_module_1 = require("./modules/user/user.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            typeorm_1.TypeOrmModule.forRootAsync({
+            mongoose_1.MongooseModule.forRootAsync({
                 useFactory: (configService) => ({
-                    host: configService.get('DB_HOST'),
-                    port: configService.get('DB_PORT'),
-                    username: configService.get('DB_USER'),
-                    password: configService.get('DB_PASSWORD'),
-                    database: configService.get('DB_DB'),
-                    authSource: 'admin',
-                    type: 'mongodb',
-                    synchronize: true,
-                    dropSchema: false,
-                    autoLoadEntities: true,
+                    uri: `mongodb://${configService.get('DB_USER')}:${configService.get('DB_PASSWORD')}@${configService.get('DB_HOST')}:${configService.get('DB_PORT')}/${configService.get('DB_DB')}?authSource=admin`,
+                    useNewUrlParser: true,
+                    connectionFactory: (connection) => {
+                        connection.plugin(require('mongoose-autopopulate'));
+                        return connection;
+                    },
                 }),
                 inject: [config_1.ConfigService],
             }),
@@ -47,7 +44,8 @@ AppModule = __decorate([
                     abortEarly: true,
                 },
             }),
-            message_module_1.MessageModule
+            message_module_1.MessageModule,
+            user_module_1.UserModule,
         ],
         controllers: [],
         providers: [],

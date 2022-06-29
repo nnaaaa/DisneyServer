@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { GuildEntity } from 'src/entities/guild.entity'
 import { UserEntity } from 'src/entities/user.entity'
 import { GuildRepository } from 'src/repositories/guild.repository'
-import { GuildDefault } from 'src/shared/guild.default'
+import { Default } from 'src/shared/default'
 import { FindOptionsRelations, FindOptionsWhere } from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { ChannelCategoryService } from '../channel-category/channel-category.service'
@@ -110,7 +110,7 @@ export class GuildService {
         const savedJoinedGuild = await this.guildMemberService.save(joinedGuild)
 
         const role = await this.roleService.create(
-            { name: GuildDefault.everyOneRoleName },
+            { name: Default.everyOneRoleName },
             savedGuild
         )
 
@@ -173,7 +173,7 @@ export class GuildService {
 
         const defaultRoleInThisGuild = await this.roleService.findOneWithReletion({
             guild: { guildId },
-            name: GuildDefault.everyOneRoleName,
+            name: Default.everyOneRoleName,
         })
 
         const joinGuild = await this.guildMemberService.create(guild, user)

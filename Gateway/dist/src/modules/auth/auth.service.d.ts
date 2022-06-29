@@ -12,7 +12,7 @@ export declare class AuthService {
     verifyToken(token: string): any;
     getAccessToken(userId: string): Promise<string>;
     getRefreshToken(userId: string): Promise<string>;
-    createAuthUser(userRegisterDto: UserRegisterDto): Promise<void>;
+    createAuthUser(userRegisterDto: UserRegisterDto): Promise<import("../../entities/user.entity").UserEntity>;
     createAuthChangePassword({ account }: ForgetPasswordDto): Promise<void>;
     verifyAuthUserToChangePassword(newPassordWithSMSDto: NewPassordWithSMSDto): Promise<void>;
     verifyAuthUserToRegister({ account, digitCode }: VerifyAuthUserDto): Promise<import("../../entities/user.entity").UserEntity>;

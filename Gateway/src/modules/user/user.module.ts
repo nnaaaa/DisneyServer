@@ -1,6 +1,9 @@
 import { forwardRef, Module } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { ClientsModule } from '@nestjs/microservices'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { UserBeFriendEntity } from 'src/entities/userBeFriend.entity'
+import { Service, ServiceName } from 'src/shared/services'
 import { UserEntity } from '../../entities/user.entity'
 import { ChannelCategoryModule } from '../channel-category/channel-category.module'
 import { ChannelGateway } from '../channel/channel.gateway'
@@ -19,6 +22,13 @@ import { UserService } from './user.service'
         GuildMemberModule,
         forwardRef(() => ChannelCategoryModule),
         forwardRef(() => ChannelModule),
+        ClientsModule.registerAsync([
+            {
+                name: ServiceName.MESSAGE,
+                useFactory: Service.messageFactory,
+                inject: [ConfigService]
+            }
+        ]),
     ],
     providers: [GuildMemberService, UserService, UserGateway, ChannelGateway],
     controllers: [UserController],

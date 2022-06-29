@@ -10,13 +10,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserEntity = void 0;
-const guild_default_1 = require("../shared/guild.default");
+const default_1 = require("../shared/default");
 const typeorm_1 = require("typeorm");
-const abstract_entity_1 = require("./abstract.entity");
+const guildMember_entity_1 = require("./guildMember.entity");
 const message_entity_1 = require("./message.entity");
 const userBeFriend_entity_1 = require("./userBeFriend.entity");
-const guildMember_entity_1 = require("./guildMember.entity");
-let UserEntity = class UserEntity extends abstract_entity_1.AbstractEntity {
+let UserEntity = class UserEntity {
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
@@ -31,7 +30,7 @@ __decorate([
     __metadata("design:type", String)
 ], UserEntity.prototype, "name", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ default: guild_default_1.GuildDefault.userAvatar }),
+    (0, typeorm_1.Column)({ default: default_1.Default.userAvatar }),
     __metadata("design:type", String)
 ], UserEntity.prototype, "avatarUrl", void 0);
 __decorate([
@@ -63,7 +62,7 @@ __decorate([
     __metadata("design:type", Array)
 ], UserEntity.prototype, "friends", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => message_entity_1.MesssageEntity, (type) => type.sender, { cascade: true }),
+    (0, typeorm_1.OneToMany)(() => message_entity_1.MesssageEntity, (type) => type.author, { cascade: true }),
     __metadata("design:type", Array)
 ], UserEntity.prototype, "sentMessages", void 0);
 __decorate([

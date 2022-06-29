@@ -10,7 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GuildEntity = void 0;
-const guild_default_1 = require("../shared/guild.default");
+const default_1 = require("../shared/default");
 const typeorm_1 = require("typeorm");
 const channelCategory_entity_1 = require("./channelCategory.entity");
 const role_entity_1 = require("./role.entity");
@@ -26,7 +26,7 @@ __decorate([
     __metadata("design:type", String)
 ], GuildEntity.prototype, "name", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ default: guild_default_1.GuildDefault.guildAvatar }),
+    (0, typeorm_1.Column)({ default: default_1.Default.guildAvatar }),
     __metadata("design:type", String)
 ], GuildEntity.prototype, "avatarUrl", void 0);
 __decorate([

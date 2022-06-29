@@ -14,9 +14,13 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
+const microservices_1 = require("@nestjs/microservices");
 const swagger_1 = require("@nestjs/swagger");
+const class_transformer_1 = require("class-transformer");
 const auth_user_decorator_1 = require("../../decorators/auth-user.decorator");
 const user_entity_1 = require("../../entities/user.entity");
+const event_pattern_1 = require("../../shared/event.pattern");
+const services_1 = require("../../shared/services");
 const auth_service_1 = require("./auth.service");
 const forgetPassword_dto_1 = require("./dtos/forgetPassword.dto");
 const tokenPayload_dto_1 = require("./dtos/tokenPayload.dto");
@@ -27,8 +31,9 @@ const facebook_guard_1 = require("./guards/facebook.guard");
 const local_guard_1 = require("./guards/local.guard");
 const refresh_guard_1 = require("./guards/refresh.guard");
 let AuthController = class AuthController {
-    constructor(authService) {
+    constructor(authService, messageClient) {
         this.authService = authService;
+        this.messageClient = messageClient;
     }
     async localLogin(user, res) {
         const accessToken = await this.authService.getAccessToken(user.userId);
@@ -38,7 +43,8 @@ let AuthController = class AuthController {
         res.setHeader('refreshToken', refreshToken);
     }
     async register(createUserDto) {
-        await this.authService.createAuthUser(createUserDto);
+        const user = await this.authService.createAuthUser(createUserDto);
+        this.messageClient.emit(event_pattern_1.UserPatternEvent.CREATE, (0, class_transformer_1.instanceToPlain)(user));
     }
     async verify(verifyAuthUserDto, res) {
         const user = await this.authService.verifyAuthUserToRegister(verifyAuthUserDto);
@@ -144,7 +150,8 @@ AuthController = __decorate([
     (0, swagger_1.ApiTags)('auth'),
     (0, common_1.UseInterceptors)(common_1.CacheInterceptor),
     (0, common_1.Controller)('auth'),
-    __metadata("design:paramtypes", [auth_service_1.AuthService])
+    __param(1, (0, common_1.Inject)(services_1.ServiceName.MESSAGE)),
+    __metadata("design:paramtypes", [auth_service_1.AuthService, microservices_1.ClientKafka])
 ], AuthController);
 exports.AuthController = AuthController;
 //# sourceMappingURL=auth.controller.js.map

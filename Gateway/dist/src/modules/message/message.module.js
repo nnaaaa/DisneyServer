@@ -13,6 +13,9 @@ const microservices_1 = require("@nestjs/microservices");
 const typeorm_1 = require("@nestjs/typeorm");
 const message_entity_1 = require("../../entities/message.entity");
 const services_1 = require("../../shared/services");
+const channel_module_1 = require("../channel/channel.module");
+const user_module_1 = require("../user/user.module");
+const utility_module_1 = require("../utility/utility.module");
 const message_gateway_1 = require("./message.gateway");
 const message_service_1 = require("./message.service");
 let MessageModule = class MessageModule {
@@ -27,7 +30,10 @@ MessageModule = __decorate([
                     useFactory: services_1.Service.messageFactory,
                     inject: [config_1.ConfigService]
                 }
-            ])
+            ]),
+            utility_module_1.UtilityModule,
+            channel_module_1.ChannelModule,
+            user_module_1.UserModule,
         ],
         providers: [message_service_1.MessageService, message_gateway_1.MessageGateway],
     })

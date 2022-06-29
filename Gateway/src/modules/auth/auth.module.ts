@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
+import { ClientsModule } from '@nestjs/microservices'
 import { PassportModule } from '@nestjs/passport'
+import { Service, ServiceName } from 'src/shared/services'
 import { MailModule } from '../mail/mail.module'
 import { MailService } from '../mail/mail.service'
 import { UserModule } from '../user/user.module'
@@ -15,7 +17,19 @@ import { LocalStrategy } from './strategies/local.strategy'
 import { RefreshTokenStrategy } from './strategies/refresh.strategy'
 
 @Module({
-    imports: [UtilityModule, PassportModule, UserModule, MailModule],
+    imports: [
+        ClientsModule.registerAsync([
+            {
+                name: ServiceName.MESSAGE,
+                useFactory: Service.messageFactory,
+                inject: [ConfigService]
+            }
+        ]),
+        UtilityModule,
+        PassportModule,
+        UserModule,
+        MailModule
+    ],
     providers: [
         UserService,
         MailService,

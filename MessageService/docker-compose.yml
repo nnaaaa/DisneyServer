@@ -1,4 +1,4 @@
-version: "3.9"
+version: '3.9'
 
 services:
   # server:
@@ -53,7 +53,7 @@ services:
     depends_on:
       - kafka
       - database
-  
+
   database:
     image: mysql:5.7
     volumes:
@@ -79,7 +79,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - 22181:${ZOOKEEPER_DOCKER_PORT}
-  
+
   kafka:
     image: confluentinc/cp-kafka:latest
     depends_on:
@@ -101,11 +101,9 @@ services:
       - kafka
     ports:
       - 9000:9000
-    environment: 
+    environment:
       SERVER_PORT: 9000
       KAFKA_BROKERCONNECT: kafka:${KAFKA_DOCKER_PORT}
 
 volumes:
   mysql-data:
-
-

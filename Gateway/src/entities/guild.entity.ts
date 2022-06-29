@@ -1,4 +1,4 @@
-import { GuildDefault } from 'src/shared/guild.default'
+import { Default } from 'src/shared/default'
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { ChannelCategoryEntity } from './channelCategory.entity'
 import { RoleEntity } from './role.entity'
@@ -12,7 +12,7 @@ export class GuildEntity {
     @Column()
     name: string
 
-    @Column({ default: GuildDefault.guildAvatar })
+    @Column({ default: Default.guildAvatar })
     avatarUrl: string
 
     /** @relationship */

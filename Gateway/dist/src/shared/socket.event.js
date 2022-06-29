@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RoleSocketEvent = exports.ChannelSocketEvent = exports.ChannelCtgSocketEvent = exports.GuildSocketEvent = exports.UserSocketEvent = void 0;
+exports.MessageSocketEvent = exports.RoleSocketEvent = exports.ChannelSocketEvent = exports.ChannelCtgSocketEvent = exports.GuildSocketEvent = exports.UserSocketEvent = void 0;
 var UserSocketEvent;
 (function (UserSocketEvent) {
     UserSocketEvent["ONLINE"] = "online";
@@ -42,4 +42,10 @@ var RoleSocketEvent;
     RoleSocketEvent["ADD_TO_CHANNEL"] = "addToChannel";
     RoleSocketEvent["REMOVE_FROM_CHANNEL"] = "removeFromChannel";
 })(RoleSocketEvent = exports.RoleSocketEvent || (exports.RoleSocketEvent = {}));
+var MessageSocketEvent;
+(function (MessageSocketEvent) {
+    MessageSocketEvent["CREATE"] = "create";
+    MessageSocketEvent["UPDATE"] = "update";
+    MessageSocketEvent["DELETE"] = "delete";
+})(MessageSocketEvent = exports.MessageSocketEvent || (exports.MessageSocketEvent = {}));
 //# sourceMappingURL=socket.event.js.map

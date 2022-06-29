@@ -1,20 +1,16 @@
-import { GuildDefault } from 'src/shared/guild.default'
+import { Default } from 'src/shared/default'
 import {
     Column,
     CreateDateColumn,
-    Entity,
-    ManyToMany,
-    OneToMany,
-    PrimaryGeneratedColumn,
+    Entity, OneToMany,
+    PrimaryGeneratedColumn
 } from 'typeorm'
-import { AbstractEntity } from './abstract.entity'
-import { ChannelEntity } from './channel.entity'
+import { GuildMemberEntity } from './guildMember.entity'
 import { MesssageEntity } from './message.entity'
 import { UserBeFriendEntity } from './userBeFriend.entity'
-import { GuildMemberEntity } from './guildMember.entity'
 
 @Entity('user')
-export class UserEntity extends AbstractEntity<UserEntity> {
+export class UserEntity{
     @PrimaryGeneratedColumn('uuid')
     userId: string
 
@@ -24,7 +20,7 @@ export class UserEntity extends AbstractEntity<UserEntity> {
     @Column()
     name: string
 
-    @Column({ default: GuildDefault.userAvatar })
+    @Column({ default: Default.userAvatar })
     avatarUrl: string
 
     @CreateDateColumn()
@@ -62,7 +58,7 @@ export class UserEntity extends AbstractEntity<UserEntity> {
     )
     friends: UserBeFriendEntity[]
 
-    @OneToMany(() => MesssageEntity, (type) => type.sender, { cascade: true })
+    @OneToMany(() => MesssageEntity, (type) => type.author, { cascade: true })
     sentMessages: MesssageEntity[]
 
     @OneToMany(() => GuildMemberEntity, (type) => type.user, { cascade: true })

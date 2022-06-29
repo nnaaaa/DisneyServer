@@ -33,10 +33,6 @@ __decorate([
     __metadata("design:type", Date)
 ], MesssageEntity.prototype, "createAt", void 0);
 __decorate([
-    (0, typeorm_1.UpdateDateColumn)(),
-    __metadata("design:type", Date)
-], MesssageEntity.prototype, "updateAt", void 0);
-__decorate([
     (0, typeorm_1.ManyToOne)(() => channel_entity_1.ChannelEntity, (type) => type.messages, {
         onDelete: 'CASCADE',
     }),
@@ -47,9 +43,9 @@ __decorate([
         onDelete: 'CASCADE',
     }),
     __metadata("design:type", user_entity_1.UserEntity)
-], MesssageEntity.prototype, "sender", void 0);
+], MesssageEntity.prototype, "author", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => MesssageEntity_1, { cascade: true }),
+    (0, typeorm_1.OneToOne)(() => MesssageEntity_1, { cascade: true, nullable: true }),
     __metadata("design:type", MesssageEntity)
 ], MesssageEntity.prototype, "replyTo", void 0);
 MesssageEntity = MesssageEntity_1 = __decorate([

@@ -1,8 +1,7 @@
-import { AbstractEntity } from './abstract.entity';
+import { GuildMemberEntity } from './guildMember.entity';
 import { MesssageEntity } from './message.entity';
 import { UserBeFriendEntity } from './userBeFriend.entity';
-import { GuildMemberEntity } from './guildMember.entity';
-export declare class UserEntity extends AbstractEntity<UserEntity> {
+export declare class UserEntity {
     userId: string;
     account: string;
     name: string;

@@ -44,9 +44,9 @@ export class AuthService {
 
         const digitCode = Algorithm.generateDigit(6)
 
-        await this.userService.create(userRegisterDto, digitCode)
+        this.mailService.registerConfirm(userRegisterDto, digitCode)
 
-        await this.mailService.registerConfirm(userRegisterDto, digitCode)
+        return await this.userService.create(userRegisterDto, digitCode)
     }
 
     async createAuthChangePassword({ account }: ForgetPasswordDto) {

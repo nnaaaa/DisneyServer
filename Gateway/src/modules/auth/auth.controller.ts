@@ -3,22 +3,27 @@ import {
     CacheInterceptor,
     Controller,
     Get,
+    Inject,
     Post,
     Put,
     Req,
     Res,
     UseGuards,
-    UseInterceptors,
+    UseInterceptors
 } from '@nestjs/common'
+import { ClientKafka } from '@nestjs/microservices'
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
+import { instanceToPlain } from 'class-transformer'
 import { Response } from 'express'
 import { AuthUser } from 'src/decorators/auth-user.decorator'
 import { UserEntity } from 'src/entities/user.entity'
+import { UserPatternEvent } from 'src/shared/event.pattern'
+import { ServiceName } from 'src/shared/services'
 import { AuthService } from './auth.service'
 import {
     ForgetPasswordDto,
     NewPassordWithSMSDto,
-    NewPasswordWithComparationDto,
+    NewPasswordWithComparationDto
 } from './dtos/forgetPassword.dto'
 import { TokenPayload } from './dtos/tokenPayload.dto'
 import { UserLoginDto } from './dtos/userLogin.dto'
@@ -32,7 +37,7 @@ import { RefreshTokenGuard } from './guards/refresh.guard'
 @UseInterceptors(CacheInterceptor)
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService, @Inject(ServiceName.MESSAGE) private messageClient: ClientKafka) { }
 
     @Post('login')
     @ApiBody({ required: true, type: UserLoginDto })
@@ -51,7 +56,9 @@ export class AuthController {
 
     @Post('register')
     async register(@Body() createUserDto: UserRegisterDto) {
-        await this.authService.createAuthUser(createUserDto)
+        const user = await this.authService.createAuthUser(createUserDto)
+
+        this.messageClient.emit(UserPatternEvent.CREATE, instanceToPlain(user))
     }
 
     @Put('verify')
@@ -86,7 +93,7 @@ export class AuthController {
 
     @Get('facebook')
     @UseGuards(FacebookGuard)
-    async facebookLogin(): Promise<any> {}
+    async facebookLogin(): Promise<any> { }
 
     @Get('facebook/redirect')
     @UseGuards(FacebookGuard)

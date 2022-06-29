@@ -5,8 +5,7 @@ export declare class MesssageEntity {
     content: string;
     images: string[];
     createAt: Date;
-    updateAt: Date;
     channel: ChannelEntity;
-    sender: UserEntity;
+    author: UserEntity;
     replyTo: MesssageEntity;
 }

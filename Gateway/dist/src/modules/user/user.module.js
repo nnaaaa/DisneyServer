@@ -8,8 +8,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserModule = void 0;
 const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config");
+const microservices_1 = require("@nestjs/microservices");
 const typeorm_1 = require("@nestjs/typeorm");
 const userBeFriend_entity_1 = require("../../entities/userBeFriend.entity");
+const services_1 = require("../../shared/services");
 const user_entity_1 = require("../../entities/user.entity");
 const channel_category_module_1 = require("../channel-category/channel-category.module");
 const channel_gateway_1 = require("../channel/channel.gateway");
@@ -30,6 +33,13 @@ UserModule = __decorate([
             guild_member_module_1.GuildMemberModule,
             (0, common_1.forwardRef)(() => channel_category_module_1.ChannelCategoryModule),
             (0, common_1.forwardRef)(() => channel_module_1.ChannelModule),
+            microservices_1.ClientsModule.registerAsync([
+                {
+                    name: services_1.ServiceName.MESSAGE,
+                    useFactory: services_1.Service.messageFactory,
+                    inject: [config_1.ConfigService]
+                }
+            ]),
         ],
         providers: [guild_member_service_1.GuildMemberService, user_service_1.UserService, user_gateway_1.UserGateway, channel_gateway_1.ChannelGateway],
         controllers: [user_controller_1.UserController],

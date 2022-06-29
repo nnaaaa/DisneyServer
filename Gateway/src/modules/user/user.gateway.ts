@@ -1,11 +1,14 @@
+import { instanceToPlain } from 'class-transformer';
 import {
     ClassSerializerInterceptor,
+    Inject,
     Logger,
     UseGuards,
     UseInterceptors,
     UsePipes,
     ValidationPipe,
 } from '@nestjs/common'
+import { ClientKafka } from '@nestjs/microservices'
 import {
     MessageBody,
     SubscribeMessage,
@@ -17,6 +20,8 @@ import { Server } from 'socket.io'
 import { AuthWSUser } from 'src/decorators/auth-user.decorator'
 import { UserEntity } from 'src/entities/user.entity'
 import { UserBeFriendEntity } from 'src/entities/userBeFriend.entity'
+import { UserPatternEvent } from 'src/shared/event.pattern'
+import { ServiceName } from 'src/shared/services'
 import { ChannelSocketEmit, UserSocketEmit } from 'src/shared/socket.emit'
 import { UserSocketEvent } from 'src/shared/socket.event'
 import { JwtWsGuard } from '../auth/guards/jwtWS.guard'
@@ -34,7 +39,8 @@ export class UserGateway {
     constructor(
         private userService: UserService,
         private guildMemberService: GuildMemberService,
-        private channelGateway: ChannelGateway
+        private channelGateway: ChannelGateway,
+        @Inject(ServiceName.MESSAGE) private messageClient: ClientKafka
     ) {}
 
     @UseGuards(JwtWsGuard)
@@ -79,6 +85,7 @@ export class UserGateway {
                 { userId: authUser.userId },
                 newProfile
             )
+            this.messageClient.emit(UserPatternEvent.UPDATE, instanceToPlain(user))
 
             this.server.emit(`${UserSocketEmit.UPDATE_PROFILE}/${user.userId}`, user)
         } catch (e) {

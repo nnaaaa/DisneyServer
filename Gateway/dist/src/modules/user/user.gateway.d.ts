@@ -1,3 +1,4 @@
+import { ClientKafka } from '@nestjs/microservices';
 import { Server } from 'socket.io';
 import { UserEntity } from 'src/entities/user.entity';
 import { UserBeFriendEntity } from 'src/entities/userBeFriend.entity';
@@ -10,9 +11,10 @@ export declare class UserGateway {
     private userService;
     private guildMemberService;
     private channelGateway;
+    private messageClient;
     private readonly logger;
     readonly server: Server;
-    constructor(userService: UserService, guildMemberService: GuildMemberService, channelGateway: ChannelGateway);
+    constructor(userService: UserService, guildMemberService: GuildMemberService, channelGateway: ChannelGateway, messageClient: ClientKafka);
     get(authUser: UserEntity): Promise<UserEntity>;
     update(authUser: UserEntity, newProfile: UpdateProfileDto): Promise<void>;
     addFriend(friendId: string, authUser: UserEntity): Promise<void>;

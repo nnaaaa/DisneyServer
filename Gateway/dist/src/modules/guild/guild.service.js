@@ -17,7 +17,7 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const guild_entity_1 = require("../../entities/guild.entity");
 const guild_repository_1 = require("../../repositories/guild.repository");
-const guild_default_1 = require("../../shared/guild.default");
+const default_1 = require("../../shared/default");
 const channel_category_service_1 = require("../channel-category/channel-category.service");
 const guild_member_service_1 = require("../guild-member/guild-member.service");
 const role_service_1 = require("../role/role.service");
@@ -100,7 +100,7 @@ let GuildService = class GuildService {
         const savedGuild = await this.saveGuild(guild);
         const joinedGuild = await this.guildMemberService.create(savedGuild, creator);
         const savedJoinedGuild = await this.guildMemberService.save(joinedGuild);
-        const role = await this.roleService.create({ name: guild_default_1.GuildDefault.everyOneRoleName }, savedGuild);
+        const role = await this.roleService.create({ name: default_1.Default.everyOneRoleName }, savedGuild);
         const category1 = await this.channelCtgService.create({ name: 'Category 1' }, savedGuild);
         const category2 = await this.channelCtgService.create({ name: 'Category 2' }, savedGuild);
         const savedCategory1 = await this.channelCtgService.save(category1);
@@ -129,7 +129,7 @@ let GuildService = class GuildService {
         const guild = await this.findOneGuildWithRelation({ guildId });
         const defaultRoleInThisGuild = await this.roleService.findOneWithReletion({
             guild: { guildId },
-            name: guild_default_1.GuildDefault.everyOneRoleName,
+            name: default_1.Default.everyOneRoleName,
         });
         const joinGuild = await this.guildMemberService.create(guild, user);
         if (defaultRoleInThisGuild)

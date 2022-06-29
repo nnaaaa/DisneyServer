@@ -14,11 +14,15 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 var UserGateway_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserGateway = void 0;
+const class_transformer_1 = require("class-transformer");
 const common_1 = require("@nestjs/common");
+const microservices_1 = require("@nestjs/microservices");
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 const auth_user_decorator_1 = require("../../decorators/auth-user.decorator");
 const user_entity_1 = require("../../entities/user.entity");
+const event_pattern_1 = require("../../shared/event.pattern");
+const services_1 = require("../../shared/services");
 const socket_emit_1 = require("../../shared/socket.emit");
 const socket_event_1 = require("../../shared/socket.event");
 const jwtWS_guard_1 = require("../auth/guards/jwtWS.guard");
@@ -27,10 +31,11 @@ const guild_member_service_1 = require("./../guild-member/guild-member.service")
 const updateProfile_dto_1 = require("./dtos/updateProfile.dto");
 const user_service_1 = require("./user.service");
 let UserGateway = UserGateway_1 = class UserGateway {
-    constructor(userService, guildMemberService, channelGateway) {
+    constructor(userService, guildMemberService, channelGateway, messageClient) {
         this.userService = userService;
         this.guildMemberService = guildMemberService;
         this.channelGateway = channelGateway;
+        this.messageClient = messageClient;
         this.logger = new common_1.Logger(UserGateway_1.name);
     }
     async get(authUser) {
@@ -53,6 +58,7 @@ let UserGateway = UserGateway_1 = class UserGateway {
     async update(authUser, newProfile) {
         try {
             const user = await this.userService.updateOne({ userId: authUser.userId }, newProfile);
+            this.messageClient.emit(event_pattern_1.UserPatternEvent.UPDATE, (0, class_transformer_1.instanceToPlain)(user));
             this.server.emit(`${socket_emit_1.UserSocketEmit.UPDATE_PROFILE}/${user.userId}`, user);
         }
         catch (e) {
@@ -148,9 +154,11 @@ __decorate([
 ], UserGateway.prototype, "block", null);
 UserGateway = UserGateway_1 = __decorate([
     (0, websockets_1.WebSocketGateway)({ cors: { origin: '*' }, namespace: 'user' }),
+    __param(3, (0, common_1.Inject)(services_1.ServiceName.MESSAGE)),
     __metadata("design:paramtypes", [user_service_1.UserService,
         guild_member_service_1.GuildMemberService,
-        channel_gateway_1.ChannelGateway])
+        channel_gateway_1.ChannelGateway,
+        microservices_1.ClientKafka])
 ], UserGateway);
 exports.UserGateway = UserGateway;
 //# sourceMappingURL=user.gateway.js.map

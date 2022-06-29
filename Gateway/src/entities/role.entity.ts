@@ -1,4 +1,4 @@
-import { GuildDefault } from 'src/shared/guild.default'
+import { Default } from 'src/shared/default'
 import {
     Column,
     Entity,
@@ -22,7 +22,7 @@ export class RoleEntity {
     @Column({ nullable: true })
     icon: string
 
-    @Column({ default: GuildDefault.roleColor })
+    @Column({ default: Default.roleColor })
     color: string
 
     /** @relationship */

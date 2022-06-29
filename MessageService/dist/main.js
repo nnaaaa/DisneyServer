@@ -8,15 +8,17 @@ async function bootstrap() {
         transport: microservices_1.Transport.KAFKA,
         options: {
             producer: {
-                allowAutoTopicCreation: true
+                allowAutoTopicCreation: true,
             },
             client: {
-                brokers: [`${process.env.MESSAGE_BROKER_HOST}:${process.env.MESSAGE_BROKER_PORT}`],
+                brokers: [
+                    `${process.env.MESSAGE_BROKER_HOST}:${process.env.MESSAGE_BROKER_PORT}`,
+                ],
             },
             consumer: {
-                groupId: 'message-consumer'
-            }
-        }
+                groupId: 'message-consumer',
+            },
+        },
     });
     await app.listen();
 }

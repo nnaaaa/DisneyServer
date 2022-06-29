@@ -9,20 +9,24 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MessageEntity = void 0;
-const typeorm_1 = require("typeorm");
-let MessageEntity = class MessageEntity {
-};
+exports.UpdateMessageDto = void 0;
+const class_validator_1 = require("class-validator");
+class UpdateMessageDto {
+}
 __decorate([
-    (0, typeorm_1.ObjectIdColumn)(),
+    (0, class_validator_1.IsUUID)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], MessageEntity.prototype, "messageId", void 0);
+], UpdateMessageDto.prototype, "messageId", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
-], MessageEntity.prototype, "name", void 0);
-MessageEntity = __decorate([
-    (0, typeorm_1.Entity)()
-], MessageEntity);
-exports.MessageEntity = MessageEntity;
-//# sourceMappingURL=message.entity.js.map
+], UpdateMessageDto.prototype, "content", void 0);
+__decorate([
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UpdateMessageDto.prototype, "images", void 0);
+exports.UpdateMessageDto = UpdateMessageDto;
+//# sourceMappingURL=updateMessage.dto.js.map
