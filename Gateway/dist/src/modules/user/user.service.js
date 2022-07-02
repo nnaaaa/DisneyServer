@@ -40,7 +40,9 @@ let UserService = class UserService {
         const newUser = this.userRepository.create(user);
         const salt = await Bcrypt.genSalt();
         newUser.password = await Bcrypt.hash(newUser.password, salt);
-        newUser.registerVerifyCode = verifyCode;
+        if (verifyCode) {
+            newUser.registerVerifyCode = verifyCode;
+        }
         return await this.save(newUser);
     }
     async updateOne(findCondition, updateCondition) {

@@ -1,11 +1,13 @@
 import { ChannelEntity } from './channel.entity';
-import { UserEntity } from './user.entity';
-export declare class MesssageEntity {
+import { MemberEntity } from './member.entity';
+import { ReactEntity } from './react.entity';
+export declare class MessageEntity {
     messageId: string;
     content: string;
     images: string[];
-    createAt: Date;
+    createdAt: Date;
     channel: ChannelEntity;
-    author: UserEntity;
-    replyTo: MesssageEntity;
+    author: MemberEntity;
+    reacts: ReactEntity[];
+    replyTo: MessageEntity;
 }

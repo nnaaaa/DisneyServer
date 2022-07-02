@@ -1,19 +1,16 @@
 import {
-    ForbiddenException,
     Injectable,
     InternalServerErrorException,
-    NotFoundException,
+    NotFoundException
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { ChannelEntity } from 'src/entities/channel.entity'
-import { GuildEntity } from 'src/entities/guild.entity'
 import { RoleEntity } from 'src/entities/role.entity'
-import { ChannelRepository } from 'src/repositories/channel.repository'
-import { GuildRepository } from 'src/repositories/guild.repository'
 import { RoleRepository } from 'src/repositories/role.repository'
+import { GuildDto } from 'src/shared/dtos'
 import { FindOptionsRelations, FindOptionsWhere } from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
-import { GuildMemberService } from '../guild-member/guild-member.service'
+import { ChannelService } from '../channel/channel.service'
+import { MemberService } from '../member/member.service'
 import { ChannelRoleDto } from './dtos/channelRole.dto'
 import { CreateRoleDto } from './dtos/createRole.dto'
 import { MemberRoleDto } from './dtos/memberRole.dto'
@@ -27,15 +24,14 @@ export class RoleService {
 
     constructor(
         @InjectRepository(RoleEntity) private roleRepository: RoleRepository,
-        @InjectRepository(GuildEntity) private guildRepository: GuildRepository,
-        @InjectRepository(ChannelEntity) private channelRepository: ChannelRepository,
-        private guildMemberService: GuildMemberService
-    ) {}
+        private channelService: ChannelService,
+        private memberService: MemberService
+    ) { }
     async save(role: RoleEntity) {
         return await this.roleRepository.save(role)
     }
 
-    async create(createDto: CreateRoleDto, guild: GuildEntity) {
+    async create(createDto: CreateRoleDto, guild: GuildDto) {
         const role = this.roleRepository.create({
             ...createDto,
             guild,
@@ -46,8 +42,15 @@ export class RoleService {
         return role
     }
 
-    async findOneWithReletion(findCondition: FindOptionsWhere<RoleEntity>) {
+    async findOneWithRelation(findCondition: FindOptionsWhere<RoleEntity>) {
         return await this.roleRepository.findOne({
+            where: findCondition,
+            relations: this.roleRelations,
+        })
+    }
+
+    async findManyWithReletion(findCondition: FindOptionsWhere<RoleEntity>) {
+        return await this.roleRepository.find({
             where: findCondition,
             relations: this.roleRelations,
         })
@@ -67,97 +70,82 @@ export class RoleService {
             throw new InternalServerErrorException(e)
         }
     }
-    async delete(findCondition: FindOptionsWhere<RoleEntity>) {
+    async deleteMany(findCondition: FindOptionsWhere<RoleEntity>) {
         try {
-            const role = await this.findOneWithReletion(findCondition)
+            const roles = await this.findManyWithReletion(findCondition)
 
-            role.channels = []
-            role.members = []
+            for (const role of roles) {
+                await this.roleRepository.remove(role)
+            }
+        } catch (e) {
+            throw new InternalServerErrorException(e)
+        }
+    }
+    async deleteOne(findCondition: FindOptionsWhere<RoleEntity>) {
+        try {
+            const role = await this.findOneWithRelation(findCondition)
 
-            await this.roleRepository.remove(role)
+            if (role) {
+                await this.roleRepository.remove(role)
+            }
+
+            return role
+            
         } catch (e) {
             throw new InternalServerErrorException(e)
         }
     }
 
-    async addToMember({ roleId, guildMemberId }: MemberRoleDto) {
-        const role = await this.findOneWithReletion({ roleId })
 
-        const member = await this.guildMemberService.findOneWithRelation({
-            guildMemberId,
+    async addToMember({ roleId, memberId }: MemberRoleDto) {
+        const role = await this.findOneWithRelation({ roleId })
+        const member = await this.memberService.findOneWithRelation({
+            memberId,
         })
-
         if (!member || !role) throw new NotFoundException()
-
         member.roles.push(role)
         role.members.push(member)
-
         await this.save(role)
-
         return { role, member }
     }
 
-    async removeFromMember({ roleId, guildMemberId }: MemberRoleDto) {
-        const role = await this.findOneWithReletion({ roleId })
-
-        const member = await this.guildMemberService.findOneWithRelation({
-            guildMemberId,
+    async removeFromMember({ roleId, memberId }: MemberRoleDto) {
+        const role = await this.findOneWithRelation({ roleId })
+        const member = await this.memberService.findOneWithRelation({
+            memberId,
         })
-
         if (!member || !role) throw new NotFoundException()
-
         member.roles = member.roles.filter((role) => role.roleId !== roleId)
-
         role.members = role.members.filter(
-            (member) => member.guildMemberId !== guildMemberId
+            (member) => member.memberId !== memberId
         )
-
         await this.save(role)
-
         return { role, member }
     }
 
     async addToChannel({ roleId, channelId }: ChannelRoleDto) {
-        const role = await this.findOneWithReletion({ roleId })
-
-        const channel = await this.channelRepository.findOneBy({
+        const role = await this.findOneWithRelation({ roleId })
+        const channel = await this.channelService.findOneWithRelation({
             channelId,
         })
-
         if (!channel || !role) throw new NotFoundException()
-
         role.channels.push(channel)
         channel.roles.push(role)
-
         await this.save(role)
         return { role, channel }
     }
 
     async removeFromChannel({ roleId, channelId }: ChannelRoleDto) {
-        const role = await this.findOneWithReletion({ roleId })
-
-        const channel = await this.channelRepository.findOneBy({
+        const role = await this.findOneWithRelation({ roleId })
+        const channel = await this.channelService.findOneWithRelation({
             channelId,
         })
-
         if (!channel || !role) throw new NotFoundException()
-
         channel.roles = channel.roles.filter((role) => role.roleId !== roleId)
-
         role.channels = role.channels.filter((channel) => channel.channelId !== channelId)
-
         await this.save(role)
-
         return { role, channel }
     }
 
-    async createByGuildIdAndSave(createDto: CreateRoleDto, guildId: string) {
-        const guild = await this.guildRepository.findOneBy({ guildId })
-
-        const role = await this.create(createDto, guild)
-
-        const savedRole = await this.roleRepository.save(role)
-
-        return savedRole
-    }
+  
 }

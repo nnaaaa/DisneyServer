@@ -21,7 +21,7 @@ export declare class UserService {
     };
     constructor(userRepository: UserRepository, userBeFriendRepository: UserBeFriendRepository);
     save(user: UserEntity): Promise<UserEntity>;
-    create(user: UserRegisterDto, verifyCode: number): Promise<UserEntity>;
+    create(user: UserRegisterDto, verifyCode?: number): Promise<UserEntity>;
     updateOne(findCondition: FindOptionsWhere<UserEntity>, updateCondition: QueryDeepPartialEntity<UserEntity>): Promise<UserEntity>;
     findOne(findCondition: FindOptionsWhere<UserEntity>, selectFields?: FindOptionsSelect<UserEntity>): Promise<UserEntity>;
     changePassword(newPasswordDto: NewPasswordDto, user: UserEntity): Promise<void>;

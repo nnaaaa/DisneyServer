@@ -19,46 +19,47 @@ const guild_entity_1 = require("../../entities/guild.entity");
 const guild_repository_1 = require("../../repositories/guild.repository");
 const default_1 = require("../../shared/default");
 const channel_category_service_1 = require("../channel-category/channel-category.service");
-const guild_member_service_1 = require("../guild-member/guild-member.service");
+const emoji_service_1 = require("../emoji/emoji.service");
+const member_service_1 = require("../member/member.service");
 const role_service_1 = require("../role/role.service");
-const channel_service_1 = require("./../channel/channel.service");
 let GuildService = class GuildService {
-    constructor(channelCtgService, channelService, roleService, guildMemberService, guildRepository) {
+    constructor(channelCtgService, roleService, memberService, emojiService, guildRepository) {
         this.channelCtgService = channelCtgService;
-        this.channelService = channelService;
         this.roleService = roleService;
-        this.guildMemberService = guildMemberService;
+        this.memberService = memberService;
+        this.emojiService = emojiService;
         this.guildRepository = guildRepository;
         this.guildRelations = {
-            members: this.guildMemberService.guildMemberRelations,
+            members: this.memberService.guildMemberRelations,
             categories: this.channelCtgService.channelCtgRelations,
             roles: this.roleService.roleRelations,
+            emojis: this.emojiService.emojiRelations
         };
     }
-    async saveGuild(guild) {
+    async save(guild) {
         return await this.guildRepository.save(guild);
     }
-    async createGuild(createGuildDto, creator) {
+    async create(createGuildDto, creator) {
         const guild = this.guildRepository.create(Object.assign(Object.assign({}, createGuildDto), { categories: [], members: [] }));
         return guild;
     }
-    async findOneGuild(findCondition) {
+    async findOne(findCondition) {
         return await this.guildRepository.findOne({
             where: findCondition,
         });
     }
-    async findOneGuildWithRelation(findCondition) {
+    async findOneWithRelation(findCondition) {
         return await this.guildRepository.findOne({
             relations: this.guildRelations,
             where: findCondition,
         });
     }
-    async findManyGuild(findCondition) {
+    async findMany(findCondition) {
         return await this.guildRepository.find({
             where: findCondition,
         });
     }
-    async updateOneGuild(findCondition, updateCondition) {
+    async updateOne(findCondition, updateCondition) {
         try {
             await this.guildRepository
                 .createQueryBuilder()
@@ -70,90 +71,52 @@ let GuildService = class GuildService {
             throw new common_1.InternalServerErrorException(e);
         }
     }
-    async deleteGuild(findCondition) {
+    async deleteOne(findCondition) {
         try {
-            const guild = await this.findOneGuildWithRelation(findCondition);
-            let removeChildren = [];
-            for (const ctg of guild.categories) {
-                removeChildren.push(this.channelService.delete({
-                    category: { categoryId: ctg.categoryId },
-                }));
+            const guild = await this.findOneWithRelation(findCondition);
+            if (guild) {
+                let removeChildren = [];
+                removeChildren = removeChildren.concat([
+                    this.channelCtgService.deleteMany({
+                        guild: { guildId: guild.guildId },
+                    }),
+                    this.roleService.deleteMany({ guild: { guildId: guild.guildId } }),
+                    this.emojiService.deleteMany({ guild: { guildId: guild.guildId } }),
+                ]);
+                await Promise.all(removeChildren);
+                await this.memberService.deleteMany({
+                    guild: { guildId: guild.guildId },
+                });
+                await this.guildRepository.remove(guild);
             }
-            removeChildren = removeChildren.concat([
-                this.channelCtgService.delete({
-                    guild: { guildId: guild.guildId },
-                }),
-                this.guildMemberService.delete({
-                    guild: { guildId: guild.guildId },
-                }),
-                this.roleService.delete({ guild: { guildId: guild.guildId } }),
-            ]);
-            await Promise.all(removeChildren);
-            await this.guildRepository.remove(guild);
         }
         catch (e) {
             throw new common_1.InternalServerErrorException(e);
         }
     }
     async createTemplateGuild(createGuildDto, creator) {
-        const guild = await this.createGuild(createGuildDto, creator);
-        const savedGuild = await this.saveGuild(guild);
-        const joinedGuild = await this.guildMemberService.create(savedGuild, creator);
-        const savedJoinedGuild = await this.guildMemberService.save(joinedGuild);
+        const guild = await this.create(createGuildDto, creator);
+        const savedGuild = await this.save(guild);
+        const member = await this.memberService.create(savedGuild, creator);
+        const savedMember = await this.memberService.save(member);
         const role = await this.roleService.create({ name: default_1.Default.everyOneRoleName }, savedGuild);
-        const category1 = await this.channelCtgService.create({ name: 'Category 1' }, savedGuild);
-        const category2 = await this.channelCtgService.create({ name: 'Category 2' }, savedGuild);
-        const savedCategory1 = await this.channelCtgService.save(category1);
-        const savedCategory2 = await this.channelCtgService.save(category2);
-        const channelLobby1 = await this.channelService.create({ name: 'lobby' }, category1);
-        channelLobby1.roles = [role];
-        channelLobby1.members = [savedJoinedGuild];
-        const channelDoc1 = await this.channelService.create({ name: 'document' }, category1);
-        channelDoc1.roles = [role];
-        channelDoc1.members = [savedJoinedGuild];
-        const channelLobby2 = await this.channelService.create({ name: 'lobby' }, category2);
-        channelLobby2.roles = [role];
-        channelLobby2.members = [savedJoinedGuild];
-        const channelDoc2 = await this.channelService.create({ name: 'document' }, category2);
-        channelDoc2.roles = [role];
-        channelDoc2.members = [savedJoinedGuild];
-        category1.channels = [channelLobby1, channelDoc1];
-        category2.channels = [channelLobby2, channelDoc2];
-        savedGuild.categories = [savedCategory1, savedCategory2];
-        savedGuild.members = [savedJoinedGuild];
+        savedMember.roles = [role];
+        const category1 = await this.channelCtgService.createTemplateCategory({ name: 'TFT' }, savedGuild, [member], [role]);
+        const category2 = await this.channelCtgService.createTemplateCategory({ name: 'LOL' }, savedGuild, [member], [role]);
+        savedGuild.categories = [category1, category2];
+        savedGuild.members = [savedMember];
         savedGuild.roles = [role];
-        const savedGuildTheSecond = await this.saveGuild(savedGuild);
+        const savedGuildTheSecond = await this.save(savedGuild);
         return savedGuildTheSecond;
-    }
-    async joinGuild(guildId, user) {
-        const guild = await this.findOneGuildWithRelation({ guildId });
-        const defaultRoleInThisGuild = await this.roleService.findOneWithReletion({
-            guild: { guildId },
-            name: default_1.Default.everyOneRoleName,
-        });
-        const joinGuild = await this.guildMemberService.create(guild, user);
-        if (defaultRoleInThisGuild)
-            joinGuild.roles = [defaultRoleInThisGuild];
-        guild.members.push(joinGuild);
-        const savedJoinGuild = await this.guildMemberService.save(joinGuild);
-        const savedGuild = await this.saveGuild(guild);
-        return { guild: savedGuild, newMember: savedJoinGuild };
-    }
-    async leaveGuild(userId, guildId) {
-        const joinGuild = await this.guildMemberService.delete({
-            user: { userId },
-            guild: { guildId },
-        });
-        return joinGuild;
     }
 };
 GuildService = __decorate([
     (0, common_1.Injectable)(),
     __param(4, (0, typeorm_1.InjectRepository)(guild_entity_1.GuildEntity)),
     __metadata("design:paramtypes", [channel_category_service_1.ChannelCategoryService,
-        channel_service_1.ChannelService,
         role_service_1.RoleService,
-        guild_member_service_1.GuildMemberService,
+        member_service_1.MemberService,
+        emoji_service_1.EmojiService,
         guild_repository_1.GuildRepository])
 ], GuildService);
 exports.GuildService = GuildService;

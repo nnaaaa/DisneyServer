@@ -14,16 +14,14 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageService = void 0;
 const common_1 = require("@nestjs/common");
-const microservices_1 = require("@nestjs/microservices");
 const typeorm_1 = require("@nestjs/typeorm");
 const message_entity_1 = require("../../entities/message.entity");
 const message_repository_1 = require("../../repositories/message.repository");
-const event_pattern_1 = require("../../shared/event.pattern");
-const services_1 = require("../../shared/services");
+const react_service_1 = require("../react/react.service");
 let MessageService = class MessageService {
-    constructor(messageClient, messageRepository) {
-        this.messageClient = messageClient;
+    constructor(messageRepository, reactService) {
         this.messageRepository = messageRepository;
+        this.reactService = reactService;
         this.messageRelations = {
             author: true,
             channel: true,
@@ -37,15 +35,22 @@ let MessageService = class MessageService {
             channel }));
         return newMessage;
     }
-    async findOne(findCondition) {
+    async findOneWithRelation(findCondition) {
         return await this.messageRepository.findOne({
             relations: this.messageRelations,
             where: findCondition,
         });
     }
+    async findMany(findCondition) {
+        return await this.messageRepository.find({
+            where: findCondition,
+        });
+    }
     async updateOne(updateMessageDto) {
         try {
-            let message = await this.findOne({ messageId: updateMessageDto.messageId });
+            let message = await this.findOneWithRelation({
+                messageId: updateMessageDto.messageId,
+            });
             message = Object.assign(message, updateMessageDto);
             return await this.save(message);
         }
@@ -55,23 +60,41 @@ let MessageService = class MessageService {
     }
     async deleteOne(findCondition) {
         try {
-            await this.messageRepository.delete(findCondition);
+            const message = await this.findOneWithRelation(findCondition);
+            if (message) {
+                const reacts = [];
+                for (const react of message.reacts) {
+                    reacts.push(this.reactService.deleteOne({ reactId: react.reactId }));
+                }
+                await Promise.all(reacts);
+                await this.messageRepository.remove(message);
+            }
+            return message;
         }
         catch (e) {
             throw new common_1.InternalServerErrorException(e);
         }
     }
-    onModuleInit() {
-        this.messageClient.subscribeToResponseOf(event_pattern_1.MessagePatternEvent.CREATE);
-        this.messageClient.subscribeToResponseOf(event_pattern_1.MessagePatternEvent.UPDATE);
+    async deleteMany(findCondition) {
+        try {
+            const messages = await this.findMany(findCondition);
+            const reacts = [];
+            for (const message of messages) {
+                reacts.push(this.reactService.deleteMany({ message: { messageId: message.messageId } }));
+            }
+            await Promise.all(reacts);
+            await this.messageRepository.remove(messages);
+        }
+        catch (e) {
+            throw new common_1.InternalServerErrorException(e);
+        }
     }
 };
 MessageService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)(services_1.ServiceName.MESSAGE)),
-    __param(1, (0, typeorm_1.InjectRepository)(message_entity_1.MesssageEntity)),
-    __metadata("design:paramtypes", [microservices_1.ClientKafka,
-        message_repository_1.MessageRepository])
+    __param(0, (0, typeorm_1.InjectRepository)(message_entity_1.MessageEntity)),
+    __metadata("design:paramtypes", [message_repository_1.MessageRepository,
+        react_service_1.ReactService])
 ], MessageService);
 exports.MessageService = MessageService;
 //# sourceMappingURL=message.service.js.map

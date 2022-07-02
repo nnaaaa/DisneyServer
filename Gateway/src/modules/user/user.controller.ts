@@ -7,7 +7,7 @@ import {
     UseInterceptors,
 } from '@nestjs/common'
 import { ApiBearerAuth } from '@nestjs/swagger'
-import { AuthUser } from 'src/decorators/auth-user.decorator'
+import { AuthUser } from 'src/shared/decorators/auth-user.decorator'
 import { UserEntity } from 'src/entities/user.entity'
 import { JwtGuard } from 'src/modules/auth/guards/jwt.guard'
 import { UserService } from './user.service'

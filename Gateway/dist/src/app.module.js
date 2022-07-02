@@ -18,9 +18,9 @@ const channel_module_1 = require("./modules/channel/channel.module");
 const role_module_1 = require("./modules/role/role.module");
 const emoji_module_1 = require("./modules/emoji/emoji.module");
 const mail_module_1 = require("./modules/mail/mail.module");
-const utility_module_1 = require("./modules/utility/utility.module");
 const channel_category_module_1 = require("./modules/channel-category/channel-category.module");
-const guild_member_module_1 = require("./modules/guild-member/guild-member.module");
+const member_module_1 = require("./modules/member/member.module");
+const react_module_1 = require("./modules/react/react.module");
 const Joi = require("joi");
 let AppModule = class AppModule {
 };
@@ -52,13 +52,13 @@ AppModule = __decorate([
                     EMAIL_PASSWORD: Joi.string().required(),
                     FACEBOOK_ID: Joi.string().required(),
                     FACEBOOK_SECRET: Joi.string().required(),
+                    GOOGLE_ID: Joi.string().required(),
+                    GOOGLE_SECRET: Joi.string().required(),
                     DB_HOST: Joi.string().required(),
                     DB_PORT: Joi.string().required(),
                     DB_USER: Joi.string().required(),
                     DB_PASSWORD: Joi.string().required(),
                     DB_DB: Joi.string().required(),
-                    MESSAGE_BROKER_PORT: Joi.string().required(),
-                    MESSAGE_BROKER_HOST: Joi.string().required(),
                 }),
                 validationOptions: {
                     abortEarly: true,
@@ -72,9 +72,9 @@ AppModule = __decorate([
             role_module_1.RoleModule,
             emoji_module_1.EmojiModule,
             mail_module_1.MailModule,
-            utility_module_1.UtilityModule,
             channel_category_module_1.ChannelCategoryModule,
-            guild_member_module_1.GuildMemberModule,
+            member_module_1.MemberModule,
+            react_module_1.ReactModule,
         ],
         providers: [],
     })

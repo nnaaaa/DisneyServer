@@ -17,17 +17,16 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const channel_entity_1 = require("../../entities/channel.entity");
 const channel_repository_1 = require("../../repositories/channel.repository");
-const guild_member_service_1 = require("../guild-member/guild-member.service");
-const role_service_1 = require("../role/role.service");
+const member_service_1 = require("../member/member.service");
+const message_service_1 = require("../message/message.service");
 let ChannelService = class ChannelService {
-    constructor(roleService, guildMemberService, channelRepository) {
-        this.roleService = roleService;
-        this.guildMemberService = guildMemberService;
+    constructor(channelRepository, messageService, memberService) {
         this.channelRepository = channelRepository;
+        this.messageService = messageService;
+        this.memberService = memberService;
         this.channelRelations = {
-            messages: true,
-            members: this.guildMemberService.guildMemberRelations,
-            roles: this.roleService.roleRelations,
+            roles: { members: { user: true } },
+            members: { user: true }
         };
     }
     async save(category) {
@@ -37,7 +36,7 @@ let ChannelService = class ChannelService {
         const channel = this.channelRepository.create(Object.assign(Object.assign({}, createChannelDto), { category, messages: [], members: [] }));
         return channel;
     }
-    async findOne(findCondition) {
+    async findOneWithRelation(findCondition) {
         return await this.channelRepository.findOne({
             relations: this.channelRelations,
             where: findCondition,
@@ -51,35 +50,71 @@ let ChannelService = class ChannelService {
     }
     async updateOne(findCondition, updateCondition) {
         try {
-            await this.channelRepository
-                .createQueryBuilder()
-                .update(updateCondition)
-                .where(findCondition)
-                .execute();
+            let channel = await this.findOneWithRelation(findCondition);
+            channel = Object.assign(channel, updateCondition);
+            return this.save(channel);
         }
         catch (e) {
             throw new common_1.InternalServerErrorException(e);
         }
     }
-    async delete(findCondition) {
+    async deleteOne(findCondition) {
         try {
-            await this.channelRepository
-                .createQueryBuilder()
-                .delete()
-                .where(findCondition)
-                .execute();
+            const channel = await this.findOneWithRelation(findCondition);
+            if (channel) {
+                await this.messageService.deleteMany({ channel: { channelId: channel.channelId } });
+                await this.channelRepository.remove(channel);
+            }
         }
         catch (e) {
             throw new common_1.InternalServerErrorException(e);
         }
+    }
+    async deleteMany(findCondition) {
+        try {
+            const channels = await this.findMany(findCondition);
+            const removeChildren = [];
+            for (const channel of channels) {
+                removeChildren.push(this.messageService.deleteMany({ channel: { channelId: channel.channelId } }));
+            }
+            await Promise.all(removeChildren);
+            await this.channelRepository.remove(channels);
+        }
+        catch (e) {
+            throw new common_1.InternalServerErrorException(e);
+        }
+    }
+    async addMember({ channelId, memberId }) {
+        const channel = await this.findOneWithRelation({ channelId });
+        const member = await this.memberService.findOneWithRelation({
+            memberId,
+        });
+        if (!member || !channel)
+            throw new common_1.NotFoundException();
+        member.joinedChannels.push(channel);
+        channel.members.push(member);
+        await this.save(channel);
+        return { channel, member };
+    }
+    async removeMember({ channelId, memberId }) {
+        const channel = await this.findOneWithRelation({ channelId });
+        const member = await this.memberService.findOneWithRelation({
+            memberId,
+        });
+        if (!member || !channel)
+            throw new common_1.NotFoundException();
+        member.joinedChannels = member.joinedChannels.filter((c) => c.channelId !== channelId);
+        channel.members = channel.members.filter((member) => member.memberId !== memberId);
+        await this.save(channel);
+        return { channel, member };
     }
 };
 ChannelService = __decorate([
     (0, common_1.Injectable)(),
-    __param(2, (0, typeorm_1.InjectRepository)(channel_entity_1.ChannelEntity)),
-    __metadata("design:paramtypes", [role_service_1.RoleService,
-        guild_member_service_1.GuildMemberService,
-        channel_repository_1.ChannelRepository])
+    __param(0, (0, typeorm_1.InjectRepository)(channel_entity_1.ChannelEntity)),
+    __metadata("design:paramtypes", [channel_repository_1.ChannelRepository,
+        message_service_1.MessageService,
+        member_service_1.MemberService])
 ], ChannelService);
 exports.ChannelService = ChannelService;
 //# sourceMappingURL=channel.service.js.map

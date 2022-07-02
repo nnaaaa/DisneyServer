@@ -7,17 +7,16 @@ import {
     WsException,
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
-import { RoleSocketEmit } from 'src/shared/socket.emit'
-import { RoleSocketEvent } from 'src/shared/socket.event'
+import { RoleEntity } from 'src/entities/role.entity'
+import { GuildDto } from 'src/shared/dtos'
+import { RoleSocketEmit } from 'src/shared/socket/emit'
+import { RoleSocketEvent } from 'src/shared/socket/event'
 import { JwtWsGuard } from '../auth/guards/jwtWS.guard'
-import { MemberRoleDto } from './dtos/memberRole.dto'
+import { ChannelRoleDto } from './dtos/channelRole.dto'
 import { CreateRoleDto } from './dtos/createRole.dto'
+import { MemberRoleDto } from './dtos/memberRole.dto'
 import { UpdateRoleDto } from './dtos/updateRole.dto'
 import { RoleService } from './role.service'
-import { ChannelRoleDto } from './dtos/channelRole.dto'
-import { ChannelGateway } from '../channel/channel.gateway'
-import { RoleEntity } from 'src/entities/role.entity'
-import { GuildGateway } from '../guild/guild.gateway'
 
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'role' })
 export class RoleGateway {
@@ -25,23 +24,21 @@ export class RoleGateway {
     @WebSocketServer()
     server: Server
 
-    constructor(
-        private roleService: RoleService,
-        private channelGateway: ChannelGateway,
-        private guildGateway: GuildGateway
-    ) {}
+    constructor(private roleService: RoleService) {}
 
     @UseGuards(JwtWsGuard)
     @UsePipes(new ValidationPipe())
     @SubscribeMessage(RoleSocketEvent.CREATE)
     async create(
         @MessageBody('role') createDto: CreateRoleDto,
-        @MessageBody('guildId') guildId: string
+        @MessageBody('guild') guild: GuildDto
     ) {
         try {
-            const role = await this.roleService.createByGuildIdAndSave(createDto, guildId)
+            const role = await this.roleService.create(createDto, guild)
 
-            this.server.emit(`${guildId}/${RoleSocketEmit.CREATE}`, role)
+            const savedRole = await this.roleService.save(role)
+
+            this.server.emit(`${guild.guildId}/${RoleSocketEmit.CREATE}`, savedRole)
         } catch (e) {
             this.logger.error(e)
             throw new WsException(e)
@@ -65,11 +62,10 @@ export class RoleGateway {
     }
 
     @UseGuards(JwtWsGuard)
-    @UsePipes(new ValidationPipe())
     @SubscribeMessage(RoleSocketEvent.DELETE)
     async delete(@MessageBody() roleId: string) {
         try {
-            await this.roleService.delete({ roleId })
+            await this.roleService.deleteOne({ roleId })
             this.server.emit(`${RoleSocketEmit.DELETE}/${roleId}`)
         } catch (e) {
             this.logger.error(e)
@@ -84,9 +80,7 @@ export class RoleGateway {
         try {
             const { member, role } = await this.roleService.addToMember(memberRoleDto)
 
-            this.updateNotify(role)
-
-            this.guildGateway.memberUpdateNotify(member)
+            this.server.emit(`${RoleSocketEmit.ADD_TO_MEMBER}/${role.roleId}`, { member, role })
         } catch (e) {
             this.logger.error(e)
             throw new WsException(e)
@@ -100,10 +94,7 @@ export class RoleGateway {
             const { member, role } = await this.roleService.removeFromMember(
                 memberRoleDto
             )
-
-            this.updateNotify(role)
-
-            this.guildGateway.memberUpdateNotify(member)
+            this.server.emit(`${RoleSocketEmit.REMOVE_FROM_MEMBER}/${role.roleId}`, { member, role })
         } catch (e) {
             this.logger.error(e)
             throw new WsException(e)
@@ -117,9 +108,7 @@ export class RoleGateway {
         try {
             const { role, channel } = await this.roleService.addToChannel(channelRoleDto)
 
-            this.updateNotify(role)
-
-            this.channelGateway.updateNotify(channel)
+            this.server.emit(`${RoleSocketEmit.ADD_TO_CHANNEL}/${role.roleId}`, { channel, role })
         } catch (e) {
             this.logger.error(e)
             throw new WsException(e)
@@ -133,17 +122,10 @@ export class RoleGateway {
             const { role, channel } = await this.roleService.removeFromChannel(
                 channelRoleDto
             )
-
-            this.updateNotify(role)
-
-            this.channelGateway.updateNotify(channel)
+            this.server.emit(`${RoleSocketEmit.REMOVE_FROM_CHANNEL}/${role.roleId}`, { channel, role })
         } catch (e) {
             this.logger.error(e)
             throw new WsException(e)
         }
-    }
-
-    updateNotify(role: RoleEntity) {
-        this.server.emit(`${RoleSocketEmit.UPDATE}/${role.roleId}`, role)
     }
 }

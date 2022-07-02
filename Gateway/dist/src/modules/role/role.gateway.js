@@ -17,27 +17,25 @@ exports.RoleGateway = void 0;
 const common_1 = require("@nestjs/common");
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
-const socket_emit_1 = require("../../shared/socket.emit");
-const socket_event_1 = require("../../shared/socket.event");
+const dtos_1 = require("../../shared/dtos");
+const emit_1 = require("../../shared/socket/emit");
+const event_1 = require("../../shared/socket/event");
 const jwtWS_guard_1 = require("../auth/guards/jwtWS.guard");
-const memberRole_dto_1 = require("./dtos/memberRole.dto");
+const channelRole_dto_1 = require("./dtos/channelRole.dto");
 const createRole_dto_1 = require("./dtos/createRole.dto");
+const memberRole_dto_1 = require("./dtos/memberRole.dto");
 const updateRole_dto_1 = require("./dtos/updateRole.dto");
 const role_service_1 = require("./role.service");
-const channelRole_dto_1 = require("./dtos/channelRole.dto");
-const channel_gateway_1 = require("../channel/channel.gateway");
-const guild_gateway_1 = require("../guild/guild.gateway");
 let RoleGateway = RoleGateway_1 = class RoleGateway {
-    constructor(roleService, channelGateway, guildGateway) {
+    constructor(roleService) {
         this.roleService = roleService;
-        this.channelGateway = channelGateway;
-        this.guildGateway = guildGateway;
         this.logger = new common_1.Logger(RoleGateway_1.name);
     }
-    async create(createDto, guildId) {
+    async create(createDto, guild) {
         try {
-            const role = await this.roleService.createByGuildIdAndSave(createDto, guildId);
-            this.server.emit(`${guildId}/${socket_emit_1.RoleSocketEmit.CREATE}`, role);
+            const role = await this.roleService.create(createDto, guild);
+            const savedRole = await this.roleService.save(role);
+            this.server.emit(`${guild.guildId}/${emit_1.RoleSocketEmit.CREATE}`, savedRole);
         }
         catch (e) {
             this.logger.error(e);
@@ -48,7 +46,7 @@ let RoleGateway = RoleGateway_1 = class RoleGateway {
         try {
             const { roleId } = updateRoleDto;
             await this.roleService.update({ roleId }, updateRoleDto);
-            this.server.emit(`${socket_emit_1.RoleSocketEmit.UPDATE}/${roleId}`, updateRoleDto);
+            this.server.emit(`${emit_1.RoleSocketEmit.UPDATE}/${roleId}`, updateRoleDto);
         }
         catch (e) {
             this.logger.error(e);
@@ -57,8 +55,8 @@ let RoleGateway = RoleGateway_1 = class RoleGateway {
     }
     async delete(roleId) {
         try {
-            await this.roleService.delete({ roleId });
-            this.server.emit(`${socket_emit_1.RoleSocketEmit.DELETE}/${roleId}`);
+            await this.roleService.deleteOne({ roleId });
+            this.server.emit(`${emit_1.RoleSocketEmit.DELETE}/${roleId}`);
         }
         catch (e) {
             this.logger.error(e);
@@ -68,8 +66,7 @@ let RoleGateway = RoleGateway_1 = class RoleGateway {
     async addToMember(memberRoleDto) {
         try {
             const { member, role } = await this.roleService.addToMember(memberRoleDto);
-            this.updateNotify(role);
-            this.guildGateway.memberUpdateNotify(member);
+            this.server.emit(`${emit_1.RoleSocketEmit.ADD_TO_MEMBER}/${role.roleId}`, { member, role });
         }
         catch (e) {
             this.logger.error(e);
@@ -79,8 +76,7 @@ let RoleGateway = RoleGateway_1 = class RoleGateway {
     async removeFromMember(memberRoleDto) {
         try {
             const { member, role } = await this.roleService.removeFromMember(memberRoleDto);
-            this.updateNotify(role);
-            this.guildGateway.memberUpdateNotify(member);
+            this.server.emit(`${emit_1.RoleSocketEmit.REMOVE_FROM_MEMBER}/${role.roleId}`, { member, role });
         }
         catch (e) {
             this.logger.error(e);
@@ -90,8 +86,7 @@ let RoleGateway = RoleGateway_1 = class RoleGateway {
     async addToChannel(channelRoleDto) {
         try {
             const { role, channel } = await this.roleService.addToChannel(channelRoleDto);
-            this.updateNotify(role);
-            this.channelGateway.updateNotify(channel);
+            this.server.emit(`${emit_1.RoleSocketEmit.ADD_TO_CHANNEL}/${role.roleId}`, { channel, role });
         }
         catch (e) {
             this.logger.error(e);
@@ -101,16 +96,12 @@ let RoleGateway = RoleGateway_1 = class RoleGateway {
     async removeFromChannel(channelRoleDto) {
         try {
             const { role, channel } = await this.roleService.removeFromChannel(channelRoleDto);
-            this.updateNotify(role);
-            this.channelGateway.updateNotify(channel);
+            this.server.emit(`${emit_1.RoleSocketEmit.REMOVE_FROM_CHANNEL}/${role.roleId}`, { channel, role });
         }
         catch (e) {
             this.logger.error(e);
             throw new websockets_1.WsException(e);
         }
-    }
-    updateNotify(role) {
-        this.server.emit(`${socket_emit_1.RoleSocketEmit.UPDATE}/${role.roleId}`, role);
     }
 };
 __decorate([
@@ -120,17 +111,18 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwtWS_guard_1.JwtWsGuard),
     (0, common_1.UsePipes)(new common_1.ValidationPipe()),
-    (0, websockets_1.SubscribeMessage)(socket_event_1.RoleSocketEvent.CREATE),
+    (0, websockets_1.SubscribeMessage)(event_1.RoleSocketEvent.CREATE),
     __param(0, (0, websockets_1.MessageBody)('role')),
-    __param(1, (0, websockets_1.MessageBody)('guildId')),
+    __param(1, (0, websockets_1.MessageBody)('guild')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [createRole_dto_1.CreateRoleDto, String]),
+    __metadata("design:paramtypes", [createRole_dto_1.CreateRoleDto,
+        dtos_1.GuildDto]),
     __metadata("design:returntype", Promise)
 ], RoleGateway.prototype, "create", null);
 __decorate([
     (0, common_1.UseGuards)(jwtWS_guard_1.JwtWsGuard),
     (0, common_1.UsePipes)(new common_1.ValidationPipe()),
-    (0, websockets_1.SubscribeMessage)(socket_event_1.RoleSocketEvent.UPDATE),
+    (0, websockets_1.SubscribeMessage)(event_1.RoleSocketEvent.UPDATE),
     __param(0, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [updateRole_dto_1.UpdateRoleDto]),
@@ -138,8 +130,7 @@ __decorate([
 ], RoleGateway.prototype, "update", null);
 __decorate([
     (0, common_1.UseGuards)(jwtWS_guard_1.JwtWsGuard),
-    (0, common_1.UsePipes)(new common_1.ValidationPipe()),
-    (0, websockets_1.SubscribeMessage)(socket_event_1.RoleSocketEvent.DELETE),
+    (0, websockets_1.SubscribeMessage)(event_1.RoleSocketEvent.DELETE),
     __param(0, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -148,7 +139,7 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwtWS_guard_1.JwtWsGuard),
     (0, common_1.UsePipes)(new common_1.ValidationPipe()),
-    (0, websockets_1.SubscribeMessage)(socket_event_1.RoleSocketEvent.ADD_TO_MEMBER),
+    (0, websockets_1.SubscribeMessage)(event_1.RoleSocketEvent.ADD_TO_MEMBER),
     __param(0, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [memberRole_dto_1.MemberRoleDto]),
@@ -156,7 +147,7 @@ __decorate([
 ], RoleGateway.prototype, "addToMember", null);
 __decorate([
     (0, common_1.UseGuards)(jwtWS_guard_1.JwtWsGuard),
-    (0, websockets_1.SubscribeMessage)(socket_event_1.RoleSocketEvent.REMOVE_FROM_MEMBER),
+    (0, websockets_1.SubscribeMessage)(event_1.RoleSocketEvent.REMOVE_FROM_MEMBER),
     __param(0, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [memberRole_dto_1.MemberRoleDto]),
@@ -165,7 +156,7 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwtWS_guard_1.JwtWsGuard),
     (0, common_1.UsePipes)(new common_1.ValidationPipe()),
-    (0, websockets_1.SubscribeMessage)(socket_event_1.RoleSocketEvent.ADD_TO_CHANNEL),
+    (0, websockets_1.SubscribeMessage)(event_1.RoleSocketEvent.ADD_TO_CHANNEL),
     __param(0, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [channelRole_dto_1.ChannelRoleDto]),
@@ -173,7 +164,7 @@ __decorate([
 ], RoleGateway.prototype, "addToChannel", null);
 __decorate([
     (0, common_1.UseGuards)(jwtWS_guard_1.JwtWsGuard),
-    (0, websockets_1.SubscribeMessage)(socket_event_1.RoleSocketEvent.REMOVE_FROM_CHANNEL),
+    (0, websockets_1.SubscribeMessage)(event_1.RoleSocketEvent.REMOVE_FROM_CHANNEL),
     __param(0, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [channelRole_dto_1.ChannelRoleDto]),
@@ -181,9 +172,7 @@ __decorate([
 ], RoleGateway.prototype, "removeFromChannel", null);
 RoleGateway = RoleGateway_1 = __decorate([
     (0, websockets_1.WebSocketGateway)({ cors: { origin: '*' }, namespace: 'role' }),
-    __metadata("design:paramtypes", [role_service_1.RoleService,
-        channel_gateway_1.ChannelGateway,
-        guild_gateway_1.GuildGateway])
+    __metadata("design:paramtypes", [role_service_1.RoleService])
 ], RoleGateway);
 exports.RoleGateway = RoleGateway;
 //# sourceMappingURL=role.gateway.js.map

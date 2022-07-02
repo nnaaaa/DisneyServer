@@ -9,9 +9,9 @@ import { ChannelModule } from './modules/channel/channel.module'
 import { RoleModule } from './modules/role/role.module'
 import { EmojiModule } from './modules/emoji/emoji.module'
 import { MailModule } from './modules/mail/mail.module'
-import { UtilityModule } from './modules/utility/utility.module'
 import { ChannelCategoryModule } from './modules/channel-category/channel-category.module'
-import { GuildMemberModule } from './modules/guild-member/guild-member.module'
+import { MemberModule } from './modules/member/member.module'
+import { ReactModule } from './modules/react/react.module'
 import * as Joi from 'joi'
 
 @Module({
@@ -42,13 +42,15 @@ import * as Joi from 'joi'
                 EMAIL_PASSWORD: Joi.string().required(),
                 FACEBOOK_ID: Joi.string().required(),
                 FACEBOOK_SECRET: Joi.string().required(),
+                GOOGLE_ID: Joi.string().required(),
+                GOOGLE_SECRET: Joi.string().required(),
                 DB_HOST: Joi.string().required(),
                 DB_PORT: Joi.string().required(),
                 DB_USER: Joi.string().required(),
                 DB_PASSWORD: Joi.string().required(),
                 DB_DB: Joi.string().required(),
-                MESSAGE_BROKER_PORT: Joi.string().required(),
-                MESSAGE_BROKER_HOST: Joi.string().required(),
+                // MESSAGE_BROKER_PORT: Joi.string().required(),
+                // MESSAGE_BROKER_HOST: Joi.string().required(),
             }),
             validationOptions: {
                 // allowUnknown: false,
@@ -63,9 +65,9 @@ import * as Joi from 'joi'
         RoleModule,
         EmojiModule,
         MailModule,
-        UtilityModule,
         ChannelCategoryModule,
-        GuildMemberModule,
+        MemberModule,
+        ReactModule,
     ],
     providers: [],
 })

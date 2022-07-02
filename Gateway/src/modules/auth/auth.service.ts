@@ -22,7 +22,7 @@ export class AuthService {
         private jwtService: JwtService,
         private userService: UserService,
         private mailService: MailService
-    ) {}
+    ) { }
 
     verifyToken(token: string) {
         return this.jwtService.verify(token)
@@ -36,17 +36,23 @@ export class AuthService {
         return this.jwtService.sign({ userId }, { expiresIn: '30d' })
     }
 
-    async createAuthUser(userRegisterDto: UserRegisterDto) {
+    async createAuthUser(userRegisterDto: UserRegisterDto, withVerify = true) {
         const user = await this.userService.findOne({
             account: userRegisterDto.account,
         })
         if (user) throw new ForbiddenException()
 
-        const digitCode = Algorithm.generateDigit(6)
+        if (withVerify) {
+            const digitCode = Algorithm.generateDigit(6)
 
-        this.mailService.registerConfirm(userRegisterDto, digitCode)
+            this.mailService.registerConfirm(userRegisterDto, digitCode)
 
-        return await this.userService.create(userRegisterDto, digitCode)
+            await this.userService.create(userRegisterDto, digitCode)
+        }
+        else {
+            await this.userService.create(userRegisterDto)
+        }
+
     }
 
     async createAuthChangePassword({ account }: ForgetPasswordDto) {

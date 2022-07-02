@@ -12,8 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserEntity = void 0;
 const default_1 = require("../shared/default");
 const typeorm_1 = require("typeorm");
-const guildMember_entity_1 = require("./guildMember.entity");
-const message_entity_1 = require("./message.entity");
+const member_entity_1 = require("./member.entity");
 const userBeFriend_entity_1 = require("./userBeFriend.entity");
 let UserEntity = class UserEntity {
 };
@@ -62,11 +61,7 @@ __decorate([
     __metadata("design:type", Array)
 ], UserEntity.prototype, "friends", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => message_entity_1.MesssageEntity, (type) => type.author, { cascade: true }),
-    __metadata("design:type", Array)
-], UserEntity.prototype, "sentMessages", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => guildMember_entity_1.GuildMemberEntity, (type) => type.user, { cascade: true }),
+    (0, typeorm_1.OneToMany)(() => member_entity_1.MemberEntity, (type) => type.user, { cascade: true }),
     __metadata("design:type", Array)
 ], UserEntity.prototype, "joinedGuilds", void 0);
 UserEntity = __decorate([

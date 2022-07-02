@@ -15,13 +15,13 @@ export class JwtWsGuard implements CanActivate {
         try {
             const client = context.switchToWs().getClient()
             if (!client.handshake.headers || !client.handshake.headers.authorization) {
-                throw new WsException('No token')
+                throw new WsException('Token is required')
             }
             const accessToken = client.handshake.headers.authorization
                 .replace('Bearer', '')
                 .trim()
 
-            if (!accessToken) throw new WsException('No token')
+            if (!accessToken) throw new WsException('Token is required')
             const tokenPayload: TokenPayload = this.jwtService.verify(accessToken)
 
             const user = await this.userService.findOne({

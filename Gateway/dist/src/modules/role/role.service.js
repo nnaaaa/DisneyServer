@@ -15,19 +15,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RoleService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
-const channel_entity_1 = require("../../entities/channel.entity");
-const guild_entity_1 = require("../../entities/guild.entity");
 const role_entity_1 = require("../../entities/role.entity");
-const channel_repository_1 = require("../../repositories/channel.repository");
-const guild_repository_1 = require("../../repositories/guild.repository");
 const role_repository_1 = require("../../repositories/role.repository");
-const guild_member_service_1 = require("../guild-member/guild-member.service");
+const channel_service_1 = require("../channel/channel.service");
+const member_service_1 = require("../member/member.service");
 let RoleService = class RoleService {
-    constructor(roleRepository, guildRepository, channelRepository, guildMemberService) {
+    constructor(roleRepository, channelService, memberService) {
         this.roleRepository = roleRepository;
-        this.guildRepository = guildRepository;
-        this.channelRepository = channelRepository;
-        this.guildMemberService = guildMemberService;
+        this.channelService = channelService;
+        this.memberService = memberService;
         this.roleRelations = {
             members: true,
             channels: true,
@@ -40,8 +36,14 @@ let RoleService = class RoleService {
         const role = this.roleRepository.create(Object.assign(Object.assign({}, createDto), { guild, members: [], channels: [] }));
         return role;
     }
-    async findOneWithReletion(findCondition) {
+    async findOneWithRelation(findCondition) {
         return await this.roleRepository.findOne({
+            where: findCondition,
+            relations: this.roleRelations,
+        });
+    }
+    async findManyWithReletion(findCondition) {
+        return await this.roleRepository.find({
             where: findCondition,
             relations: this.roleRelations,
         });
@@ -58,21 +60,33 @@ let RoleService = class RoleService {
             throw new common_1.InternalServerErrorException(e);
         }
     }
-    async delete(findCondition) {
+    async deleteMany(findCondition) {
         try {
-            const role = await this.findOneWithReletion(findCondition);
-            role.channels = [];
-            role.members = [];
-            await this.roleRepository.remove(role);
+            const roles = await this.findManyWithReletion(findCondition);
+            for (const role of roles) {
+                await this.roleRepository.remove(role);
+            }
         }
         catch (e) {
             throw new common_1.InternalServerErrorException(e);
         }
     }
-    async addToMember({ roleId, guildMemberId }) {
-        const role = await this.findOneWithReletion({ roleId });
-        const member = await this.guildMemberService.findOneWithRelation({
-            guildMemberId,
+    async deleteOne(findCondition) {
+        try {
+            const role = await this.findOneWithRelation(findCondition);
+            if (role) {
+                await this.roleRepository.remove(role);
+            }
+            return role;
+        }
+        catch (e) {
+            throw new common_1.InternalServerErrorException(e);
+        }
+    }
+    async addToMember({ roleId, memberId }) {
+        const role = await this.findOneWithRelation({ roleId });
+        const member = await this.memberService.findOneWithRelation({
+            memberId,
         });
         if (!member || !role)
             throw new common_1.NotFoundException();
@@ -81,21 +95,21 @@ let RoleService = class RoleService {
         await this.save(role);
         return { role, member };
     }
-    async removeFromMember({ roleId, guildMemberId }) {
-        const role = await this.findOneWithReletion({ roleId });
-        const member = await this.guildMemberService.findOneWithRelation({
-            guildMemberId,
+    async removeFromMember({ roleId, memberId }) {
+        const role = await this.findOneWithRelation({ roleId });
+        const member = await this.memberService.findOneWithRelation({
+            memberId,
         });
         if (!member || !role)
             throw new common_1.NotFoundException();
         member.roles = member.roles.filter((role) => role.roleId !== roleId);
-        role.members = role.members.filter((member) => member.guildMemberId !== guildMemberId);
+        role.members = role.members.filter((member) => member.memberId !== memberId);
         await this.save(role);
         return { role, member };
     }
     async addToChannel({ roleId, channelId }) {
-        const role = await this.findOneWithReletion({ roleId });
-        const channel = await this.channelRepository.findOneBy({
+        const role = await this.findOneWithRelation({ roleId });
+        const channel = await this.channelService.findOneWithRelation({
             channelId,
         });
         if (!channel || !role)
@@ -106,8 +120,8 @@ let RoleService = class RoleService {
         return { role, channel };
     }
     async removeFromChannel({ roleId, channelId }) {
-        const role = await this.findOneWithReletion({ roleId });
-        const channel = await this.channelRepository.findOneBy({
+        const role = await this.findOneWithRelation({ roleId });
+        const channel = await this.channelService.findOneWithRelation({
             channelId,
         });
         if (!channel || !role)
@@ -117,22 +131,13 @@ let RoleService = class RoleService {
         await this.save(role);
         return { role, channel };
     }
-    async createByGuildIdAndSave(createDto, guildId) {
-        const guild = await this.guildRepository.findOneBy({ guildId });
-        const role = await this.create(createDto, guild);
-        const savedRole = await this.roleRepository.save(role);
-        return savedRole;
-    }
 };
 RoleService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(role_entity_1.RoleEntity)),
-    __param(1, (0, typeorm_1.InjectRepository)(guild_entity_1.GuildEntity)),
-    __param(2, (0, typeorm_1.InjectRepository)(channel_entity_1.ChannelEntity)),
     __metadata("design:paramtypes", [role_repository_1.RoleRepository,
-        guild_repository_1.GuildRepository,
-        channel_repository_1.ChannelRepository,
-        guild_member_service_1.GuildMemberService])
+        channel_service_1.ChannelService,
+        member_service_1.MemberService])
 ], RoleService);
 exports.RoleService = RoleService;
 //# sourceMappingURL=role.service.js.map

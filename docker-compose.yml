@@ -20,7 +20,7 @@ services:
     depends_on:
       - message-broker
       - gateway-database
-      - message-server
+        #      - message-server
 
   gateway-database:
     image: mysql:5.7
@@ -43,47 +43,47 @@ services:
     depends_on:
       - gateway-database
 
-  message-server:
-    build: ./MessageService
-    command: npm run start:dev
-    volumes:
-      - ./MessageService:/app/MessageService
-      - /app/MessageService/node_modules
-    environment:
-      DB_HOST: message-database
-      DB_PORT: ${MESSAGE_DB_PORT}
-      DB_USER: root
-      DB_PASSWORD: dummyguys
-      DB_DB: disney
-      MESSAGE_BROKER_PORT: ${KAFKA_DOCKER_PORT}
-      MESSAGE_BROKER_HOST: message-broker
-    depends_on:
-      - message-broker
-      - message-database
+  # message-server:
+  #   build: ./MessageService
+  #   command: npm run start:dev
+  #   volumes:
+  #     - ./MessageService:/app/MessageService
+  #     - /app/MessageService/node_modules
+  #   environment:
+  #     DB_HOST: message-database
+  #     DB_PORT: ${MESSAGE_DB_PORT}
+  #     DB_USER: root
+  #     DB_PASSWORD: dummyguys
+  #     DB_DB: disney
+  #     MESSAGE_BROKER_PORT: ${KAFKA_DOCKER_PORT}
+  #     MESSAGE_BROKER_HOST: message-broker
+  #   depends_on:
+  #     - message-broker
+  #     - message-database
 
-  message-database:
-    image: mongo:4.2.21-bionic
-    ports:
-      - ${MESSAGE_DB_PORT}:${MESSAGE_DB_PORT}
-    volumes:
-      - mongodb:/data/db
-      - mongoconfig:/data/configdb
-    environment:
-      MONGO_INITDB_DATABASE: disney
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: dummyguys
+  # message-database:
+  #   image: mongo:4.2.21-bionic
+  #   ports:
+  #     - ${MESSAGE_DB_PORT}:${MESSAGE_DB_PORT}
+  #   volumes:
+  #     - mongodb:/data/db
+  #     - mongoconfig:/data/configdb
+  #   environment:
+  #     MONGO_INITDB_DATABASE: disney
+  #     MONGO_INITDB_ROOT_USERNAME: root
+  #     MONGO_INITDB_ROOT_PASSWORD: dummyguys
 
-  message-database-manager:
-    image: mongo-express:1.0.0-alpha.4
-    ports:
-      - ${MESSAGE_DB_MANAGER_PORT}:${MESSAGE_DB_MANAGER_PORT}
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: dummyguys
-      ME_CONFIG_MONGODB_SERVER: message-database
-      ME_CONFIG_MONGODB_PORT: ${MESSAGE_DB_PORT}
-    depends_on:
-      - message-database
+  # message-database-manager:
+  #   image: mongo-express:1.0.0-alpha.4
+  #   ports:
+  #     - ${MESSAGE_DB_MANAGER_PORT}:${MESSAGE_DB_MANAGER_PORT}
+  #   environment:
+  #     ME_CONFIG_MONGODB_ADMINUSERNAME: root
+  #     ME_CONFIG_MONGODB_ADMINPASSWORD: dummyguys
+  #     ME_CONFIG_MONGODB_SERVER: message-database
+  #     ME_CONFIG_MONGODB_PORT: ${MESSAGE_DB_PORT}
+  #   depends_on:
+  #     - message-database
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest

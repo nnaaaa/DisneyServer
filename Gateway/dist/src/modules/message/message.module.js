@@ -8,34 +8,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageModule = void 0;
 const common_1 = require("@nestjs/common");
-const config_1 = require("@nestjs/config");
-const microservices_1 = require("@nestjs/microservices");
 const typeorm_1 = require("@nestjs/typeorm");
 const message_entity_1 = require("../../entities/message.entity");
-const services_1 = require("../../shared/services");
-const channel_module_1 = require("../channel/channel.module");
-const user_module_1 = require("../user/user.module");
-const utility_module_1 = require("../utility/utility.module");
+const auth_module_1 = require("../auth/auth.module");
+const react_module_1 = require("../react/react.module");
+const react_service_1 = require("../react/react.service");
 const message_gateway_1 = require("./message.gateway");
 const message_service_1 = require("./message.service");
 let MessageModule = class MessageModule {
 };
 MessageModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            typeorm_1.TypeOrmModule.forFeature([message_entity_1.MesssageEntity]),
-            microservices_1.ClientsModule.registerAsync([
-                {
-                    name: services_1.ServiceName.MESSAGE,
-                    useFactory: services_1.Service.messageFactory,
-                    inject: [config_1.ConfigService],
-                },
-            ]),
-            utility_module_1.UtilityModule,
-            channel_module_1.ChannelModule,
-            user_module_1.UserModule,
-        ],
-        providers: [message_service_1.MessageService, message_gateway_1.MessageGateway],
+        imports: [typeorm_1.TypeOrmModule.forFeature([message_entity_1.MessageEntity]), auth_module_1.AuthModule, react_module_1.ReactModule],
+        providers: [react_service_1.ReactService, message_service_1.MessageService, message_gateway_1.MessageGateway],
+        exports: [typeorm_1.TypeOrmModule, message_service_1.MessageService, react_module_1.ReactModule],
     })
 ], MessageModule);
 exports.MessageModule = MessageModule;

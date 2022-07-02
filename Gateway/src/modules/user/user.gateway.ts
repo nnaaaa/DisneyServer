@@ -1,14 +1,11 @@
-import { instanceToPlain } from 'class-transformer'
 import {
     ClassSerializerInterceptor,
-    Inject,
     Logger,
     UseGuards,
     UseInterceptors,
     UsePipes,
     ValidationPipe,
 } from '@nestjs/common'
-import { ClientKafka } from '@nestjs/microservices'
 import {
     MessageBody,
     SubscribeMessage,
@@ -17,16 +14,12 @@ import {
     WsException,
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
-import { AuthWSUser } from 'src/decorators/auth-user.decorator'
+import { AuthWSUser } from 'src/shared/decorators/auth-user.decorator'
 import { UserEntity } from 'src/entities/user.entity'
 import { UserBeFriendEntity } from 'src/entities/userBeFriend.entity'
-import { UserPatternEvent } from 'src/shared/event.pattern'
-import { ServiceName } from 'src/shared/services'
-import { ChannelSocketEmit, UserSocketEmit } from 'src/shared/socket.emit'
-import { UserSocketEvent } from 'src/shared/socket.event'
+import { UserSocketEmit } from 'src/shared/socket/emit'
+import { UserSocketEvent } from 'src/shared/socket/event'
 import { JwtWsGuard } from '../auth/guards/jwtWS.guard'
-import { ChannelGateway } from '../channel/channel.gateway'
-import { GuildMemberService } from './../guild-member/guild-member.service'
 import { UpdateProfileDto } from './dtos/updateProfile.dto'
 import { UserService } from './user.service'
 
@@ -36,12 +29,7 @@ export class UserGateway {
     @WebSocketServer()
     public readonly server: Server
 
-    constructor(
-        private userService: UserService,
-        private guildMemberService: GuildMemberService,
-        private channelGateway: ChannelGateway,
-        @Inject(ServiceName.MESSAGE) private messageClient: ClientKafka
-    ) {}
+    constructor(private userService: UserService) {}
 
     @UseGuards(JwtWsGuard)
     @SubscribeMessage(UserSocketEvent.ONLINE)
@@ -53,18 +41,6 @@ export class UserGateway {
             )
 
             this.server.emit(`${UserSocketEmit.ONLINE}/${user.userId}`, user)
-
-            const joinedGuilds = await this.guildMemberService.findManyWithRelation({
-                user: { userId: authUser.userId },
-            })
-
-            // emit to all channels of all guilds which user joined
-            for (const joinedGuild of joinedGuilds) {
-                this.channelGateway.channelMemberNotify(
-                    ChannelSocketEmit.USER_ONLINE,
-                    joinedGuild
-                )
-            }
 
             return user
         } catch (e) {
@@ -85,7 +61,6 @@ export class UserGateway {
                 { userId: authUser.userId },
                 newProfile
             )
-            this.messageClient.emit(UserPatternEvent.UPDATE, instanceToPlain(user))
 
             this.server.emit(`${UserSocketEmit.UPDATE_PROFILE}/${user.userId}`, user)
         } catch (e) {

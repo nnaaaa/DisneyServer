@@ -1,4 +1,4 @@
 export declare class ChannelRoleDto {
-    roleId: string
-    channelId: string
+    roleId: string;
+    channelId: string;
 }

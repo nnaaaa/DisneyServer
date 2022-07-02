@@ -17,26 +17,24 @@ exports.MessageGateway = void 0;
 const common_1 = require("@nestjs/common");
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
-const auth_user_decorator_1 = require("../../decorators/auth-user.decorator");
-const user_entity_1 = require("../../entities/user.entity");
-const socket_event_1 = require("../../shared/socket.event");
+const dtos_1 = require("../../shared/dtos");
+const emit_1 = require("../../shared/socket/emit");
+const event_1 = require("../../shared/socket/event");
 const jwtWS_guard_1 = require("../auth/guards/jwtWS.guard");
-const channel_service_1 = require("../channel/channel.service");
 const createMessage_dto_1 = require("./dtos/createMessage.dto");
 const updateMessage_dto_1 = require("./dtos/updateMessage.dto");
 const message_service_1 = require("./message.service");
 let MessageGateway = MessageGateway_1 = class MessageGateway {
-    constructor(messageService, channelService) {
+    constructor(messageService) {
         this.messageService = messageService;
-        this.channelService = channelService;
         this.logger = new common_1.Logger(MessageGateway_1.name);
     }
-    async create(authUser, createMessageDto, channelId) {
+    async create(createMessageDto, destinationDto, authorDto) {
         try {
-            const channel = await this.channelService.findOne({ channelId });
-            const newMessage = this.messageService.create(createMessageDto, channel, authUser);
+            const newMessage = this.messageService.create(createMessageDto, destinationDto, authorDto);
             const savedMessage = await this.messageService.save(newMessage);
-            this.server.emit(`${channelId}/${socket_event_1.MessageSocketEvent.CREATE}`, savedMessage);
+            this.server.emit(`${destinationDto.channelId}/${emit_1.MessageSocketEmit.CREATE}`, savedMessage);
+            this.server.emit(`${emit_1.MessageSocketEmit.CREATE}`, savedMessage);
         }
         catch (e) {
             this.logger.error(e);
@@ -46,7 +44,7 @@ let MessageGateway = MessageGateway_1 = class MessageGateway {
     async update(updateMessageDto) {
         try {
             this.messageService.updateOne(updateMessageDto);
-            this.server.emit(`${socket_event_1.MessageSocketEvent.UPDATE}/${updateMessageDto.messageId}`, updateMessageDto);
+            this.server.emit(`${emit_1.MessageSocketEmit.UPDATE}/${updateMessageDto.messageId}`, updateMessageDto);
         }
         catch (e) {
             this.logger.error(e);
@@ -56,7 +54,7 @@ let MessageGateway = MessageGateway_1 = class MessageGateway {
     async delete(messageId) {
         try {
             this.messageService.deleteOne({ messageId });
-            this.server.emit(`${socket_event_1.MessageSocketEvent.DELETE}/${messageId}`, messageId);
+            this.server.emit(`${emit_1.MessageSocketEmit.DELETE}/${messageId}`, messageId);
         }
         catch (e) {
             this.logger.error(e);
@@ -70,19 +68,20 @@ __decorate([
 ], MessageGateway.prototype, "server", void 0);
 __decorate([
     (0, common_1.UseGuards)(jwtWS_guard_1.JwtWsGuard),
-    (0, websockets_1.SubscribeMessage)(socket_event_1.MessageSocketEvent.CREATE),
+    (0, websockets_1.SubscribeMessage)(event_1.MessageSocketEvent.CREATE),
     (0, common_1.UsePipes)(new common_1.ValidationPipe()),
-    __param(0, (0, auth_user_decorator_1.AuthWSUser)()),
-    __param(1, (0, websockets_1.MessageBody)('message')),
-    __param(2, (0, websockets_1.MessageBody)('channelId')),
+    __param(0, (0, websockets_1.MessageBody)('message')),
+    __param(1, (0, websockets_1.MessageBody)('channel')),
+    __param(2, (0, websockets_1.MessageBody)('member')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_entity_1.UserEntity,
-        createMessage_dto_1.CreateMessageDto, String]),
+    __metadata("design:paramtypes", [createMessage_dto_1.CreateMessageDto,
+        dtos_1.ChannelDto,
+        dtos_1.MemberDto]),
     __metadata("design:returntype", Promise)
 ], MessageGateway.prototype, "create", null);
 __decorate([
     (0, common_1.UseGuards)(jwtWS_guard_1.JwtWsGuard),
-    (0, websockets_1.SubscribeMessage)(socket_event_1.MessageSocketEvent.UPDATE),
+    (0, websockets_1.SubscribeMessage)(event_1.MessageSocketEvent.UPDATE),
     (0, common_1.UsePipes)(new common_1.ValidationPipe()),
     __param(0, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
@@ -91,8 +90,7 @@ __decorate([
 ], MessageGateway.prototype, "update", null);
 __decorate([
     (0, common_1.UseGuards)(jwtWS_guard_1.JwtWsGuard),
-    (0, websockets_1.SubscribeMessage)(socket_event_1.MessageSocketEvent.DELETE),
-    (0, common_1.UsePipes)(new common_1.ValidationPipe()),
+    (0, websockets_1.SubscribeMessage)(event_1.MessageSocketEvent.DELETE),
     __param(0, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -100,8 +98,7 @@ __decorate([
 ], MessageGateway.prototype, "delete", null);
 MessageGateway = MessageGateway_1 = __decorate([
     (0, websockets_1.WebSocketGateway)({ cors: { origin: '*' }, namespace: 'message' }),
-    __metadata("design:paramtypes", [message_service_1.MessageService,
-        channel_service_1.ChannelService])
+    __metadata("design:paramtypes", [message_service_1.MessageService])
 ], MessageGateway);
 exports.MessageGateway = MessageGateway;
 //# sourceMappingURL=message.gateway.js.map

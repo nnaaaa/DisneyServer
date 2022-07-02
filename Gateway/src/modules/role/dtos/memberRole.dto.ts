@@ -7,5 +7,5 @@ export class MemberRoleDto {
 
     @IsNotEmpty()
     @IsUUID()
-    guildMemberId: string
+    memberId: string
 }

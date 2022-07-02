@@ -10,17 +10,15 @@ exports.GuildModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const guild_entity_1 = require("../../entities/guild.entity");
+const auth_module_1 = require("../auth/auth.module");
 const channel_category_module_1 = require("../channel-category/channel-category.module");
 const channel_category_service_1 = require("../channel-category/channel-category.service");
-const channel_gateway_1 = require("../channel/channel.gateway");
-const channel_module_1 = require("../channel/channel.module");
-const channel_service_1 = require("../channel/channel.service");
-const guild_member_module_1 = require("../guild-member/guild-member.module");
-const guild_member_service_1 = require("../guild-member/guild-member.service");
+const emoji_module_1 = require("../emoji/emoji.module");
+const emoji_service_1 = require("../emoji/emoji.service");
+const member_module_1 = require("../member/member.module");
+const member_service_1 = require("../member/member.service");
 const role_module_1 = require("../role/role.module");
 const role_service_1 = require("../role/role.service");
-const user_module_1 = require("../user/user.module");
-const utility_module_1 = require("../utility/utility.module");
 const guild_gateway_1 = require("./guild.gateway");
 const guild_service_1 = require("./guild.service");
 let GuildModule = class GuildModule {
@@ -28,24 +26,29 @@ let GuildModule = class GuildModule {
 GuildModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            utility_module_1.UtilityModule,
+            auth_module_1.AuthModule,
             typeorm_1.TypeOrmModule.forFeature([guild_entity_1.GuildEntity]),
-            (0, common_1.forwardRef)(() => user_module_1.UserModule),
-            (0, common_1.forwardRef)(() => channel_category_module_1.ChannelCategoryModule),
-            (0, common_1.forwardRef)(() => channel_module_1.ChannelModule),
-            (0, common_1.forwardRef)(() => role_module_1.RoleModule),
-            guild_member_module_1.GuildMemberModule,
+            channel_category_module_1.ChannelCategoryModule,
+            role_module_1.RoleModule,
+            emoji_module_1.EmojiModule,
+            member_module_1.MemberModule,
         ],
         providers: [
-            guild_member_service_1.GuildMemberService,
+            emoji_service_1.EmojiService,
+            member_service_1.MemberService,
             channel_category_service_1.ChannelCategoryService,
-            channel_service_1.ChannelService,
             role_service_1.RoleService,
             guild_service_1.GuildService,
-            channel_gateway_1.ChannelGateway,
             guild_gateway_1.GuildGateway,
         ],
-        exports: [typeorm_1.TypeOrmModule, guild_service_1.GuildService],
+        exports: [
+            typeorm_1.TypeOrmModule,
+            guild_service_1.GuildService,
+            channel_category_module_1.ChannelCategoryModule,
+            role_module_1.RoleModule,
+            emoji_module_1.EmojiModule,
+            member_module_1.MemberModule,
+        ],
     })
 ], GuildModule);
 exports.GuildModule = GuildModule;

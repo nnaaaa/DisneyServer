@@ -6,8 +6,7 @@ import {
     OneToMany,
     PrimaryGeneratedColumn,
 } from 'typeorm'
-import { GuildMemberEntity } from './guildMember.entity'
-import { MesssageEntity } from './message.entity'
+import { MemberEntity } from './member.entity'
 import { UserBeFriendEntity } from './userBeFriend.entity'
 
 @Entity('user')
@@ -59,9 +58,6 @@ export class UserEntity {
     )
     friends: UserBeFriendEntity[]
 
-    @OneToMany(() => MesssageEntity, (type) => type.author, { cascade: true })
-    sentMessages: MesssageEntity[]
-
-    @OneToMany(() => GuildMemberEntity, (type) => type.user, { cascade: true })
-    joinedGuilds: GuildMemberEntity[]
+    @OneToMany(() => MemberEntity, (type) => type.user, { cascade: true })
+    joinedGuilds: MemberEntity[]
 }

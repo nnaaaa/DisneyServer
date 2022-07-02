@@ -6,13 +6,13 @@ import {
     OneToMany,
     OneToOne,
     PrimaryGeneratedColumn,
-    UpdateDateColumn,
 } from 'typeorm'
 import { ChannelEntity } from './channel.entity'
-import { UserEntity } from './user.entity'
+import { MemberEntity } from './member.entity'
+import { ReactEntity } from './react.entity'
 
 @Entity()
-export class MesssageEntity {
+export class MessageEntity {
     @PrimaryGeneratedColumn('uuid')
     messageId: string
 
@@ -23,20 +23,19 @@ export class MesssageEntity {
     images: string[]
 
     @CreateDateColumn()
-    createAt: Date
+    createdAt: Date
 
     /** @relationship */
-    @ManyToOne(() => ChannelEntity, (type) => type.messages, {
-        onDelete: 'CASCADE',
-    })
+    @ManyToOne(() => ChannelEntity, (type) => type.messages)
     channel: ChannelEntity
 
-    @ManyToOne(() => UserEntity, (type) => type.sentMessages, {
-        onDelete: 'CASCADE',
-    })
-    author: UserEntity
+    @ManyToOne(() => MemberEntity, (type) => type.sentMessages)
+    author: MemberEntity
+
+    @OneToMany(() => ReactEntity, (type) => type.message, { cascade: true })
+    reacts: ReactEntity[]
 
     /** @unidirection */
-    @OneToOne(() => MesssageEntity, { cascade: true, nullable: true })
-    replyTo: MesssageEntity
+    @OneToOne(() => MessageEntity, { cascade: true, nullable: true })
+    replyTo: MessageEntity
 }

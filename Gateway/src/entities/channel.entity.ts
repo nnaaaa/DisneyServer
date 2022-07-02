@@ -8,10 +8,10 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm'
 import { ChannelCategoryEntity } from './channelCategory.entity'
-import { MesssageEntity } from './message.entity'
+import { MessageEntity } from './message.entity'
 import { RoleEntity } from './role.entity'
 import { UserEntity } from './user.entity'
-import { GuildMemberEntity } from './guildMember.entity'
+import { MemberEntity } from './member.entity'
 
 @Entity()
 export class ChannelEntity {
@@ -25,14 +25,14 @@ export class ChannelEntity {
     isPrivate: boolean
 
     /** @relationship */
-    @OneToMany(() => MesssageEntity, (type) => type.channel, { cascade: true })
-    messages: MesssageEntity[]
+    @OneToMany(() => MessageEntity, (type) => type.channel, { cascade: true })
+    messages: MessageEntity[]
 
-    @ManyToMany(() => GuildMemberEntity, (type) => type.joinedChannels, {
+    @ManyToMany(() => MemberEntity, (type) => type.joinedChannels, {
         cascade: true,
     })
     @JoinTable()
-    members: GuildMemberEntity[]
+    members: MemberEntity[]
 
     @ManyToOne(() => ChannelCategoryEntity, (type) => type.channels)
     category: ChannelCategoryEntity

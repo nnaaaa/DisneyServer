@@ -14,13 +14,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
-const microservices_1 = require("@nestjs/microservices");
 const swagger_1 = require("@nestjs/swagger");
-const class_transformer_1 = require("class-transformer");
-const auth_user_decorator_1 = require("../../decorators/auth-user.decorator");
+const auth_user_decorator_1 = require("../../shared/decorators/auth-user.decorator");
 const user_entity_1 = require("../../entities/user.entity");
-const event_pattern_1 = require("../../shared/event.pattern");
-const services_1 = require("../../shared/services");
 const auth_service_1 = require("./auth.service");
 const forgetPassword_dto_1 = require("./dtos/forgetPassword.dto");
 const tokenPayload_dto_1 = require("./dtos/tokenPayload.dto");
@@ -30,10 +26,10 @@ const verifyAuthUser_dto_1 = require("./dtos/verifyAuthUser.dto");
 const facebook_guard_1 = require("./guards/facebook.guard");
 const local_guard_1 = require("./guards/local.guard");
 const refresh_guard_1 = require("./guards/refresh.guard");
+const google_guard_1 = require("./guards/google.guard");
 let AuthController = class AuthController {
-    constructor(authService, messageClient) {
+    constructor(authService) {
         this.authService = authService;
-        this.messageClient = messageClient;
     }
     async localLogin(user, res) {
         const accessToken = await this.authService.getAccessToken(user.userId);
@@ -43,8 +39,10 @@ let AuthController = class AuthController {
         res.setHeader('refreshToken', refreshToken);
     }
     async register(createUserDto) {
-        const user = await this.authService.createAuthUser(createUserDto);
-        this.messageClient.emit(event_pattern_1.UserPatternEvent.CREATE, (0, class_transformer_1.instanceToPlain)(user));
+        await this.authService.createAuthUser(createUserDto);
+    }
+    async registerOAuth(createUserDto) {
+        await this.authService.createAuthUser(createUserDto, false);
     }
     async verify(verifyAuthUserDto, res) {
         const user = await this.authService.verifyAuthUserToRegister(verifyAuthUserDto);
@@ -63,15 +61,19 @@ let AuthController = class AuthController {
     async changePassword(newPasswordDto) {
         await this.authService.changeUserPassword(newPasswordDto);
     }
+    async refreshToken(user, res) {
+        const accessToken = await this.authService.getAccessToken(user.userId);
+        res.setHeader('accessToken', accessToken);
+    }
     async facebookLogin() { }
     async facebookLoginRedirect(req, res) {
         const { accessToken, refreshToken, profile } = req.user;
         res.setHeader('accessToken', accessToken);
         return res.redirect('https://localhost:3000/EUN#/auth');
     }
-    async refreshToken(user, res) {
-        const accessToken = await this.authService.getAccessToken(user.userId);
-        res.setHeader('accessToken', accessToken);
+    async googleLogin() { }
+    googleAuthRedirect(req) {
+        console.log(req.user);
     }
 };
 __decorate([
@@ -91,6 +93,13 @@ __decorate([
     __metadata("design:paramtypes", [userRegister_dto_1.UserRegisterDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "register", null);
+__decorate([
+    (0, common_1.Post)('register-oauth'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [userRegister_dto_1.UserRegisterDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "registerOAuth", null);
 __decorate([
     (0, common_1.Put)('verify'),
     __param(0, (0, common_1.Body)()),
@@ -121,6 +130,16 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "changePassword", null);
 __decorate([
+    (0, common_1.Get)('refresh'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(refresh_guard_1.RefreshTokenGuard),
+    __param(0, (0, auth_user_decorator_1.AuthUser)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [tokenPayload_dto_1.TokenPayload, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "refreshToken", null);
+__decorate([
     (0, common_1.Get)('facebook'),
     (0, common_1.UseGuards)(facebook_guard_1.FacebookGuard),
     __metadata("design:type", Function),
@@ -137,22 +156,25 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "facebookLoginRedirect", null);
 __decorate([
-    (0, common_1.Get)('refresh'),
-    (0, swagger_1.ApiBearerAuth)(),
-    (0, common_1.UseGuards)(refresh_guard_1.RefreshTokenGuard),
-    __param(0, (0, auth_user_decorator_1.AuthUser)()),
-    __param(1, (0, common_1.Res)({ passthrough: true })),
+    (0, common_1.Get)('google'),
+    (0, common_1.UseGuards)(google_guard_1.GoogleGuard),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [tokenPayload_dto_1.TokenPayload, Object]),
+    __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], AuthController.prototype, "refreshToken", null);
+], AuthController.prototype, "googleLogin", null);
+__decorate([
+    (0, common_1.Get)('google/redirect'),
+    (0, common_1.UseGuards)(google_guard_1.GoogleGuard),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "googleAuthRedirect", null);
 AuthController = __decorate([
     (0, swagger_1.ApiTags)('auth'),
     (0, common_1.UseInterceptors)(common_1.CacheInterceptor),
     (0, common_1.Controller)('auth'),
-    __param(1, (0, common_1.Inject)(services_1.ServiceName.MESSAGE)),
-    __metadata("design:paramtypes", [auth_service_1.AuthService,
-        microservices_1.ClientKafka])
+    __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthController);
 exports.AuthController = AuthController;
 //# sourceMappingURL=auth.controller.js.map

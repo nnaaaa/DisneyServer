@@ -26,13 +26,13 @@ let JwtWsGuard = class JwtWsGuard {
         try {
             const client = context.switchToWs().getClient();
             if (!client.handshake.headers || !client.handshake.headers.authorization) {
-                throw new websockets_1.WsException('No token');
+                throw new websockets_1.WsException('Token is required');
             }
             const accessToken = client.handshake.headers.authorization
                 .replace('Bearer', '')
                 .trim();
             if (!accessToken)
-                throw new websockets_1.WsException('No token');
+                throw new websockets_1.WsException('Token is required');
             const tokenPayload = this.jwtService.verify(accessToken);
             const user = await this.userService.findOne({
                 userId: tokenPayload.userId,

@@ -10,15 +10,10 @@ exports.RoleModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const role_entity_1 = require("../../entities/role.entity");
-const channel_category_module_1 = require("../channel-category/channel-category.module");
-const channel_gateway_1 = require("../channel/channel.gateway");
+const auth_module_1 = require("../auth/auth.module");
 const channel_module_1 = require("../channel/channel.module");
-const guild_member_module_1 = require("../guild-member/guild-member.module");
-const guild_member_service_1 = require("../guild-member/guild-member.service");
-const guild_gateway_1 = require("../guild/guild.gateway");
-const guild_module_1 = require("../guild/guild.module");
-const user_module_1 = require("../user/user.module");
-const utility_module_1 = require("../utility/utility.module");
+const channel_service_1 = require("../channel/channel.service");
+const member_module_1 = require("../member/member.module");
 const role_gateway_1 = require("./role.gateway");
 const role_service_1 = require("./role.service");
 let RoleModule = class RoleModule {
@@ -26,21 +21,12 @@ let RoleModule = class RoleModule {
 RoleModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            utility_module_1.UtilityModule,
-            (0, common_1.forwardRef)(() => user_module_1.UserModule),
-            (0, common_1.forwardRef)(() => guild_module_1.GuildModule),
-            (0, common_1.forwardRef)(() => channel_module_1.ChannelModule),
-            (0, common_1.forwardRef)(() => channel_category_module_1.ChannelCategoryModule),
-            guild_member_module_1.GuildMemberModule,
+            auth_module_1.AuthModule,
             typeorm_1.TypeOrmModule.forFeature([role_entity_1.RoleEntity]),
+            channel_module_1.ChannelModule,
+            member_module_1.MemberModule
         ],
-        providers: [
-            guild_member_service_1.GuildMemberService,
-            role_service_1.RoleService,
-            role_gateway_1.RoleGateway,
-            channel_gateway_1.ChannelGateway,
-            guild_gateway_1.GuildGateway,
-        ],
+        providers: [channel_service_1.ChannelService, member_module_1.MemberModule, role_service_1.RoleService, role_gateway_1.RoleGateway],
         exports: [typeorm_1.TypeOrmModule, role_service_1.RoleService],
     })
 ], RoleModule);

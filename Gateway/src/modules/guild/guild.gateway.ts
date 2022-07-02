@@ -7,14 +7,12 @@ import {
     WsException,
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
-import { AuthWSUser } from 'src/decorators/auth-user.decorator'
-import { GuildMemberEntity } from 'src/entities/guildMember.entity'
+import { AuthWSUser } from 'src/shared/decorators/auth-user.decorator'
 import { UserEntity } from 'src/entities/user.entity'
-import { ChannelSocketEmit, GuildSocketEmit } from 'src/shared/socket.emit'
-import { GuildSocketEvent } from 'src/shared/socket.event'
+import { GuildSocketEmit } from 'src/shared/socket/emit'
+import { GuildSocketEvent } from 'src/shared/socket/event'
 import { JwtWsGuard } from '../auth/guards/jwtWS.guard'
-import { ChannelGateway } from '../channel/channel.gateway'
-import { GuildMemberService } from '../guild-member/guild-member.service'
+import { MemberService } from '../member/member.service'
 import { RoleService } from '../role/role.service'
 import { CreateGuildDto } from './dtos/createGuild.dto'
 import { UpdateGuildDto } from './dtos/updateGuild.dto'
@@ -28,9 +26,8 @@ export class GuildGateway {
 
     constructor(
         private guildService: GuildService,
-        private guildMemberService: GuildMemberService,
-        private roleService: RoleService,
-        private channelGateway: ChannelGateway
+        private memberService: MemberService,
+        // private roleService: RoleService
     ) {}
 
     /** @return GuildEntity after save */
@@ -54,7 +51,7 @@ export class GuildGateway {
     @UsePipes(new ValidationPipe())
     async update(@MessageBody() updateGuildDto: UpdateGuildDto) {
         try {
-            await this.guildService.updateOneGuild(
+            await this.guildService.updateOne(
                 { guildId: updateGuildDto.guildId },
                 updateGuildDto
             )
@@ -73,7 +70,7 @@ export class GuildGateway {
     @SubscribeMessage(GuildSocketEvent.GET_ONE)
     async getOne(@MessageBody() guildId: string, @AuthWSUser() authUser: UserEntity) {
         try {
-            const guild = await this.guildService.findOneGuildWithRelation({ guildId })
+            const guild = await this.guildService.findOneWithRelation({ guildId })
             const member = guild.members.find((m) => m.user.userId === authUser.userId)
             // O(n^3)
             for (let ctg of guild.categories) {
@@ -100,6 +97,7 @@ export class GuildGateway {
                 })
             }
             return { guild, member }
+            // return guild
         } catch (e) {
             this.logger.error(e)
             throw new WsException(e)
@@ -111,7 +109,7 @@ export class GuildGateway {
     @SubscribeMessage(GuildSocketEvent.GET_JOINED)
     async getOfMe(@AuthWSUser() { userId }: UserEntity) {
         try {
-            const joinedGuilds = await this.guildMemberService.findManyWithRelation({
+            const joinedGuilds = await this.memberService.findManyWithRelation({
                 user: { userId },
             })
             const guilds = joinedGuilds.map((j) => j.guild)
@@ -126,102 +124,11 @@ export class GuildGateway {
     @SubscribeMessage(GuildSocketEvent.DELETE)
     async delete(@MessageBody() guildId: string) {
         try {
-            await this.guildService.deleteGuild({ guildId })
+            await this.guildService.deleteOne({ guildId })
             this.server.emit(`${GuildSocketEmit.DELETE}/${guildId}`)
         } catch (e) {
             this.logger.error(e)
             throw new WsException(e)
         }
-    }
-
-    /** @return GuildEntity which user have joined */
-    @UseGuards(JwtWsGuard)
-    @SubscribeMessage(GuildSocketEvent.JOIN_GUILD)
-    async joinGuild(@MessageBody() guildId: string, @AuthWSUser() authUser: UserEntity) {
-        try {
-            const { guild, newMember } = await this.guildService.joinGuild(
-                guildId,
-                authUser
-            )
-
-            // emit to guild
-            this.server.emit(`${guildId}/${GuildSocketEmit.MEMBER_JOIN}`, newMember)
-
-            // if channel was private, it wouldn't been seen
-            for (let ctg of guild.categories) {
-                ctg.channels = ctg.channels.filter((channel) => {
-                    if (!channel.isPrivate) return true
-                    return false
-                })
-            }
-
-            // emit to all channel which user have joined
-            this.channelGateway.channelMemberNotify(
-                ChannelSocketEmit.USER_JOIN,
-                newMember
-            )
-
-            return { guild, member: newMember }
-        } catch (e) {
-            this.logger.error(e)
-            throw new WsException(e)
-        }
-    }
-
-    @UseGuards(JwtWsGuard)
-    @SubscribeMessage(GuildSocketEvent.LEAVE_GUILD)
-    async leaveGuild(@MessageBody() guildId: string, @AuthWSUser() authUser: UserEntity) {
-        try {
-            const memberLeaveGuild = await this.guildService.leaveGuild(
-                authUser.userId,
-                guildId
-            )
-            // emit to guild
-            this.server.emit(
-                `${GuildSocketEmit.MEMBER_LEAVE}/${memberLeaveGuild.guildMemberId}`,
-                memberLeaveGuild
-            )
-
-            // emit to all channel which user have joined
-            this.channelGateway.channelMemberNotify(
-                ChannelSocketEmit.USER_LEAVE,
-                memberLeaveGuild
-            )
-        } catch (e) {
-            this.logger.error(e)
-            throw new WsException(e)
-        }
-    }
-
-    @UseGuards(JwtWsGuard)
-    @UsePipes(new ValidationPipe())
-    @SubscribeMessage(GuildSocketEvent.MEMBER_UPDATE)
-    async updateMember(
-        @MessageBody() updateJoinGuildDto: UpdateGuildDto,
-        @AuthWSUser() authUser: UserEntity
-    ) {
-        try {
-            const member = await this.guildMemberService.updateOne(
-                {
-                    guild: { guildId: updateJoinGuildDto.guildId },
-                    user: { userId: authUser.userId },
-                },
-                updateJoinGuildDto
-            )
-
-            this.memberUpdateNotify(member)
-
-            // emit to all channel which user have joined
-            this.channelGateway.channelMemberNotify(ChannelSocketEmit.USER_UPDATE, member)
-        } catch (e) {
-            this.logger.error(e)
-        }
-    }
-
-    memberUpdateNotify(member: GuildMemberEntity) {
-        this.server.emit(
-            `${GuildSocketEmit.MEMBER_UPDATE}/${member.guildMemberId}`,
-            member
-        )
     }
 }

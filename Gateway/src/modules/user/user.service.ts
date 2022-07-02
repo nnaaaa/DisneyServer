@@ -40,11 +40,14 @@ export class UserService {
         return await this.userRepository.save(user)
     }
 
-    async create(user: UserRegisterDto, verifyCode: number) {
+    async create(user: UserRegisterDto, verifyCode?: number) {
         const newUser = this.userRepository.create(user)
         const salt = await Bcrypt.genSalt()
         newUser.password = await Bcrypt.hash(newUser.password, salt)
-        newUser.registerVerifyCode = verifyCode
+
+        if (verifyCode) {
+            newUser.registerVerifyCode = verifyCode
+        }
 
         return await this.save(newUser)
     }

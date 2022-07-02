@@ -1,4 +1,4 @@
 export declare class CreateGuildDto {
-    name: string
-    avatarUrl?: string
+    name: string;
+    avatarUrl?: string;
 }

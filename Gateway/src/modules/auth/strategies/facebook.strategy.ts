@@ -23,7 +23,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy) {
         done: (err: any, user: any, info?: any) => void
     ): Promise<any> {
         done(null, {
-            user: profile,
+            profile,
             accessToken,
             refreshToken,
         })

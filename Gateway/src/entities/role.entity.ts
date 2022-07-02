@@ -9,7 +9,7 @@ import {
 } from 'typeorm'
 import { ChannelEntity } from './channel.entity'
 import { GuildEntity } from './guild.entity'
-import { GuildMemberEntity } from './guildMember.entity'
+import { MemberEntity } from './member.entity'
 
 @Entity()
 export class RoleEntity {
@@ -29,8 +29,8 @@ export class RoleEntity {
     @ManyToOne(() => GuildEntity, (type) => type.roles)
     guild: GuildEntity
 
-    @ManyToMany(() => GuildMemberEntity, (type) => type.roles)
-    members: GuildMemberEntity[]
+    @ManyToMany(() => MemberEntity, (type) => type.roles)
+    members: MemberEntity[]
 
     @ManyToMany(() => ChannelEntity, (type) => type.roles)
     channels: ChannelEntity[]

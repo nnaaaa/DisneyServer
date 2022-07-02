@@ -1,5 +1,4 @@
-import { GuildMemberEntity } from './guildMember.entity';
-import { MesssageEntity } from './message.entity';
+import { MemberEntity } from './member.entity';
 import { UserBeFriendEntity } from './userBeFriend.entity';
 export declare class UserEntity {
     userId: string;
@@ -13,6 +12,5 @@ export declare class UserEntity {
     registerVerifyCode: number;
     changePwdVerfiyCode: number;
     friends: UserBeFriendEntity[];
-    sentMessages: MesssageEntity[];
-    joinedGuilds: GuildMemberEntity[];
+    joinedGuilds: MemberEntity[];
 }

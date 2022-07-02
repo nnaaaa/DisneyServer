@@ -1,21 +1,20 @@
-import { OnModuleInit } from '@nestjs/common';
-import { ClientKafka } from '@nestjs/microservices';
-import { ChannelEntity } from 'src/entities/channel.entity';
-import { MesssageEntity } from 'src/entities/message.entity';
-import { UserEntity } from 'src/entities/user.entity';
+import { MessageEntity } from 'src/entities/message.entity';
 import { MessageRepository } from 'src/repositories/message.repository';
+import { ChannelDto, MemberDto } from 'src/shared/dtos';
 import { FindOptionsRelations, FindOptionsWhere } from 'typeorm';
+import { ReactService } from '../react/react.service';
 import { CreateMessageDto } from './dtos/createMessage.dto';
 import { UpdateMessageDto } from './dtos/updateMessage.dto';
-export declare class MessageService implements OnModuleInit {
-    private messageClient;
+export declare class MessageService {
     private messageRepository;
-    readonly messageRelations: FindOptionsRelations<MesssageEntity>;
-    constructor(messageClient: ClientKafka, messageRepository: MessageRepository);
-    save(message: MesssageEntity): Promise<MesssageEntity>;
-    create(createMessageDto: CreateMessageDto, channel: ChannelEntity, author: UserEntity): MesssageEntity;
-    findOne(findCondition: FindOptionsWhere<MesssageEntity>): Promise<MesssageEntity>;
-    updateOne(updateMessageDto: UpdateMessageDto): Promise<MesssageEntity>;
-    deleteOne(findCondition: FindOptionsWhere<MesssageEntity>): Promise<void>;
-    onModuleInit(): void;
+    private reactService;
+    readonly messageRelations: FindOptionsRelations<MessageEntity>;
+    constructor(messageRepository: MessageRepository, reactService: ReactService);
+    save(message: MessageEntity): Promise<MessageEntity>;
+    create(createMessageDto: CreateMessageDto, channel: ChannelDto, author: MemberDto): MessageEntity;
+    findOneWithRelation(findCondition: FindOptionsWhere<MessageEntity>): Promise<MessageEntity>;
+    findMany(findCondition: FindOptionsWhere<MessageEntity>): Promise<MessageEntity[]>;
+    updateOne(updateMessageDto: UpdateMessageDto): Promise<MessageEntity>;
+    deleteOne(findCondition: FindOptionsWhere<MessageEntity>): Promise<MessageEntity>;
+    deleteMany(findCondition: FindOptionsWhere<MessageEntity>): Promise<void>;
 }

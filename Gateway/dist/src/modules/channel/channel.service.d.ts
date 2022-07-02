@@ -1,21 +1,31 @@
 import { ChannelEntity } from 'src/entities/channel.entity';
-import { ChannelCategoryEntity } from 'src/entities/channelCategory.entity';
 import { ChannelRepository } from 'src/repositories/channel.repository';
+import { ChannelCategoryDto } from 'src/shared/dtos';
 import { FindOptionsRelations, FindOptionsWhere } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { GuildMemberService } from '../guild-member/guild-member.service';
-import { RoleService } from '../role/role.service';
+import { MemberService } from '../member/member.service';
+import { MessageService } from '../message/message.service';
 import { CreateChannelDto } from './dtos/createChannel.dto';
+import { MemberChannelDto } from './dtos/memberChannel.dto';
 export declare class ChannelService {
-    private roleService;
-    private guildMemberService;
     private channelRepository;
+    private messageService;
+    private memberService;
     readonly channelRelations: FindOptionsRelations<ChannelEntity>;
-    constructor(roleService: RoleService, guildMemberService: GuildMemberService, channelRepository: ChannelRepository);
+    constructor(channelRepository: ChannelRepository, messageService: MessageService, memberService: MemberService);
     save(category: ChannelEntity): Promise<ChannelEntity>;
-    create(createChannelDto: CreateChannelDto, category: ChannelCategoryEntity): Promise<ChannelEntity>;
-    findOne(findCondition: FindOptionsWhere<ChannelEntity>): Promise<ChannelEntity>;
+    create(createChannelDto: CreateChannelDto, category: ChannelCategoryDto): Promise<ChannelEntity>;
+    findOneWithRelation(findCondition: FindOptionsWhere<ChannelEntity>): Promise<ChannelEntity>;
     findMany(findCondition: FindOptionsWhere<ChannelEntity>): Promise<ChannelEntity[]>;
-    updateOne(findCondition: FindOptionsWhere<ChannelEntity>, updateCondition: QueryDeepPartialEntity<ChannelEntity>): Promise<void>;
-    delete(findCondition: FindOptionsWhere<ChannelEntity>): Promise<void>;
+    updateOne(findCondition: FindOptionsWhere<ChannelEntity>, updateCondition: QueryDeepPartialEntity<ChannelEntity>): Promise<ChannelEntity>;
+    deleteOne(findCondition: FindOptionsWhere<ChannelEntity>): Promise<void>;
+    deleteMany(findCondition: FindOptionsWhere<ChannelEntity>): Promise<void>;
+    addMember({ channelId, memberId }: MemberChannelDto): Promise<{
+        channel: ChannelEntity;
+        member: import("../../entities/member.entity").MemberEntity;
+    }>;
+    removeMember({ channelId, memberId }: MemberChannelDto): Promise<{
+        channel: ChannelEntity;
+        member: import("../../entities/member.entity").MemberEntity;
+    }>;
 }

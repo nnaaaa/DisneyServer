@@ -2,28 +2,31 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ChannelCategoryEntity } from 'src/entities/channelCategory.entity'
 import { GuildEntity } from 'src/entities/guild.entity'
+import { MemberEntity } from 'src/entities/member.entity'
+import { RoleEntity } from 'src/entities/role.entity'
 import { ChannelCategoryRepository } from 'src/repositories/channelCategory.repository'
-import { FindOptionsWhere } from 'typeorm'
+import { GuildDto } from 'src/shared/dtos'
+import { FindOptionsRelations, FindOptionsWhere } from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { ChannelService } from '../channel/channel.service'
 import { CreateChannelCtgDto } from './dtos/createChannelCtg.dto'
 
 @Injectable()
 export class ChannelCategoryService {
-    public readonly channelCtgRelations = {
+    public readonly channelCtgRelations: FindOptionsRelations<ChannelCategoryEntity> = {
         channels: this.channelService.channelRelations,
     }
     constructor(
         private channelService: ChannelService,
         @InjectRepository(ChannelCategoryEntity)
         private channelCtgRepository: ChannelCategoryRepository
-    ) {}
+    ) { }
 
     async save(category: ChannelCategoryEntity) {
         return await this.channelCtgRepository.save(category)
     }
 
-    async create(createChannelCtgDto: CreateChannelCtgDto, guild: GuildEntity) {
+    async create(createChannelCtgDto: CreateChannelCtgDto, guild: GuildDto) {
         const category = this.channelCtgRepository.create({
             ...createChannelCtgDto,
             guild,
@@ -38,7 +41,7 @@ export class ChannelCategoryService {
         })
     }
 
-    async findMany(findCondition: FindOptionsWhere<ChannelCategoryEntity>) {
+    async findManyWithRelation(findCondition: FindOptionsWhere<ChannelCategoryEntity>) {
         return await this.channelCtgRepository.find({
             relations: this.channelCtgRelations,
             where: findCondition,
@@ -59,21 +62,75 @@ export class ChannelCategoryService {
         }
     }
 
-    async delete(findCondition: FindOptionsWhere<ChannelCategoryEntity>) {
+    async deleteMany(findCondition: FindOptionsWhere<ChannelCategoryEntity>) {
         try {
-            const category = await this.findOneWithRelation(findCondition)
+            const categories = await this.findManyWithRelation(findCondition)
+
 
             const removeChildren = []
-            for (const channel of category.channels)
+            for (const category of categories) {
                 removeChildren.push(
-                    this.channelService.delete({ channelId: channel.channelId })
+                    this.channelService.deleteMany({ category: { categoryId: category.categoryId } })
                 )
-
+            }
             await Promise.all(removeChildren)
 
-            await this.channelCtgRepository.remove(category)
+            await this.channelCtgRepository.remove(categories)
+
         } catch (e) {
             throw new InternalServerErrorException(e)
         }
+    }
+
+    async deleteOne(findCondition: FindOptionsWhere<ChannelCategoryEntity>) {
+        try {
+            const category = await this.findOneWithRelation(findCondition)
+
+            if (category) {
+                const removeChildren = []
+                for (const channel of category.channels)
+                    removeChildren.push(
+                        this.channelService.deleteOne({ channelId: channel.channelId })
+                    )
+
+                await Promise.all(removeChildren)
+
+                await this.channelCtgRepository.remove(category)
+            }
+
+            return category
+        } catch (e) {
+            throw new InternalServerErrorException(e)
+        }
+    }
+
+    async createTemplateCategory(
+        createCategoryDto: CreateChannelCtgDto,
+        guild: GuildEntity,
+        members: MemberEntity[],
+        roles: RoleEntity[]
+    ) {
+        const category1 = await this.create(createCategoryDto, guild)
+        const savedCategory = await this.save(category1)
+
+        const channelLobby = await this.channelService.create(
+            { name: 'lobby' },
+            savedCategory
+        )
+
+        channelLobby.roles = roles
+        channelLobby.members = members
+
+        const channelDoc = await this.channelService.create(
+            { name: 'document' },
+            savedCategory
+        )
+
+        channelDoc.roles = roles
+        channelDoc.members = members
+
+        savedCategory.channels = [channelLobby, channelDoc]
+
+        return savedCategory
     }
 }

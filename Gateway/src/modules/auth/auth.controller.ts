@@ -3,7 +3,6 @@ import {
     CacheInterceptor,
     Controller,
     Get,
-    Inject,
     Post,
     Put,
     Req,
@@ -11,14 +10,10 @@ import {
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common'
-import { ClientKafka } from '@nestjs/microservices'
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
-import { instanceToPlain } from 'class-transformer'
 import { Response } from 'express'
-import { AuthUser } from 'src/decorators/auth-user.decorator'
+import { AuthUser } from 'src/shared/decorators/auth-user.decorator'
 import { UserEntity } from 'src/entities/user.entity'
-import { UserPatternEvent } from 'src/shared/event.pattern'
-import { ServiceName } from 'src/shared/services'
 import { AuthService } from './auth.service'
 import {
     ForgetPasswordDto,
@@ -32,15 +27,13 @@ import { VerifyAuthUserDto } from './dtos/verifyAuthUser.dto'
 import { FacebookGuard } from './guards/facebook.guard'
 import { LocalGuard } from './guards/local.guard'
 import { RefreshTokenGuard } from './guards/refresh.guard'
+import { GoogleGuard } from './guards/google.guard'
 
 @ApiTags('auth')
 @UseInterceptors(CacheInterceptor)
 @Controller('auth')
 export class AuthController {
-    constructor(
-        private authService: AuthService,
-        @Inject(ServiceName.MESSAGE) private messageClient: ClientKafka
-    ) {}
+    constructor(private authService: AuthService) { }
 
     @Post('login')
     @ApiBody({ required: true, type: UserLoginDto })
@@ -59,9 +52,12 @@ export class AuthController {
 
     @Post('register')
     async register(@Body() createUserDto: UserRegisterDto) {
-        const user = await this.authService.createAuthUser(createUserDto)
+        await this.authService.createAuthUser(createUserDto)
+    }
 
-        this.messageClient.emit(UserPatternEvent.CREATE, instanceToPlain(user))
+    @Post('register-oauth')
+    async registerOAuth(@Body() createUserDto: UserRegisterDto) {
+        await this.authService.createAuthUser(createUserDto,false)
     }
 
     @Put('verify')
@@ -94,9 +90,20 @@ export class AuthController {
         await this.authService.changeUserPassword(newPasswordDto)
     }
 
+    @Get('refresh')
+    @ApiBearerAuth()
+    @UseGuards(RefreshTokenGuard)
+    async refreshToken(
+        @AuthUser() user: TokenPayload,
+        @Res({ passthrough: true }) res: Response
+    ) {
+        const accessToken = await this.authService.getAccessToken(user.userId)
+        res.setHeader('accessToken', accessToken)
+    }
+
     @Get('facebook')
     @UseGuards(FacebookGuard)
-    async facebookLogin(): Promise<any> {}
+    async facebookLogin(): Promise<any> { }
 
     @Get('facebook/redirect')
     @UseGuards(FacebookGuard)
@@ -108,14 +115,16 @@ export class AuthController {
         return res.redirect('https://localhost:3000/EUN#/auth')
     }
 
-    @Get('refresh')
-    @ApiBearerAuth()
-    @UseGuards(RefreshTokenGuard)
-    async refreshToken(
-        @AuthUser() user: TokenPayload,
-        @Res({ passthrough: true }) res: Response
-    ) {
-        const accessToken = await this.authService.getAccessToken(user.userId)
-        res.setHeader('accessToken', accessToken)
+    @Get('google')
+    @UseGuards(GoogleGuard)
+    async googleLogin() { }
+
+    @Get('google/redirect')
+    @UseGuards(GoogleGuard)
+    googleAuthRedirect(@Req() req) {
+        console.log(req.user)
     }
+
+
+
 }

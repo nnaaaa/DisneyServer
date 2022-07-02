@@ -1,55 +1,32 @@
-import {
-    Inject,
-    Injectable,
-    InternalServerErrorException,
-    OnModuleInit,
-} from '@nestjs/common'
-import { ClientKafka } from '@nestjs/microservices'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ChannelEntity } from 'src/entities/channel.entity'
-import { MesssageEntity } from 'src/entities/message.entity'
-import { UserEntity } from 'src/entities/user.entity'
+import { MemberEntity } from 'src/entities/member.entity'
+import { MessageEntity } from 'src/entities/message.entity'
 import { MessageRepository } from 'src/repositories/message.repository'
-import { MessagePatternEvent } from 'src/shared/event.pattern'
-import { ServiceName } from 'src/shared/services'
+import { ChannelDto, MemberDto } from 'src/shared/dtos'
 import { FindOptionsRelations, FindOptionsWhere } from 'typeorm'
+import { ReactService } from '../react/react.service'
 import { CreateMessageDto } from './dtos/createMessage.dto'
 import { UpdateMessageDto } from './dtos/updateMessage.dto'
 
 @Injectable()
-export class MessageService implements OnModuleInit {
-    public readonly messageRelations: FindOptionsRelations<MesssageEntity> = {
+export class MessageService {
+    public readonly messageRelations: FindOptionsRelations<MessageEntity> = {
         author: true,
         channel: true,
     }
 
     constructor(
-        @Inject(ServiceName.MESSAGE) private messageClient: ClientKafka,
-        @InjectRepository(MesssageEntity) private messageRepository: MessageRepository
-    ) {}
+        @InjectRepository(MessageEntity) private messageRepository: MessageRepository,
+        private reactService: ReactService
+    ) { }
 
-    // create(createMessageDto: CreateMessageDto, author: UserEntity) {
-    //     return this.messageClient.send(MessagePatternEvent.CREATE, { ...createMessageDto,userId:author.userId })
-    // }
-
-    // updateOne(updateMessageDto: UpdateMessageDto) {
-    //     return this.messageClient.send(MessagePatternEvent.UPDATE, updateMessageDto)
-    // }
-
-    // deleteOne(messageId: string) {
-    //     this.messageClient.emit(MessagePatternEvent.DELETE, messageId)
-    // }
-
-    async save(message: MesssageEntity) {
+    async save(message: MessageEntity) {
         return await this.messageRepository.save(message)
-        // this.messageClient.emit(MessagePatternEvent.CREATE, message)
     }
 
-    create(
-        createMessageDto: CreateMessageDto,
-        channel: ChannelEntity,
-        author: UserEntity
-    ) {
+    create(createMessageDto: CreateMessageDto, channel: ChannelDto, author: MemberDto) {
         const newMessage = this.messageRepository.create({
             images: [],
             ...createMessageDto,
@@ -58,19 +35,26 @@ export class MessageService implements OnModuleInit {
         })
 
         return newMessage
-        // return this.messageClient.send(MessagePatternEvent.CREATE, { ...createMessageDto, userId: author.userId })
     }
 
-    async findOne(findCondition: FindOptionsWhere<MesssageEntity>) {
+    async findOneWithRelation(findCondition: FindOptionsWhere<MessageEntity>) {
         return await this.messageRepository.findOne({
             relations: this.messageRelations,
+            where: findCondition,
+        })
+    }
+    async findMany(findCondition: FindOptionsWhere<MessageEntity>) {
+        return await this.messageRepository.find({
+            // relations: this.messageRelations,
             where: findCondition,
         })
     }
 
     async updateOne(updateMessageDto: UpdateMessageDto) {
         try {
-            let message = await this.findOne({ messageId: updateMessageDto.messageId })
+            let message = await this.findOneWithRelation({
+                messageId: updateMessageDto.messageId,
+            })
 
             message = Object.assign(message, updateMessageDto)
 
@@ -78,20 +62,39 @@ export class MessageService implements OnModuleInit {
         } catch (e) {
             throw new InternalServerErrorException(e)
         }
-        // return this.messageClient.send(MessagePatternEvent.UPDATE, updateMessageDto)
     }
 
-    async deleteOne(findCondition: FindOptionsWhere<MesssageEntity>) {
+    async deleteOne(findCondition: FindOptionsWhere<MessageEntity>) {
         try {
-            await this.messageRepository.delete(findCondition)
+            const message = await this.findOneWithRelation(findCondition)
+            if (message) {
+                const reacts = []
+                for (const react of message.reacts) {
+                    reacts.push(this.reactService.deleteOne({ reactId: react.reactId }))
+                }
+                await Promise.all(reacts)
+
+                await this.messageRepository.remove(message)
+            }
+            return message
         } catch (e) {
             throw new InternalServerErrorException(e)
         }
-        // this.messageClient.emit(MessagePatternEvent.DELETE, messageId)
     }
 
-    onModuleInit() {
-        this.messageClient.subscribeToResponseOf(MessagePatternEvent.CREATE)
-        this.messageClient.subscribeToResponseOf(MessagePatternEvent.UPDATE)
+    async deleteMany(findCondition: FindOptionsWhere<MessageEntity>) {
+        try {
+            const messages = await this.findMany(findCondition)
+
+            const reacts = []
+            for (const message of messages) {
+                reacts.push(this.reactService.deleteMany({ message: { messageId: message.messageId } }))
+            }
+            await Promise.all(reacts)
+
+            await this.messageRepository.remove(messages)
+        } catch (e) {
+            throw new InternalServerErrorException(e)
+        }
     }
 }

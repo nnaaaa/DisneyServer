@@ -30,15 +30,20 @@ let AuthService = class AuthService {
     async getRefreshToken(userId) {
         return this.jwtService.sign({ userId }, { expiresIn: '30d' });
     }
-    async createAuthUser(userRegisterDto) {
+    async createAuthUser(userRegisterDto, withVerify = true) {
         const user = await this.userService.findOne({
             account: userRegisterDto.account,
         });
         if (user)
             throw new common_1.ForbiddenException();
-        const digitCode = algorithms_1.Algorithm.generateDigit(6);
-        this.mailService.registerConfirm(userRegisterDto, digitCode);
-        return await this.userService.create(userRegisterDto, digitCode);
+        if (withVerify) {
+            const digitCode = algorithms_1.Algorithm.generateDigit(6);
+            this.mailService.registerConfirm(userRegisterDto, digitCode);
+            await this.userService.create(userRegisterDto, digitCode);
+        }
+        else {
+            await this.userService.create(userRegisterDto);
+        }
     }
     async createAuthChangePassword({ account }) {
         const digitCode = algorithms_1.Algorithm.generateDigit(6);

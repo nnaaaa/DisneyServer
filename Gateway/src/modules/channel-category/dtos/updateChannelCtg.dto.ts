@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator'
+import { IsBoolean, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator'
 
 export class UpdateChannelCtgDto {
     @IsNotEmpty()
@@ -8,4 +8,8 @@ export class UpdateChannelCtgDto {
     @IsOptional()
     @IsString()
     name?: string
+
+    @IsBoolean()
+    @IsOptional()
+    isPrivate?: boolean
 }
