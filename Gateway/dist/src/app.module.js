@@ -10,17 +10,19 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
-const auth_module_1 = require("./modules/auth/auth.module");
-const user_module_1 = require("./modules/user/user.module");
-const guild_module_1 = require("./modules/guild/guild.module");
-const message_module_1 = require("./modules/message/message.module");
-const channel_module_1 = require("./modules/channel/channel.module");
-const role_module_1 = require("./modules/role/role.module");
-const emoji_module_1 = require("./modules/emoji/emoji.module");
-const mail_module_1 = require("./modules/mail/mail.module");
-const channel_category_module_1 = require("./modules/channel-category/channel-category.module");
-const member_module_1 = require("./modules/member/member.module");
-const react_module_1 = require("./modules/react/react.module");
+const auth_module_1 = require("./modules/auth-module/auth/auth.module");
+const user_module_1 = require("./modules/auth-module/user/user.module");
+const guild_module_1 = require("./modules/guild-module/guild/guild.module");
+const message_module_1 = require("./modules/message-module/message/message.module");
+const channel_module_1 = require("./modules/guild-module/channel/channel.module");
+const role_module_1 = require("./modules/guild-module/role/role.module");
+const emoji_module_1 = require("./modules/message-module/emoji/emoji.module");
+const mail_module_1 = require("./modules/auth-module/mail/mail.module");
+const channel_category_module_1 = require("./modules/guild-module/channel-category/channel-category.module");
+const member_module_1 = require("./modules/guild-module/member/member.module");
+const react_module_1 = require("./modules/message-module/react/react.module");
+const bot_module_1 = require("./modules/bot-module/bot/bot.module");
+const command_module_1 = require("./modules/bot-module/command/command.module");
 const Joi = require("joi");
 let AppModule = class AppModule {
 };
@@ -75,6 +77,8 @@ AppModule = __decorate([
             channel_category_module_1.ChannelCategoryModule,
             member_module_1.MemberModule,
             react_module_1.ReactModule,
+            bot_module_1.BotModule,
+            command_module_1.CommandModule,
         ],
         providers: [],
     })

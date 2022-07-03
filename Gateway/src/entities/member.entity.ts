@@ -1,14 +1,13 @@
 import {
     Column,
     CreateDateColumn,
-    Entity,
-    JoinColumn,
-    JoinTable,
+    Entity, JoinTable,
     ManyToMany,
     ManyToOne,
     OneToMany,
-    PrimaryGeneratedColumn,
+    PrimaryGeneratedColumn
 } from 'typeorm'
+import { BotEntity } from './bot.entity'
 import { ChannelEntity } from './channel.entity'
 import { GuildEntity } from './guild.entity'
 import { MessageEntity } from './message.entity'
@@ -36,6 +35,12 @@ export class MemberEntity {
     })
     user: UserEntity
 
+    @ManyToOne(() => BotEntity, (type) => type.joinedGuilds, {
+        onDelete: 'CASCADE',
+    })
+    bot: BotEntity
+
+
     @ManyToOne(() => GuildEntity, (type) => type.members)
     guild: GuildEntity
 
@@ -54,4 +59,6 @@ export class MemberEntity {
 
     @OneToMany(() => ReactEntity, (type) => type.author, { cascade: true })
     sentReacts: ReactEntity[]
+
+
 }

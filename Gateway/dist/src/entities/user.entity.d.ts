@@ -13,4 +13,5 @@ export declare class UserEntity {
     changePwdVerfiyCode: number;
     friends: UserBeFriendEntity[];
     joinedGuilds: MemberEntity[];
+    createdBots: MemberEntity[];
 }

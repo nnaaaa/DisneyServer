@@ -6,6 +6,7 @@ import {
     OneToMany,
     PrimaryGeneratedColumn,
 } from 'typeorm'
+import { BotEntity } from './bot.entity'
 import { MemberEntity } from './member.entity'
 import { UserBeFriendEntity } from './userBeFriend.entity'
 
@@ -60,4 +61,7 @@ export class UserEntity {
 
     @OneToMany(() => MemberEntity, (type) => type.user, { cascade: true })
     joinedGuilds: MemberEntity[]
+
+    @OneToMany(() => BotEntity, (type) => type.author, { cascade: true })
+    createdBots: MemberEntity[]
 }

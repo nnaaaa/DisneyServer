@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MemberEntity = void 0;
 const typeorm_1 = require("typeorm");
+const bot_entity_1 = require("./bot.entity");
 const channel_entity_1 = require("./channel.entity");
 const guild_entity_1 = require("./guild.entity");
 const message_entity_1 = require("./message.entity");
@@ -41,6 +42,12 @@ __decorate([
     }),
     __metadata("design:type", user_entity_1.UserEntity)
 ], MemberEntity.prototype, "user", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => bot_entity_1.BotEntity, (type) => type.joinedGuilds, {
+        onDelete: 'CASCADE',
+    }),
+    __metadata("design:type", bot_entity_1.BotEntity)
+], MemberEntity.prototype, "bot", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => guild_entity_1.GuildEntity, (type) => type.members),
     __metadata("design:type", guild_entity_1.GuildEntity)

@@ -45,6 +45,10 @@ __decorate([
     (0, typeorm_1.ManyToMany)(() => channel_entity_1.ChannelEntity, (type) => type.roles),
     __metadata("design:type", Array)
 ], RoleEntity.prototype, "channels", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'simple-array' }),
+    __metadata("design:type", Array)
+], RoleEntity.prototype, "permissions", void 0);
 RoleEntity = __decorate([
     (0, typeorm_1.Entity)()
 ], RoleEntity);

@@ -5,13 +5,12 @@ import {
     ManyToMany,
     ManyToOne,
     OneToMany,
-    PrimaryGeneratedColumn,
+    PrimaryGeneratedColumn
 } from 'typeorm'
 import { ChannelCategoryEntity } from './channelCategory.entity'
+import { MemberEntity } from './member.entity'
 import { MessageEntity } from './message.entity'
 import { RoleEntity } from './role.entity'
-import { UserEntity } from './user.entity'
-import { MemberEntity } from './member.entity'
 
 @Entity()
 export class ChannelEntity {

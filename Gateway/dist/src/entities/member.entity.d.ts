@@ -1,3 +1,4 @@
+import { BotEntity } from './bot.entity';
 import { ChannelEntity } from './channel.entity';
 import { GuildEntity } from './guild.entity';
 import { MessageEntity } from './message.entity';
@@ -10,6 +11,7 @@ export declare class MemberEntity {
     nickname: string;
     avatarUrl: string;
     user: UserEntity;
+    bot: BotEntity;
     guild: GuildEntity;
     roles: RoleEntity[];
     joinedChannels: ChannelEntity[];

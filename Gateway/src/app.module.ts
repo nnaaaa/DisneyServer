@@ -1,17 +1,19 @@
 import { CacheModule, Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { AuthModule } from './modules/auth/auth.module'
-import { UserModule } from './modules/user/user.module'
-import { GuildModule } from './modules/guild/guild.module'
-import { MessageModule } from './modules/message/message.module'
-import { ChannelModule } from './modules/channel/channel.module'
-import { RoleModule } from './modules/role/role.module'
-import { EmojiModule } from './modules/emoji/emoji.module'
-import { MailModule } from './modules/mail/mail.module'
-import { ChannelCategoryModule } from './modules/channel-category/channel-category.module'
-import { MemberModule } from './modules/member/member.module'
-import { ReactModule } from './modules/react/react.module'
+import { AuthModule } from './modules/auth-module/auth/auth.module'
+import { UserModule } from './modules/auth-module/user/user.module'
+import { GuildModule } from './modules/guild-module/guild/guild.module'
+import { MessageModule } from './modules/message-module/message/message.module'
+import { ChannelModule } from './modules/guild-module/channel/channel.module'
+import { RoleModule } from './modules/guild-module/role/role.module'
+import { EmojiModule } from './modules/message-module/emoji/emoji.module'
+import { MailModule } from './modules/auth-module/mail/mail.module'
+import { ChannelCategoryModule } from './modules/guild-module/channel-category/channel-category.module'
+import { MemberModule } from './modules/guild-module/member/member.module'
+import { ReactModule } from './modules/message-module/react/react.module'
+import { BotModule } from './modules/bot-module/bot/bot.module';
+import { CommandModule } from './modules/bot-module/command/command.module';
 import * as Joi from 'joi'
 
 @Module({
@@ -68,6 +70,8 @@ import * as Joi from 'joi'
         ChannelCategoryModule,
         MemberModule,
         ReactModule,
+        BotModule,
+        CommandModule,
     ],
     providers: [],
 })

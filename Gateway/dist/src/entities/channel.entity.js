@@ -12,9 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChannelEntity = void 0;
 const typeorm_1 = require("typeorm");
 const channelCategory_entity_1 = require("./channelCategory.entity");
+const member_entity_1 = require("./member.entity");
 const message_entity_1 = require("./message.entity");
 const role_entity_1 = require("./role.entity");
-const member_entity_1 = require("./member.entity");
 let ChannelEntity = class ChannelEntity {
 };
 __decorate([
