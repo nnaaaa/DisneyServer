@@ -1,5 +1,6 @@
 import {
     Body,
+    CacheInterceptor,
     Controller,
     Delete,
     Get,
@@ -7,7 +8,9 @@ import {
     Post,
     Put,
     UseGuards,
+    UseInterceptors,
 } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import { BotEntity } from 'src/entities/bot.entity'
 import { UserEntity } from 'src/entities/user.entity'
 import { AuthService } from 'src/modules/auth-module/auth/auth.service'
@@ -19,6 +22,8 @@ import { CreateBotDto } from './dtos/createBot.dto'
 import { GenSecretKeyDto } from './dtos/genSecretKey.dto'
 import { UpdateBotDto } from './dtos/updateBot.dto'
 
+@ApiTags('bot')
+@UseInterceptors(CacheInterceptor)
 @Controller('bot')
 export class BotController {
     constructor(private botService: BotService, private authService: AuthService) {}

@@ -48,6 +48,7 @@ const memberChannel_dto_1 = require('./dtos/memberChannel.dto')
 const updateChannel_dto_1 = require('./dtos/updateChannel.dto')
 const permission_guard_1 = require('../../../shared/guards/permission.guard')
 const role_permission_decorator_1 = require('../../../shared/decorators/role-permission.decorator')
+const namespace_1 = require('../../../shared/socket/namespace')
 let ChannelGateway = (ChannelGateway_1 = class ChannelGateway {
     constructor(channelService) {
         this.channelService = channelService
@@ -101,7 +102,10 @@ let ChannelGateway = (ChannelGateway_1 = class ChannelGateway {
             )
             this.server.emit(
                 `${emit_1.ChannelSocketEmit.ADD_MEMBER}/${channel.channelId}`,
-                { channel, member }
+                {
+                    channel,
+                    member,
+                }
             )
         } catch (e) {
             this.logger.error(e)
@@ -115,7 +119,10 @@ let ChannelGateway = (ChannelGateway_1 = class ChannelGateway {
             )
             this.server.emit(
                 `${emit_1.ChannelSocketEmit.REMOVE_MEMBER}/${channel.channelId}`,
-                { channel, member }
+                {
+                    channel,
+                    member,
+                }
             )
         } catch (e) {
             this.logger.error(e)
@@ -218,7 +225,7 @@ ChannelGateway = ChannelGateway_1 = __decorate(
     [
         (0, websockets_1.WebSocketGateway)({
             cors: { origin: '*' },
-            namespace: 'channel',
+            namespace: namespace_1.SocketNamespace.CHANNEL,
         }),
         __metadata('design:paramtypes', [channel_service_1.ChannelService]),
     ],

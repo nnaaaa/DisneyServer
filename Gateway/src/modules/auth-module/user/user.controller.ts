@@ -6,12 +6,13 @@ import {
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common'
-import { ApiBearerAuth } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { AuthUser } from 'src/shared/decorators/auth-user.decorator'
 import { UserEntity } from 'src/entities/user.entity'
 import { JwtUserGuard } from 'src/modules/auth-module/auth/guards/jwtUser.guard'
 import { UserService } from './user.service'
 
+@ApiTags('user')
 @Controller('user')
 @UseInterceptors(CacheInterceptor)
 @ApiBearerAuth()

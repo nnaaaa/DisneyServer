@@ -12,12 +12,13 @@ import { GuildDto } from 'src/shared/dtos'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { EmojiSocketEmit } from 'src/shared/socket/emit'
 import { EmojiSocketEvent } from 'src/shared/socket/event'
+import { SocketNamespace } from 'src/shared/socket/namespace'
 import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
 import { CreateEmojiDto } from './dtos/createEmoji.dto'
 import { UpdateEmojiDto } from './dtos/updateEmoji.dto'
 import { EmojiService } from './emoji.service'
 
-@WebSocketGateway({ cors: { origin: '*' }, namespace: 'emoji' })
+@WebSocketGateway({ cors: { origin: '*' }, namespace: SocketNamespace.EMOJI })
 export class EmojiGateway {
     private readonly logger = new Logger(EmojiGateway.name)
 

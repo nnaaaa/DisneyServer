@@ -13,11 +13,12 @@ import { BotDto } from 'src/shared/dtos/bot.dto'
 import { GuildDto } from 'src/shared/dtos/guild.dto'
 import { MemberSocketEmit } from 'src/shared/socket/emit'
 import { MemberSocketEvent } from 'src/shared/socket/event'
+import { SocketNamespace } from 'src/shared/socket/namespace'
 import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
 import { UpdateMemberDto } from './dtos/updateMember.dto'
 import { MemberService } from './member.service'
 
-@WebSocketGateway({ cors: { origin: '*' }, namespace: 'member' })
+@WebSocketGateway({ cors: { origin: '*' }, namespace: SocketNamespace.MEMBER })
 export class MemberGateway {
     private readonly logger = new Logger(MemberGateway.name)
     @WebSocketServer()
@@ -43,7 +44,10 @@ export class MemberGateway {
         @MessageBody('bot') botDto: BotDto
     ) {
         try {
-            const newMember = await this.memberService.create(guildOfMemberDto, botDto)
+            const newMember = await this.memberService.createByBot(
+                guildOfMemberDto,
+                botDto
+            )
 
             const savedMember = await this.memberService.save(newMember)
 
@@ -67,7 +71,10 @@ export class MemberGateway {
         @AuthWSUser() authUser: UserEntity
     ) {
         try {
-            const newMember = await this.memberService.create(guildOfMemberDto, authUser)
+            const newMember = await this.memberService.createByUser(
+                guildOfMemberDto,
+                authUser
+            )
 
             const savedMember = await this.memberService.save(newMember)
 

@@ -18,7 +18,8 @@ export declare class MemberService {
         reactService: ReactService
     )
     save(joinGuild: MemberEntity): Promise<MemberEntity>
-    create(guildOfMember: GuildDto, userOrBot: UserEntity | BotDto): Promise<MemberEntity>
+    createByUser(guildOfMember: GuildDto, user: UserEntity): Promise<MemberEntity>
+    createByBot(guildOfMember: GuildDto, bot: BotDto): Promise<MemberEntity>
     findOneWithRelation(
         findCondition: FindOptionsWhere<MemberEntity>
     ): Promise<MemberEntity>

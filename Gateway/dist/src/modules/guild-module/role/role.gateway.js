@@ -42,6 +42,7 @@ const dtos_1 = require('../../../shared/dtos')
 const permission_guard_1 = require('../../../shared/guards/permission.guard')
 const emit_1 = require('../../../shared/socket/emit')
 const event_1 = require('../../../shared/socket/event')
+const namespace_1 = require('../../../shared/socket/namespace')
 const jwtWSUser_guard_1 = require('../../auth-module/auth/guards/jwtWSUser.guard')
 const channelRole_dto_1 = require('./dtos/channelRole.dto')
 const createRole_dto_1 = require('./dtos/createRole.dto')
@@ -104,7 +105,10 @@ let RoleGateway = (RoleGateway_1 = class RoleGateway {
             )
             this.server.emit(
                 `${emit_1.RoleSocketEmit.REMOVE_FROM_MEMBER}/${role.roleId}`,
-                { member, role }
+                {
+                    member,
+                    role,
+                }
             )
         } catch (e) {
             this.logger.error(e)
@@ -130,7 +134,10 @@ let RoleGateway = (RoleGateway_1 = class RoleGateway {
             )
             this.server.emit(
                 `${emit_1.RoleSocketEmit.REMOVE_FROM_CHANNEL}/${role.roleId}`,
-                { channel, role }
+                {
+                    channel,
+                    role,
+                }
             )
         } catch (e) {
             this.logger.error(e)
@@ -259,7 +266,10 @@ __decorate(
 )
 RoleGateway = RoleGateway_1 = __decorate(
     [
-        (0, websockets_1.WebSocketGateway)({ cors: { origin: '*' }, namespace: 'role' }),
+        (0, websockets_1.WebSocketGateway)({
+            cors: { origin: '*' },
+            namespace: namespace_1.SocketNamespace.ROLE,
+        }),
         __metadata('design:paramtypes', [role_service_1.RoleService]),
     ],
     RoleGateway

@@ -13,6 +13,7 @@ import { GuildDto } from 'src/shared/dtos'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { RoleSocketEmit } from 'src/shared/socket/emit'
 import { RoleSocketEvent } from 'src/shared/socket/event'
+import { SocketNamespace } from 'src/shared/socket/namespace'
 import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
 import { ChannelRoleDto } from './dtos/channelRole.dto'
 import { CreateRoleDto } from './dtos/createRole.dto'
@@ -20,7 +21,7 @@ import { MemberRoleDto } from './dtos/memberRole.dto'
 import { UpdateRoleDto } from './dtos/updateRole.dto'
 import { RoleService } from './role.service'
 
-@WebSocketGateway({ cors: { origin: '*' }, namespace: 'role' })
+@WebSocketGateway({ cors: { origin: '*' }, namespace: SocketNamespace.ROLE })
 export class RoleGateway {
     private readonly logger = new Logger(RoleGateway.name)
     @WebSocketServer()

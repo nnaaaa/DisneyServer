@@ -13,12 +13,6 @@ async function bootstrap() {
         new ValidationPipe({ transform: true, disableErrorMessages: false })
     )
 
-    // v2.config({
-    //     cloud_name: 'nnaaaa',
-    //     api_key: '318877267159348',
-    //     api_secret: '-dqVKga0AjSsHApy6xPooEzCb9I'
-    // })
-
     app.enableCors({ exposedHeaders: ['accessToken', 'refreshToken'] })
 
     const config = new DocumentBuilder()

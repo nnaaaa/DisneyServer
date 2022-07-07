@@ -8,6 +8,7 @@ import { EmojiService } from '../../message-module/emoji/emoji.service'
 import { MemberService } from '../member/member.service'
 import { RoleService } from '../role/role.service'
 import { CreateGuildDto } from './dtos/createGuild.dto'
+import { MessageEntity } from 'src/entities/message.entity'
 export declare class GuildService {
     private channelCtgService
     private roleService
@@ -34,6 +35,7 @@ export declare class GuildService {
         updateCondition: QueryDeepPartialEntity<GuildEntity>
     ): Promise<void>
     deleteOne(findCondition: FindOptionsWhere<GuildEntity>): Promise<void>
+    findByMessage(messagEntity: MessageEntity): Promise<GuildEntity>
     createTemplateGuild(
         createGuildDto: CreateGuildDto,
         creator: UserEntity

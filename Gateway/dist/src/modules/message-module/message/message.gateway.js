@@ -37,18 +37,23 @@ exports.MessageGateway = void 0
 const common_1 = require('@nestjs/common')
 const websockets_1 = require('@nestjs/websockets')
 const socket_io_1 = require('socket.io')
+const bot_service_1 = require('../../bot-module/bot/bot.service')
+const guild_service_1 = require('../../guild-module/guild/guild.service')
 const role_permission_decorator_1 = require('../../../shared/decorators/role-permission.decorator')
 const dtos_1 = require('../../../shared/dtos')
 const permission_guard_1 = require('../../../shared/guards/permission.guard')
 const emit_1 = require('../../../shared/socket/emit')
 const event_1 = require('../../../shared/socket/event')
+const namespace_1 = require('../../../shared/socket/namespace')
 const jwtWSUser_guard_1 = require('../../auth-module/auth/guards/jwtWSUser.guard')
 const createMessage_dto_1 = require('./dtos/createMessage.dto')
 const updateMessage_dto_1 = require('./dtos/updateMessage.dto')
 const message_service_1 = require('./message.service')
 let MessageGateway = (MessageGateway_1 = class MessageGateway {
-    constructor(messageService) {
+    constructor(messageService, guildService, botService) {
         this.messageService = messageService
+        this.guildService = guildService
+        this.botService = botService
         this.logger = new common_1.Logger(MessageGateway_1.name)
     }
     async create(createMessageDto, destinationDto, authorDto, replyTo) {
@@ -60,11 +65,26 @@ let MessageGateway = (MessageGateway_1 = class MessageGateway {
                 replyTo
             )
             const savedMessage = await this.messageService.save(newMessage)
+            const guild = await this.guildService.findByMessage(savedMessage)
+            const botList = await this.botService.findByGuild(guild)
             this.server.emit(
                 `${destinationDto.channelId}/${emit_1.MessageSocketEmit.CREATE}`,
                 savedMessage
             )
-            this.server.emit(`${emit_1.MessageSocketEmit.CREATE}`, savedMessage)
+            botList.forEach((bot) => {
+                var _a
+                const botName =
+                    (_a = savedMessage.content.split('.')) === null || _a === void 0
+                        ? void 0
+                        : _a[0]
+                if (botName && botName === bot.name) {
+                    this.server.emit(
+                        `${bot.botId}/${namespace_1.SocketNamespace.MESSAGE}/${emit_1.MessageSocketEmit.CREATE}`,
+                        savedMessage,
+                        guild
+                    )
+                }
+            })
         } catch (e) {
             this.logger.error(e)
             throw new websockets_1.WsException(e)
@@ -157,9 +177,15 @@ MessageGateway = MessageGateway_1 = __decorate(
     [
         (0, websockets_1.WebSocketGateway)({
             cors: { origin: '*' },
-            namespace: 'message',
+            namespace: namespace_1.SocketNamespace.MESSAGE,
         }),
-        __metadata('design:paramtypes', [message_service_1.MessageService]),
+        __param(1, (0, common_1.Inject)(guild_service_1.GuildService)),
+        __param(2, (0, common_1.Inject)(bot_service_1.BotService)),
+        __metadata('design:paramtypes', [
+            message_service_1.MessageService,
+            guild_service_1.GuildService,
+            bot_service_1.BotService,
+        ]),
     ],
     MessageGateway
 )

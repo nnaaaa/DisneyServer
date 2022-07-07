@@ -123,10 +123,21 @@ let GuildService = class GuildService {
             throw new common_1.InternalServerErrorException(e)
         }
     }
+    async findByMessage(messagEntity) {
+        const guild = this.guildRepository
+            .createQueryBuilder('guild')
+            .innerJoin('guild.categories', 'category')
+            .innerJoin('category.channels', 'channel')
+            .where('channel.channelId = :channelId', {
+                channelId: messagEntity.channel.channelId,
+            })
+            .getOne()
+        return guild
+    }
     async createTemplateGuild(createGuildDto, creator) {
         const guild = await this.create(createGuildDto, creator)
         const savedGuild = await this.save(guild)
-        const member = await this.memberService.create(savedGuild, creator)
+        const member = await this.memberService.createByUser(savedGuild, creator)
         const savedMember = await this.memberService.save(member)
         const role = await this.roleService.create(
             {

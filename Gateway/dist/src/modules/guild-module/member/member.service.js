@@ -36,9 +36,7 @@ exports.MemberService = void 0
 const common_1 = require('@nestjs/common')
 const typeorm_1 = require('@nestjs/typeorm')
 const member_entity_1 = require('../../../entities/member.entity')
-const user_entity_1 = require('../../../entities/user.entity')
 const userJoinGuild_repository_1 = require('../../../repositories/userJoinGuild.repository')
-const bot_dto_1 = require('../../../shared/dtos/bot.dto')
 const message_service_1 = require('../../message-module/message/message.service')
 const react_service_1 = require('../../message-module/react/react.service')
 let MemberService = class MemberService {
@@ -50,26 +48,33 @@ let MemberService = class MemberService {
             user: true,
             roles: true,
             joinedChannels: true,
+            bot: true,
             guild: true,
         }
     }
     async save(joinGuild) {
         return await this.memberRepository.save(joinGuild)
     }
-    async create(guildOfMember, userOrBot) {
+    async createByUser(guildOfMember, user) {
         const joinGuild = this.memberRepository.create({
             guild: guildOfMember,
             roles: [],
             joinedChannels: [],
         })
-        joinGuild.nickname = userOrBot.name
-        joinGuild.avatarUrl = userOrBot.avatarUrl
-        if (userOrBot.constructor.name === user_entity_1.UserEntity.name) {
-            joinGuild.user = userOrBot
-        }
-        if (userOrBot.constructor.name === bot_dto_1.BotDto.name) {
-            joinGuild.bot = userOrBot
-        }
+        joinGuild.nickname = user.name
+        joinGuild.avatarUrl = user.avatarUrl
+        joinGuild.user = user
+        return joinGuild
+    }
+    async createByBot(guildOfMember, bot) {
+        const joinGuild = this.memberRepository.create({
+            guild: guildOfMember,
+            roles: [],
+            joinedChannels: [],
+        })
+        joinGuild.nickname = bot.name
+        joinGuild.avatarUrl = bot.avatarUrl
+        joinGuild.bot = bot
         return joinGuild
     }
     async findOneWithRelation(findCondition) {

@@ -96,6 +96,15 @@ let BotService = class BotService {
         await this.save(bot)
         return newKey
     }
+    async findByGuild(guildEntity) {
+        const botList = await this.botRepository
+            .createQueryBuilder('bot')
+            .innerJoin('bot.joinedGuilds', 'member')
+            .innerJoin('member.guild', 'guild')
+            .where('guild.guildId = :guildId', { guildId: guildEntity.guildId })
+            .getMany()
+        return botList
+    }
 }
 BotService = __decorate(
     [

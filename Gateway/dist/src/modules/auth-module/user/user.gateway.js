@@ -44,6 +44,7 @@ const event_1 = require('../../../shared/socket/event')
 const jwtWSUser_guard_1 = require('../auth/guards/jwtWSUser.guard')
 const updateProfile_dto_1 = require('./dtos/updateProfile.dto')
 const user_service_1 = require('./user.service')
+const namespace_1 = require('../../../shared/socket/namespace')
 let UserGateway = (UserGateway_1 = class UserGateway {
     constructor(userService) {
         this.userService = userService
@@ -200,7 +201,10 @@ __decorate(
 )
 UserGateway = UserGateway_1 = __decorate(
     [
-        (0, websockets_1.WebSocketGateway)({ cors: { origin: '*' }, namespace: 'user' }),
+        (0, websockets_1.WebSocketGateway)({
+            cors: { origin: '*' },
+            namespace: namespace_1.SocketNamespace.USER,
+        }),
         __metadata('design:paramtypes', [user_service_1.UserService]),
     ],
     UserGateway

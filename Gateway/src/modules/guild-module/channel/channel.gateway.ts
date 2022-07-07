@@ -19,8 +19,9 @@ import { MemberChannelDto } from './dtos/memberChannel.dto'
 import { UpdateChannelDto } from './dtos/updateChannel.dto'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
+import { SocketNamespace } from 'src/shared/socket/namespace'
 
-@WebSocketGateway({ cors: { origin: '*' }, namespace: 'channel' })
+@WebSocketGateway({ cors: { origin: '*' }, namespace: SocketNamespace.CHANNEL })
 export class ChannelGateway {
     private readonly logger = new Logger(ChannelGateway.name)
 

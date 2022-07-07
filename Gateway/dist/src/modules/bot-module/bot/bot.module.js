@@ -23,13 +23,14 @@ exports.BotModule = void 0
 const common_1 = require('@nestjs/common')
 const typeorm_1 = require('@nestjs/typeorm')
 const bot_entity_1 = require('../../../entities/bot.entity')
-const bot_service_1 = require('./bot.service')
-const bot_controller_1 = require('./bot.controller')
 const auth_module_1 = require('../../auth-module/auth/auth.module')
 const auth_service_1 = require('../../auth-module/auth/auth.service')
+const bot_controller_1 = require('./bot.controller')
+const bot_service_1 = require('./bot.service')
 let BotModule = class BotModule {}
 BotModule = __decorate(
     [
+        (0, common_1.Global)(),
         (0, common_1.Module)({
             imports: [
                 (0, common_1.forwardRef)(() => auth_module_1.AuthModule),

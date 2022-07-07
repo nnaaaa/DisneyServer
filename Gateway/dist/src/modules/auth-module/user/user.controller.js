@@ -61,6 +61,7 @@ __decorate(
 )
 UserController = __decorate(
     [
+        (0, swagger_1.ApiTags)('user'),
         (0, common_1.Controller)('user'),
         (0, common_1.UseInterceptors)(common_1.CacheInterceptor),
         (0, swagger_1.ApiBearerAuth)(),

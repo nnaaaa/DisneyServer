@@ -24,20 +24,21 @@ const common_1 = require('@nestjs/common')
 const typeorm_1 = require('@nestjs/typeorm')
 const guild_entity_1 = require('../../../entities/guild.entity')
 const auth_module_1 = require('../../auth-module/auth/auth.module')
-const channel_category_module_1 = require('../channel-category/channel-category.module')
-const channel_category_service_1 = require('../channel-category/channel-category.service')
 const emoji_module_1 = require('../../message-module/emoji/emoji.module')
 const emoji_service_1 = require('../../message-module/emoji/emoji.service')
+const channel_category_module_1 = require('../channel-category/channel-category.module')
+const channel_category_service_1 = require('../channel-category/channel-category.service')
 const member_module_1 = require('../member/member.module')
 const member_service_1 = require('../member/member.service')
 const role_module_1 = require('../role/role.module')
 const role_service_1 = require('../role/role.service')
+const guild_controller_1 = require('./guild.controller')
 const guild_gateway_1 = require('./guild.gateway')
 const guild_service_1 = require('./guild.service')
-const guild_controller_1 = require('./guild.controller')
 let GuildModule = class GuildModule {}
 GuildModule = __decorate(
     [
+        (0, common_1.Global)(),
         (0, common_1.Module)({
             imports: [
                 auth_module_1.AuthModule,

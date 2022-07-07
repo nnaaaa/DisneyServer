@@ -12,12 +12,13 @@ import { GuildDto } from 'src/shared/dtos'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { ChannelCtgSocketEmit } from 'src/shared/socket/emit'
 import { ChannelCtgSocketEvent } from 'src/shared/socket/event'
+import { SocketNamespace } from 'src/shared/socket/namespace'
 import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
 import { ChannelCategoryService } from './channel-category.service'
 import { CreateChannelCtgDto } from './dtos/createChannelCtg.dto'
 import { UpdateChannelCtgDto } from './dtos/updateChannelCtg.dto'
 
-@WebSocketGateway({ cors: { origin: '*' }, namespace: 'channel-category' })
+@WebSocketGateway({ cors: { origin: '*' }, namespace: SocketNamespace.CHANNEL_CATEGORY })
 export class ChannelCategoryGateway {
     private readonly logger = new Logger(ChannelCategoryGateway.name)
 

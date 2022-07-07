@@ -1,7 +1,19 @@
-import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common'
+import {
+    Body,
+    CacheInterceptor,
+    Controller,
+    Delete,
+    Param,
+    Post,
+    Put,
+    UseInterceptors,
+} from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import { CommandService } from './command.service'
 import { CreateCommandDto } from './dtos/createCommand.dto'
 
+@ApiTags('command')
+@UseInterceptors(CacheInterceptor)
 @Controller('command')
 export class CommandController {
     constructor(private commandService: CommandService) {}

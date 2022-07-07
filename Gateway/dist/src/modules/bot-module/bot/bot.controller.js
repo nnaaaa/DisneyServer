@@ -34,6 +34,7 @@ var __param =
 Object.defineProperty(exports, '__esModule', { value: true })
 exports.BotController = void 0
 const common_1 = require('@nestjs/common')
+const swagger_1 = require('@nestjs/swagger')
 const bot_entity_1 = require('../../../entities/bot.entity')
 const user_entity_1 = require('../../../entities/user.entity')
 const auth_service_1 = require('../../auth-module/auth/auth.service')
@@ -177,6 +178,8 @@ __decorate(
 )
 BotController = __decorate(
     [
+        (0, swagger_1.ApiTags)('bot'),
+        (0, common_1.UseInterceptors)(common_1.CacheInterceptor),
         (0, common_1.Controller)('bot'),
         __metadata('design:paramtypes', [
             bot_service_1.BotService,

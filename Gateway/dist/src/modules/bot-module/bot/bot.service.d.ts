@@ -1,4 +1,5 @@
 import { BotEntity } from 'src/entities/bot.entity'
+import { GuildEntity } from 'src/entities/guild.entity'
 import { AuthService } from 'src/modules/auth-module/auth/auth.service'
 import { BotRepository } from 'src/repositories/bot.repository'
 import { FindOptionsRelations, FindOptionsWhere } from 'typeorm'
@@ -20,4 +21,5 @@ export declare class BotService {
     ): Promise<BotEntity>
     deleteOne(findCondition: FindOptionsWhere<BotEntity>): Promise<BotEntity>
     genSecretKey(genSecretKeyDto: GenSecretKeyDto): Promise<string>
+    findByGuild(guildEntity: GuildEntity): Promise<BotEntity[]>
 }

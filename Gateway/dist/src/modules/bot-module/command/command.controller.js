@@ -34,6 +34,7 @@ var __param =
 Object.defineProperty(exports, '__esModule', { value: true })
 exports.CommandController = void 0
 const common_1 = require('@nestjs/common')
+const swagger_1 = require('@nestjs/swagger')
 const command_service_1 = require('./command.service')
 const createCommand_dto_1 = require('./dtos/createCommand.dto')
 let CommandController = class CommandController {
@@ -99,6 +100,8 @@ __decorate(
 )
 CommandController = __decorate(
     [
+        (0, swagger_1.ApiTags)('command'),
+        (0, common_1.UseInterceptors)(common_1.CacheInterceptor),
         (0, common_1.Controller)('command'),
         __metadata('design:paramtypes', [command_service_1.CommandService]),
     ],

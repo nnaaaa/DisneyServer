@@ -12,10 +12,11 @@ import { EmojiDto, MemberDto, MessageDto } from 'src/shared/dtos'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { ReactSocketEmit } from 'src/shared/socket/emit'
 import { ReactSocketEvent } from 'src/shared/socket/event'
+import { SocketNamespace } from 'src/shared/socket/namespace'
 import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
 import { ReactService } from './react.service'
 
-@WebSocketGateway({ cors: { origin: '*' }, namespace: 'react' })
+@WebSocketGateway({ cors: { origin: '*' }, namespace: SocketNamespace.REACT })
 export class ReactGateway {
     private readonly logger = new Logger(ReactGateway.name)
 

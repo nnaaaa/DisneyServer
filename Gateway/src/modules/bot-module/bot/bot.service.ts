@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { BotEntity } from 'src/entities/bot.entity'
+import { GuildEntity } from 'src/entities/guild.entity'
 import { AuthService } from 'src/modules/auth-module/auth/auth.service'
 import { BotRepository } from 'src/repositories/bot.repository'
 import { FindOptionsRelations, FindOptionsWhere } from 'typeorm'
@@ -91,5 +92,16 @@ export class BotService {
         await this.save(bot)
 
         return newKey
+    }
+
+    async findByGuild(guildEntity: GuildEntity) {
+        const botList = await this.botRepository
+            .createQueryBuilder('bot')
+            .innerJoin('bot.joinedGuilds', 'member')
+            .innerJoin('member.guild', 'guild')
+            .where('guild.guildId = :guildId', { guildId: guildEntity.guildId })
+            .getMany()
+
+        return botList
     }
 }

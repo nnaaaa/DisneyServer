@@ -11,6 +11,7 @@ import { EmojiService } from '../../message-module/emoji/emoji.service'
 import { MemberService } from '../member/member.service'
 import { RoleService } from '../role/role.service'
 import { CreateGuildDto } from './dtos/createGuild.dto'
+import { MessageEntity } from 'src/entities/message.entity'
 
 @Injectable()
 export class GuildService {
@@ -102,11 +103,23 @@ export class GuildService {
         }
     }
 
+    async findByMessage(messagEntity: MessageEntity) {
+        const guild = this.guildRepository
+            .createQueryBuilder('guild')
+            .innerJoin('guild.categories', 'category')
+            .innerJoin('category.channels', 'channel')
+            .where('channel.channelId = :channelId', {
+                channelId: messagEntity.channel.channelId,
+            })
+            .getOne()
+        return guild
+    }
+
     async createTemplateGuild(createGuildDto: CreateGuildDto, creator: UserEntity) {
         const guild = await this.create(createGuildDto, creator)
         const savedGuild = await this.save(guild)
 
-        const member = await this.memberService.create(savedGuild, creator)
+        const member = await this.memberService.createByUser(savedGuild, creator)
         const savedMember = await this.memberService.save(member)
 
         const role = await this.roleService.create(

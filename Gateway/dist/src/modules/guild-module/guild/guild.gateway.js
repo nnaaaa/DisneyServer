@@ -48,6 +48,7 @@ const updateGuild_dto_1 = require('./dtos/updateGuild.dto')
 const guild_service_1 = require('./guild.service')
 const permission_guard_1 = require('../../../shared/guards/permission.guard')
 const role_permission_decorator_1 = require('../../../shared/decorators/role-permission.decorator')
+const namespace_1 = require('../../../shared/socket/namespace')
 let GuildGateway = (GuildGateway_1 = class GuildGateway {
     constructor(guildService, memberService) {
         this.guildService = guildService
@@ -80,25 +81,13 @@ let GuildGateway = (GuildGateway_1 = class GuildGateway {
     async getOne(guildId, authUser) {
         try {
             const guild = await this.guildService.findOneWithRelation({ guildId })
-            const member = guild.members.find((m) => m.user.userId === authUser.userId)
-            for (let ctg of guild.categories) {
-                ctg.channels = ctg.channels.filter((channel) => {
-                    if (!channel.isPrivate) return true
-                    for (let member of channel.members) {
-                        if (member.user.userId === authUser.userId) {
-                            return true
-                        }
-                    }
-                    for (let role of channel.roles) {
-                        for (let member of role.members) {
-                            if (member.user.userId === authUser.userId) {
-                                return true
-                            }
-                        }
-                    }
-                    return false
-                })
-            }
+            const member = guild.members.find((m) => {
+                var _a
+                return (
+                    ((_a = m.user) === null || _a === void 0 ? void 0 : _a.userId) ===
+                    authUser.userId
+                )
+            })
             return { guild, member }
         } catch (e) {
             this.logger.error(e)
@@ -110,8 +99,7 @@ let GuildGateway = (GuildGateway_1 = class GuildGateway {
             const joinedGuilds = await this.memberService.findManyWithRelation({
                 user: { userId },
             })
-            const guilds = joinedGuilds.map((j) => j.guild)
-            return guilds
+            return joinedGuilds
         } catch (e) {
             this.logger.error(e)
             throw new websockets_1.WsException(e)
@@ -211,7 +199,10 @@ __decorate(
 )
 GuildGateway = GuildGateway_1 = __decorate(
     [
-        (0, websockets_1.WebSocketGateway)({ cors: { origin: '*' }, namespace: 'guild' }),
+        (0, websockets_1.WebSocketGateway)({
+            cors: { origin: '*' },
+            namespace: namespace_1.SocketNamespace.GUILD,
+        }),
         __metadata('design:paramtypes', [
             guild_service_1.GuildService,
             member_service_1.MemberService,

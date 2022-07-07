@@ -19,8 +19,9 @@ import { UpdateGuildDto } from './dtos/updateGuild.dto'
 import { GuildService } from './guild.service'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
+import { SocketNamespace } from 'src/shared/socket/namespace'
 
-@WebSocketGateway({ cors: { origin: '*' }, namespace: 'guild' })
+@WebSocketGateway({ cors: { origin: '*' }, namespace: SocketNamespace.GUILD })
 export class GuildGateway {
     private readonly logger = new Logger(GuildGateway.name)
     @WebSocketServer()
@@ -28,9 +29,8 @@ export class GuildGateway {
 
     constructor(
         private guildService: GuildService,
-        private memberService: MemberService
-    ) // private roleService: RoleService
-    {}
+        private memberService: MemberService // private roleService: RoleService
+    ) {}
 
     /** @return GuildEntity after save */
     @UseGuards(JwtUserWsGuard)
@@ -75,31 +75,31 @@ export class GuildGateway {
     async getOne(@MessageBody() guildId: string, @AuthWSUser() authUser: UserEntity) {
         try {
             const guild = await this.guildService.findOneWithRelation({ guildId })
-            const member = guild.members.find((m) => m.user.userId === authUser.userId)
+            const member = guild.members.find((m) => m.user?.userId === authUser.userId)
             // O(n^3)
-            for (let ctg of guild.categories) {
-                ctg.channels = ctg.channels.filter((channel) => {
-                    if (!channel.isPrivate) return true
+            // for (let ctg of guild.categories) {
+            //     ctg.channels = ctg.channels.filter((channel) => {
+            //         if (!channel.isPrivate) return true
 
-                    // if user are member of channel
-                    for (let member of channel.members) {
-                        if (member.user.userId === authUser.userId) {
-                            return true
-                        }
-                    }
+            //         // if user are member of channel
+            //         for (let member of channel.members) {
+            //             if (member.user.userId === authUser.userId) {
+            //                 return true
+            //             }
+            //         }
 
-                    // if user own role which channel have
-                    for (let role of channel.roles) {
-                        for (let member of role.members) {
-                            if (member.user.userId === authUser.userId) {
-                                return true
-                            }
-                        }
-                    }
+            //         // if user own role which channel have
+            //         for (let role of channel.roles) {
+            //             for (let member of role.members) {
+            //                 if (member.user.userId === authUser.userId) {
+            //                     return true
+            //                 }
+            //             }
+            //         }
 
-                    return false
-                })
-            }
+            //         return false
+            //     })
+            // }
             return { guild, member }
             // return guild
         } catch (e) {
@@ -116,8 +116,7 @@ export class GuildGateway {
             const joinedGuilds = await this.memberService.findManyWithRelation({
                 user: { userId },
             })
-            const guilds = joinedGuilds.map((j) => j.guild)
-            return guilds
+            return joinedGuilds
         } catch (e) {
             this.logger.error(e)
             throw new WsException(e)

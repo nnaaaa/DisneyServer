@@ -22,8 +22,9 @@ import { UserSocketEvent } from 'src/shared/socket/event'
 import { JwtUserWsGuard } from '../auth/guards/jwtWSUser.guard'
 import { UpdateProfileDto } from './dtos/updateProfile.dto'
 import { UserService } from './user.service'
+import { SocketNamespace } from 'src/shared/socket/namespace'
 
-@WebSocketGateway({ cors: { origin: '*' }, namespace: 'user' })
+@WebSocketGateway({ cors: { origin: '*' }, namespace: SocketNamespace.USER })
 export class UserGateway {
     private readonly logger = new Logger(UserGateway.name)
     @WebSocketServer()

@@ -10,7 +10,6 @@ import { FindOptionsRelations, FindOptionsWhere } from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { MessageService } from '../../message-module/message/message.service'
 import { ReactService } from '../../message-module/react/react.service'
-
 @Injectable()
 export class MemberService {
     public readonly guildMemberRelations: FindOptionsRelations<MemberEntity> = {
@@ -19,6 +18,7 @@ export class MemberService {
         joinedChannels: true,
         // sentMessages: true,
         // sentReacts: true,
+        bot: true,
         guild: true,
     }
     constructor(
@@ -31,25 +31,36 @@ export class MemberService {
     async save(joinGuild: MemberEntity) {
         return await this.memberRepository.save(joinGuild)
     }
-    async create(guildOfMember: GuildDto, userOrBot: UserEntity | BotDto) {
+    async createByUser(guildOfMember: GuildDto, user: UserEntity) {
         const joinGuild = this.memberRepository.create({
             guild: guildOfMember,
             roles: [],
             joinedChannels: [],
         })
 
-        joinGuild.nickname = userOrBot.name
-        joinGuild.avatarUrl = userOrBot.avatarUrl
+        joinGuild.nickname = user.name
+        joinGuild.avatarUrl = user.avatarUrl
 
-        if (userOrBot.constructor.name === UserEntity.name) {
-            joinGuild.user = userOrBot as UserEntity
-        }
-        if (userOrBot.constructor.name === BotDto.name) {
-            joinGuild.bot = userOrBot as BotEntity
-        }
+        joinGuild.user = user as UserEntity
 
         return joinGuild
     }
+
+    async createByBot(guildOfMember: GuildDto, bot: BotDto) {
+        const joinGuild = this.memberRepository.create({
+            guild: guildOfMember,
+            roles: [],
+            joinedChannels: [],
+        })
+
+        joinGuild.nickname = bot.name
+        joinGuild.avatarUrl = bot.avatarUrl
+
+        joinGuild.bot = bot as BotEntity
+
+        return joinGuild
+    }
+
     async findOneWithRelation(findCondition: FindOptionsWhere<MemberEntity>) {
         return await this.memberRepository.findOne({
             relations: this.guildMemberRelations,

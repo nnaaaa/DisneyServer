@@ -42,6 +42,7 @@ const dtos_1 = require('../../../shared/dtos')
 const permission_guard_1 = require('../../../shared/guards/permission.guard')
 const emit_1 = require('../../../shared/socket/emit')
 const event_1 = require('../../../shared/socket/event')
+const namespace_1 = require('../../../shared/socket/namespace')
 const jwtWSUser_guard_1 = require('../../auth-module/auth/guards/jwtWSUser.guard')
 const channel_category_service_1 = require('./channel-category.service')
 const createChannelCtg_dto_1 = require('./dtos/createChannelCtg.dto')
@@ -155,7 +156,7 @@ ChannelCategoryGateway = ChannelCategoryGateway_1 = __decorate(
     [
         (0, websockets_1.WebSocketGateway)({
             cors: { origin: '*' },
-            namespace: 'channel-category',
+            namespace: namespace_1.SocketNamespace.CHANNEL_CATEGORY,
         }),
         __metadata('design:paramtypes', [
             channel_category_service_1.ChannelCategoryService,

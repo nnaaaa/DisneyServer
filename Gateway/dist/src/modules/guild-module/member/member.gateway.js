@@ -43,6 +43,7 @@ const bot_dto_1 = require('../../../shared/dtos/bot.dto')
 const guild_dto_1 = require('../../../shared/dtos/guild.dto')
 const emit_1 = require('../../../shared/socket/emit')
 const event_1 = require('../../../shared/socket/event')
+const namespace_1 = require('../../../shared/socket/namespace')
 const jwtWSUser_guard_1 = require('../../auth-module/auth/guards/jwtWSUser.guard')
 const updateMember_dto_1 = require('./dtos/updateMember.dto')
 const member_service_1 = require('./member.service')
@@ -59,7 +60,10 @@ let MemberGateway = (MemberGateway_1 = class MemberGateway {
     }
     async botJoinGuild(guildOfMemberDto, botDto) {
         try {
-            const newMember = await this.memberService.create(guildOfMemberDto, botDto)
+            const newMember = await this.memberService.createByBot(
+                guildOfMemberDto,
+                botDto
+            )
             const savedMember = await this.memberService.save(newMember)
             this.server.emit(
                 `${guildOfMemberDto.guildId}/${emit_1.MemberSocketEmit.JOIN}`,
@@ -73,7 +77,10 @@ let MemberGateway = (MemberGateway_1 = class MemberGateway {
     }
     async userJoinGuild(guildOfMemberDto, authUser) {
         try {
-            const newMember = await this.memberService.create(guildOfMemberDto, authUser)
+            const newMember = await this.memberService.createByUser(
+                guildOfMemberDto,
+                authUser
+            )
             const savedMember = await this.memberService.save(newMember)
             this.server.emit(
                 `${guildOfMemberDto.guildId}/${emit_1.MemberSocketEmit.JOIN}`,
@@ -207,7 +214,7 @@ MemberGateway = MemberGateway_1 = __decorate(
     [
         (0, websockets_1.WebSocketGateway)({
             cors: { origin: '*' },
-            namespace: 'member',
+            namespace: namespace_1.SocketNamespace.MEMBER,
         }),
         __metadata('design:paramtypes', [member_service_1.MemberService]),
     ],

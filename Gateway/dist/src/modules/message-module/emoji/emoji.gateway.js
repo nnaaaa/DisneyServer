@@ -42,6 +42,7 @@ const dtos_1 = require('../../../shared/dtos')
 const permission_guard_1 = require('../../../shared/guards/permission.guard')
 const emit_1 = require('../../../shared/socket/emit')
 const event_1 = require('../../../shared/socket/event')
+const namespace_1 = require('../../../shared/socket/namespace')
 const jwtWSUser_guard_1 = require('../../auth-module/auth/guards/jwtWSUser.guard')
 const createEmoji_dto_1 = require('./dtos/createEmoji.dto')
 const updateEmoji_dto_1 = require('./dtos/updateEmoji.dto')
@@ -145,7 +146,10 @@ __decorate(
 )
 EmojiGateway = EmojiGateway_1 = __decorate(
     [
-        (0, websockets_1.WebSocketGateway)({ cors: { origin: '*' }, namespace: 'emoji' }),
+        (0, websockets_1.WebSocketGateway)({
+            cors: { origin: '*' },
+            namespace: namespace_1.SocketNamespace.EMOJI,
+        }),
         __metadata('design:paramtypes', [emoji_service_1.EmojiService]),
     ],
     EmojiGateway

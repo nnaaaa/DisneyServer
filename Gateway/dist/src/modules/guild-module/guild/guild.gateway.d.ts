@@ -24,6 +24,6 @@ export declare class GuildGateway {
     }>
     getOfMe({
         userId,
-    }: UserEntity): Promise<import('../../../entities/guild.entity').GuildEntity[]>
+    }: UserEntity): Promise<import('../../../entities/member.entity').MemberEntity[]>
     delete(guildId: string): Promise<void>
 }

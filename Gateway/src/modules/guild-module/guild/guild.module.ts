@@ -1,25 +1,20 @@
-import { forwardRef, Module } from '@nestjs/common'
+import { Global, Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { GuildEntity } from 'src/entities/guild.entity'
 import { AuthModule } from '../../auth-module/auth/auth.module'
-import { ChannelCategoryModule } from '../channel-category/channel-category.module'
-import { ChannelCategoryService } from '../channel-category/channel-category.service'
-import { ChannelGateway } from '../channel/channel.gateway'
-import { ChannelModule } from '../channel/channel.module'
-import { ChannelService } from '../channel/channel.service'
 import { EmojiModule } from '../../message-module/emoji/emoji.module'
 import { EmojiService } from '../../message-module/emoji/emoji.service'
+import { ChannelCategoryModule } from '../channel-category/channel-category.module'
+import { ChannelCategoryService } from '../channel-category/channel-category.service'
 import { MemberModule } from '../member/member.module'
 import { MemberService } from '../member/member.service'
-import { MessageModule } from '../../message-module/message/message.module'
-import { ReactModule } from '../../message-module/react/react.module'
 import { RoleModule } from '../role/role.module'
 import { RoleService } from '../role/role.service'
-import { UserModule } from '../../auth-module/user/user.module'
+import { GuildController } from './guild.controller'
 import { GuildGateway } from './guild.gateway'
 import { GuildService } from './guild.service'
-import { GuildController } from './guild.controller'
 
+@Global()
 @Module({
     imports: [
         AuthModule,
