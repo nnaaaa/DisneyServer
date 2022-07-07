@@ -3,10 +3,10 @@ import { ConfigService } from '@nestjs/config'
 import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { UserService } from 'src/modules/auth-module/user/user.service'
-import { TokenPayload } from '../dtos/tokenPayload.dto'
+import { UserTokenPayload } from '../dtos/tokenPayload.dto'
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class UserJwtStrategy extends PassportStrategy(Strategy, 'userJwt') {
     constructor(configService: ConfigService, private userService: UserService) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -14,7 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             secretOrKey: configService.get<string>('TOKEN_SECRET_KEY'),
         })
     }
-    async validate(payload: TokenPayload) {
+    async validate(payload: UserTokenPayload) {
         const user = await this.userService.findOne({ userId: payload.userId })
         if (!user) throw new NotFoundException()
         return user

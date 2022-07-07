@@ -18,7 +18,7 @@ export class GuildService {
         members: this.memberService.guildMemberRelations,
         categories: this.channelCtgService.channelCtgRelations,
         roles: this.roleService.roleRelations,
-        emojis: this.emojiService.emojiRelations
+        emojis: this.emojiService.emojiRelations,
     }
 
     constructor(
@@ -27,7 +27,7 @@ export class GuildService {
         private memberService: MemberService,
         private emojiService: EmojiService,
         @InjectRepository(GuildEntity) private guildRepository: GuildRepository
-    ) { }
+    ) {}
 
     async save(guild: GuildEntity) {
         return await this.guildRepository.save(guild)
@@ -110,8 +110,8 @@ export class GuildService {
         const savedMember = await this.memberService.save(member)
 
         const role = await this.roleService.create(
-            { name: Default.everyOneRoleName, permissions: Default.everyOnePermission},
-            savedGuild,
+            { name: Default.everyOneRoleName, permissions: Default.everyOnePermission },
+            savedGuild
         )
 
         savedMember.roles = [role]

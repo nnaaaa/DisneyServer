@@ -5,7 +5,7 @@ import {
     ManyToMany,
     ManyToOne,
     OneToMany,
-    PrimaryGeneratedColumn
+    PrimaryGeneratedColumn,
 } from 'typeorm'
 import { ChannelCategoryEntity } from './channelCategory.entity'
 import { MemberEntity } from './member.entity'

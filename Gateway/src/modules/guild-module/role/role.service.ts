@@ -1,7 +1,7 @@
 import {
     Injectable,
     InternalServerErrorException,
-    NotFoundException
+    NotFoundException,
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { RoleEntity } from 'src/entities/role.entity'
@@ -26,14 +26,14 @@ export class RoleService {
         @InjectRepository(RoleEntity) private roleRepository: RoleRepository,
         private channelService: ChannelService,
         private memberService: MemberService
-    ) { }
+    ) {}
     async save(role: RoleEntity) {
         return await this.roleRepository.save(role)
     }
 
     async create(createDto: CreateRoleDto, guild: GuildDto) {
         const role = this.roleRepository.create({
-            permissions:[],
+            permissions: [],
             ...createDto,
             guild,
             members: [],
@@ -91,12 +91,10 @@ export class RoleService {
             }
 
             return role
-            
         } catch (e) {
             throw new InternalServerErrorException(e)
         }
     }
-
 
     async addToMember({ roleId, memberId }: MemberRoleDto) {
         const role = await this.findOneWithRelation({ roleId })
@@ -117,9 +115,7 @@ export class RoleService {
         })
         if (!member || !role) throw new NotFoundException()
         member.roles = member.roles.filter((role) => role.roleId !== roleId)
-        role.members = role.members.filter(
-            (member) => member.memberId !== memberId
-        )
+        role.members = role.members.filter((member) => member.memberId !== memberId)
         await this.save(role)
         return { role, member }
     }
@@ -147,6 +143,4 @@ export class RoleService {
         await this.save(role)
         return { role, channel }
     }
-
-  
 }

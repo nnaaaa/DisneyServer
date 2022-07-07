@@ -11,7 +11,7 @@ import { UpdateEmojiDto } from './dtos/updateEmoji.dto'
 @Injectable()
 export class EmojiService {
     public readonly emojiRelations: FindOptionsRelations<EmojiEntity> = {
-        reacts: true
+        reacts: true,
     }
 
     constructor(

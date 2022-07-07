@@ -1,7 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { ChannelEntity } from 'src/entities/channel.entity'
-import { MemberEntity } from 'src/entities/member.entity'
 import { MessageEntity } from 'src/entities/message.entity'
 import { MessageRepository } from 'src/repositories/message.repository'
 import { ChannelDto, MemberDto } from 'src/shared/dtos'
@@ -15,24 +13,38 @@ export class MessageService {
     public readonly messageRelations: FindOptionsRelations<MessageEntity> = {
         author: true,
         channel: true,
+        replies: true,
+        replyTo: true,
     }
 
     constructor(
         @InjectRepository(MessageEntity) private messageRepository: MessageRepository,
         private reactService: ReactService
-    ) { }
+    ) {}
 
     async save(message: MessageEntity) {
         return await this.messageRepository.save(message)
     }
 
-    create(createMessageDto: CreateMessageDto, channel: ChannelDto, author: MemberDto) {
+    async create(
+        createMessageDto: CreateMessageDto,
+        channel: ChannelDto,
+        author: MemberDto,
+        replyTo?: string
+    ) {
         const newMessage = this.messageRepository.create({
             images: [],
             ...createMessageDto,
             author,
             channel,
         })
+
+        if (replyTo) {
+            const to = await this.findOneWithRelation({ messageId: replyTo })
+            if (to) {
+                newMessage.replyTo = to
+            }
+        }
 
         return newMessage
     }
@@ -88,7 +100,11 @@ export class MessageService {
 
             const reacts = []
             for (const message of messages) {
-                reacts.push(this.reactService.deleteMany({ message: { messageId: message.messageId } }))
+                reacts.push(
+                    this.reactService.deleteMany({
+                        message: { messageId: message.messageId },
+                    })
+                )
             }
             await Promise.all(reacts)
 

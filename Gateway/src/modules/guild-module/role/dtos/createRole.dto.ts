@@ -1,4 +1,11 @@
-import { IsArray, IsHexColor, IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator'
+import {
+    IsArray,
+    IsHexColor,
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+    IsUrl,
+} from 'class-validator'
 import { Permission } from 'src/entities/role.entity'
 
 export class CreateRoleDto {

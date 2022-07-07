@@ -24,7 +24,7 @@ export class UserRegisterDto {
         description: 'Avatar url',
         example: 'http://avatar',
         required: false,
-    })   
+    })
     public readonly avatarUrl: string
 
     @IsNotEmpty()

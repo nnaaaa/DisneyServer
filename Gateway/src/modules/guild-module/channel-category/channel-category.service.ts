@@ -20,7 +20,7 @@ export class ChannelCategoryService {
         private channelService: ChannelService,
         @InjectRepository(ChannelCategoryEntity)
         private channelCtgRepository: ChannelCategoryRepository
-    ) { }
+    ) {}
 
     async save(category: ChannelCategoryEntity) {
         return await this.channelCtgRepository.save(category)
@@ -66,17 +66,17 @@ export class ChannelCategoryService {
         try {
             const categories = await this.findManyWithRelation(findCondition)
 
-
             const removeChildren = []
             for (const category of categories) {
                 removeChildren.push(
-                    this.channelService.deleteMany({ category: { categoryId: category.categoryId } })
+                    this.channelService.deleteMany({
+                        category: { categoryId: category.categoryId },
+                    })
                 )
             }
             await Promise.all(removeChildren)
 
             await this.channelCtgRepository.remove(categories)
-
         } catch (e) {
             throw new InternalServerErrorException(e)
         }

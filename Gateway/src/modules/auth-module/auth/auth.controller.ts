@@ -20,7 +20,7 @@ import {
     NewPassordWithSMSDto,
     NewPasswordWithComparationDto,
 } from './dtos/forgetPassword.dto'
-import { TokenPayload } from './dtos/tokenPayload.dto'
+import { UserTokenPayload } from './dtos/tokenPayload.dto'
 import { UserLoginDto } from './dtos/userLogin.dto'
 import { UserRegisterDto } from './dtos/userRegister.dto'
 import { VerifyAuthUserDto } from './dtos/verifyAuthUser.dto'
@@ -33,7 +33,7 @@ import { GoogleGuard } from './guards/google.guard'
 @UseInterceptors(CacheInterceptor)
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService) { }
+    constructor(private authService: AuthService) {}
 
     @Post('login')
     @ApiBody({ required: true, type: UserLoginDto })
@@ -42,10 +42,10 @@ export class AuthController {
         @AuthUser() user: UserEntity,
         @Res({ passthrough: true }) res: Response
     ) {
-        const accessToken = await this.authService.getAccessToken(user.userId)
+        const accessToken = await this.authService.getUserAccessToken(user.userId)
         res.setHeader('accessToken', accessToken)
 
-        const refreshToken = await this.authService.getRefreshToken(user.userId)
+        const refreshToken = await this.authService.getUserRefreshToken(user.userId)
         await this.authService.storeRefreshToken(user.userId, refreshToken)
         res.setHeader('refreshToken', refreshToken)
     }
@@ -57,7 +57,7 @@ export class AuthController {
 
     @Post('register-oauth')
     async registerOAuth(@Body() createUserDto: UserRegisterDto) {
-        await this.authService.createAuthUser(createUserDto,false)
+        await this.authService.createAuthUser(createUserDto, false)
     }
 
     @Put('verify')
@@ -67,10 +67,10 @@ export class AuthController {
     ) {
         const user = await this.authService.verifyAuthUserToRegister(verifyAuthUserDto)
 
-        const accessToken = await this.authService.getAccessToken(user.userId)
+        const accessToken = await this.authService.getUserAccessToken(user.userId)
         res.setHeader('accessToken', accessToken)
 
-        const refreshToken = await this.authService.getRefreshToken(user.userId)
+        const refreshToken = await this.authService.getUserRefreshToken(user.userId)
         await this.authService.storeRefreshToken(user.userId, refreshToken)
         res.setHeader('refreshToken', refreshToken)
     }
@@ -94,16 +94,16 @@ export class AuthController {
     @ApiBearerAuth()
     @UseGuards(RefreshTokenGuard)
     async refreshToken(
-        @AuthUser() user: TokenPayload,
+        @AuthUser() user: UserTokenPayload,
         @Res({ passthrough: true }) res: Response
     ) {
-        const accessToken = await this.authService.getAccessToken(user.userId)
+        const accessToken = await this.authService.getUserAccessToken(user.userId)
         res.setHeader('accessToken', accessToken)
     }
 
     @Get('facebook')
     @UseGuards(FacebookGuard)
-    async facebookLogin(): Promise<any> { }
+    async facebookLogin(): Promise<any> {}
 
     @Get('facebook/redirect')
     @UseGuards(FacebookGuard)
@@ -117,14 +117,23 @@ export class AuthController {
 
     @Get('google')
     @UseGuards(GoogleGuard)
-    async googleLogin() { }
+    async googleLogin() {}
 
     @Get('google/redirect')
     @UseGuards(GoogleGuard)
-    googleAuthRedirect(@Req() req) {
-        console.log(req.user)
+    async googleAuthRedirect(@Req() req, @Res() res: Response) {
+        try {
+            await this.registerOAuth(req.user)
+        } catch {
+            console.log('Account already exists')
+        } finally {
+            const accessToken = await this.authService.getUserAccessToken(req.user.userId)
+            const refreshToken = await this.authService.getUserRefreshToken(
+                req.user.userId
+            )
+            return res.redirect(
+                `http://localhost:3000?accessToken=${accessToken}&refreshToken=${refreshToken}`
+            )
+        }
     }
-
-
-
 }

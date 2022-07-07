@@ -12,7 +12,7 @@ import { GuildDto } from 'src/shared/dtos'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { EmojiSocketEmit } from 'src/shared/socket/emit'
 import { EmojiSocketEvent } from 'src/shared/socket/event'
-import { JwtWsGuard } from '../../auth-module/auth/guards/jwtWS.guard'
+import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
 import { CreateEmojiDto } from './dtos/createEmoji.dto'
 import { UpdateEmojiDto } from './dtos/updateEmoji.dto'
 import { EmojiService } from './emoji.service'
@@ -26,7 +26,7 @@ export class EmojiGateway {
 
     constructor(private emojiService: EmojiService) {}
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['CREATE_EMOJI'])
     @UseGuards(GuildPermissionGuard)
     @SubscribeMessage(EmojiSocketEvent.CREATE)
@@ -50,7 +50,7 @@ export class EmojiGateway {
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['UPDATE_EMOJI'])
     @UseGuards(GuildPermissionGuard)
     @SubscribeMessage(EmojiSocketEvent.UPDATE)
@@ -69,11 +69,11 @@ export class EmojiGateway {
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['DELETE_EMOJI'])
     @UseGuards(GuildPermissionGuard)
     @SubscribeMessage(EmojiSocketEvent.DELETE)
-    async delete(@MessageBody() emojiId: string) {
+    async delete(@MessageBody('emojiId') emojiId: string) {
         try {
             this.emojiService.deleteOne({ emojiId })
 

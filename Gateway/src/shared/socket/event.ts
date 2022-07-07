@@ -15,9 +15,11 @@ export enum GuildSocketEvent {
 }
 
 export enum MemberSocketEvent {
+    GET_JOINED = 'getJoined',
     ONLINE = 'online',
     UPDATE = 'update',
-    JOIN = 'join',
+    USER_JOIN = 'userJoin',
+    BOT_JOIN = 'botJoin',
     LEAVE = 'leave',
 }
 
@@ -64,3 +66,6 @@ export enum ReactSocketEvent {
     UPDATE = 'update',
     DELETE = 'delete',
 }
+
+// export enum BotSocketEvent{
+// }

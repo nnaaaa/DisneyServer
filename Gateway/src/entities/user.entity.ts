@@ -39,15 +39,15 @@ export class UserEntity {
 
     // @Exclude()
     @Column({ nullable: true, select: false })
-    refreshToken: string
+    refreshToken?: string
 
     // @Exclude()
     @Column({ type: 'bigint', nullable: true, select: false })
-    registerVerifyCode: number
+    registerVerifyCode?: number
 
     // @Exclude()
     @Column({ type: 'bigint', nullable: true, select: false })
-    changePwdVerfiyCode: number
+    changePwdVerfiyCode?: number
 
     /**
      * @relationship
@@ -63,5 +63,5 @@ export class UserEntity {
     joinedGuilds: MemberEntity[]
 
     @OneToMany(() => BotEntity, (type) => type.author, { cascade: true })
-    createdBots: MemberEntity[]
+    createdBots: BotEntity[]
 }

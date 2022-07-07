@@ -13,9 +13,9 @@ import { RoleService } from './role.service'
         AuthModule,
         TypeOrmModule.forFeature([RoleEntity]),
         ChannelModule,
-        MemberModule
+        MemberModule,
     ],
-    providers: [ChannelService,MemberModule, RoleService, RoleGateway],
+    providers: [ChannelService, MemberModule, RoleService, RoleGateway],
     exports: [TypeOrmModule, RoleService],
 })
 export class RoleModule {}

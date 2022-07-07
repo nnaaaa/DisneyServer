@@ -4,14 +4,14 @@ import {
     SubscribeMessage,
     WebSocketGateway,
     WebSocketServer,
-    WsException
+    WsException,
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
 import { MemberEntity } from 'src/entities/member.entity'
 import { MemberDto } from 'src/shared/dtos'
 import { ChannelSocketEmit } from 'src/shared/socket/emit'
 import { ChannelSocketEvent } from 'src/shared/socket/event'
-import { JwtWsGuard } from '../../auth-module/auth/guards/jwtWS.guard'
+import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
 import { ChannelCategoryDto } from '../../../shared/dtos/channel-category.dto'
 import { ChannelService } from './channel.service'
 import { CreateChannelDto } from './dtos/createChannel.dto'
@@ -30,7 +30,7 @@ export class ChannelGateway {
     constructor(private channelService: ChannelService) {}
 
     @SubscribeMessage(ChannelSocketEvent.CREATE)
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['CREATE_CHANNEL'])
     @UseGuards(GuildPermissionGuard)
     @UsePipes(new ValidationPipe())
@@ -60,7 +60,7 @@ export class ChannelGateway {
     }
 
     @SubscribeMessage(ChannelSocketEvent.UPDATE)
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['UPDATE_CHANNEL'])
     @UseGuards(GuildPermissionGuard)
     @UsePipes(new ValidationPipe())
@@ -81,10 +81,10 @@ export class ChannelGateway {
         // this.updateNotify(updateChannelDto as ChannelEntity)
     }
     @SubscribeMessage(ChannelSocketEvent.DELETE)
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['DELETE_CHANNEL'])
     @UseGuards(GuildPermissionGuard)
-    async delete(@MessageBody() channelId: string) {
+    async delete(@MessageBody('channelId') channelId: string) {
         try {
             await this.channelService.deleteOne({ channelId })
 
@@ -96,18 +96,20 @@ export class ChannelGateway {
     }
 
     @SubscribeMessage(ChannelSocketEvent.ADD_MEMBER)
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['UPDATE_CHANNEL'])
     @UseGuards(GuildPermissionGuard)
     @UsePipes(new ValidationPipe())
     async addMember(@MessageBody() memberChannelDto: MemberChannelDto) {
         try {
-            const { channel, member } = await this.channelService.addMember(memberChannelDto)
-            
-            this.server.emit(
-                `${ChannelSocketEmit.ADD_MEMBER}/${channel.channelId}`,
-                { channel, member } 
+            const { channel, member } = await this.channelService.addMember(
+                memberChannelDto
             )
+
+            this.server.emit(`${ChannelSocketEmit.ADD_MEMBER}/${channel.channelId}`, {
+                channel,
+                member,
+            })
         } catch (e) {
             this.logger.error(e)
             throw new WsException(e)
@@ -115,24 +117,25 @@ export class ChannelGateway {
     }
 
     @SubscribeMessage(ChannelSocketEvent.REMOVE_MEMBER)
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['UPDATE_CHANNEL'])
     @UseGuards(GuildPermissionGuard)
     @UsePipes(new ValidationPipe())
     async removeMember(@MessageBody() memberChannelDto: MemberChannelDto) {
         try {
-            const { channel, member } = await this.channelService.removeMember(memberChannelDto)
-            
-            this.server.emit(
-                `${ChannelSocketEmit.REMOVE_MEMBER}/${channel.channelId}`,
-                { channel, member } 
+            const { channel, member } = await this.channelService.removeMember(
+                memberChannelDto
             )
+
+            this.server.emit(`${ChannelSocketEmit.REMOVE_MEMBER}/${channel.channelId}`, {
+                channel,
+                member,
+            })
         } catch (e) {
             this.logger.error(e)
             throw new WsException(e)
         }
     }
-
 
     // channelMemberNotify(event: ChannelSocketEmit, member: MemberEntity) {
     //     // emit to all channels have roles which user own

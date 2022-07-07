@@ -13,7 +13,7 @@ import { GuildDto } from 'src/shared/dtos'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { RoleSocketEmit } from 'src/shared/socket/emit'
 import { RoleSocketEvent } from 'src/shared/socket/event'
-import { JwtWsGuard } from '../../auth-module/auth/guards/jwtWS.guard'
+import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
 import { ChannelRoleDto } from './dtos/channelRole.dto'
 import { CreateRoleDto } from './dtos/createRole.dto'
 import { MemberRoleDto } from './dtos/memberRole.dto'
@@ -28,7 +28,7 @@ export class RoleGateway {
 
     constructor(private roleService: RoleService) {}
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['CREATE_ROLE'])
     @UseGuards(GuildPermissionGuard)
     @UsePipes(new ValidationPipe())
@@ -49,7 +49,7 @@ export class RoleGateway {
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['UPDATE_ROLE'])
     @UseGuards(GuildPermissionGuard)
     @UsePipes(new ValidationPipe())
@@ -67,11 +67,11 @@ export class RoleGateway {
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['DELETE_ROLE'])
     @UseGuards(GuildPermissionGuard)
     @SubscribeMessage(RoleSocketEvent.DELETE)
-    async delete(@MessageBody() roleId: string) {
+    async delete(@MessageBody('roleId') roleId: string) {
         try {
             await this.roleService.deleteOne({ roleId })
             this.server.emit(`${RoleSocketEmit.DELETE}/${roleId}`)
@@ -81,7 +81,7 @@ export class RoleGateway {
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['UPDATE_ROLE'])
     @UseGuards(GuildPermissionGuard)
     @UsePipes(new ValidationPipe())
@@ -90,14 +90,17 @@ export class RoleGateway {
         try {
             const { member, role } = await this.roleService.addToMember(memberRoleDto)
 
-            this.server.emit(`${RoleSocketEmit.ADD_TO_MEMBER}/${role.roleId}`, { member, role })
+            this.server.emit(`${RoleSocketEmit.ADD_TO_MEMBER}/${role.roleId}`, {
+                member,
+                role,
+            })
         } catch (e) {
             this.logger.error(e)
             throw new WsException(e)
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['UPDATE_ROLE'])
     @UseGuards(GuildPermissionGuard)
     @SubscribeMessage(RoleSocketEvent.REMOVE_FROM_MEMBER)
@@ -106,14 +109,17 @@ export class RoleGateway {
             const { member, role } = await this.roleService.removeFromMember(
                 memberRoleDto
             )
-            this.server.emit(`${RoleSocketEmit.REMOVE_FROM_MEMBER}/${role.roleId}`, { member, role })
+            this.server.emit(`${RoleSocketEmit.REMOVE_FROM_MEMBER}/${role.roleId}`, {
+                member,
+                role,
+            })
         } catch (e) {
             this.logger.error(e)
             throw new WsException(e)
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['UPDATE_ROLE'])
     @UseGuards(GuildPermissionGuard)
     @UsePipes(new ValidationPipe())
@@ -122,14 +128,17 @@ export class RoleGateway {
         try {
             const { role, channel } = await this.roleService.addToChannel(channelRoleDto)
 
-            this.server.emit(`${RoleSocketEmit.ADD_TO_CHANNEL}/${role.roleId}`, { channel, role })
+            this.server.emit(`${RoleSocketEmit.ADD_TO_CHANNEL}/${role.roleId}`, {
+                channel,
+                role,
+            })
         } catch (e) {
             this.logger.error(e)
             throw new WsException(e)
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['UPDATE_ROLE'])
     @UseGuards(GuildPermissionGuard)
     @SubscribeMessage(RoleSocketEvent.REMOVE_FROM_CHANNEL)
@@ -138,7 +147,10 @@ export class RoleGateway {
             const { role, channel } = await this.roleService.removeFromChannel(
                 channelRoleDto
             )
-            this.server.emit(`${RoleSocketEmit.REMOVE_FROM_CHANNEL}/${role.roleId}`, { channel, role })
+            this.server.emit(`${RoleSocketEmit.REMOVE_FROM_CHANNEL}/${role.roleId}`, {
+                channel,
+                role,
+            })
         } catch (e) {
             this.logger.error(e)
             throw new WsException(e)

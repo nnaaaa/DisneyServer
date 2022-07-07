@@ -1,3 +1,3 @@
 export declare class ChannelCategoryDto {
-    categoryId: string;
+    categoryId: string
 }

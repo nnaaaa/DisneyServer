@@ -9,7 +9,7 @@ import { PassportStrategy } from '@nestjs/passport'
 import { Request } from 'express'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { UserService } from 'src/modules/auth-module/user/user.service'
-import { TokenPayload } from '../dtos/tokenPayload.dto'
+import { UserTokenPayload } from '../dtos/tokenPayload.dto'
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
@@ -21,7 +21,7 @@ export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refres
             passReqToCallback: true,
         })
     }
-    async validate(req: Request, payload: TokenPayload) {
+    async validate(req: Request, payload: UserTokenPayload) {
         const refreshToken = req.headers['authorization'].replace('Bearer', '').trim()
         if (!refreshToken) throw new ForbiddenException()
 

@@ -1,20 +1,20 @@
 import { CacheModule, Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import * as Joi from 'joi'
 import { AuthModule } from './modules/auth-module/auth/auth.module'
+import { MailModule } from './modules/auth-module/mail/mail.module'
 import { UserModule } from './modules/auth-module/user/user.module'
-import { GuildModule } from './modules/guild-module/guild/guild.module'
-import { MessageModule } from './modules/message-module/message/message.module'
+import { BotModule } from './modules/bot-module/bot/bot.module'
+import { CommandModule } from './modules/bot-module/command/command.module'
+import { ChannelCategoryModule } from './modules/guild-module/channel-category/channel-category.module'
 import { ChannelModule } from './modules/guild-module/channel/channel.module'
+import { GuildModule } from './modules/guild-module/guild/guild.module'
+import { MemberModule } from './modules/guild-module/member/member.module'
 import { RoleModule } from './modules/guild-module/role/role.module'
 import { EmojiModule } from './modules/message-module/emoji/emoji.module'
-import { MailModule } from './modules/auth-module/mail/mail.module'
-import { ChannelCategoryModule } from './modules/guild-module/channel-category/channel-category.module'
-import { MemberModule } from './modules/guild-module/member/member.module'
+import { MessageModule } from './modules/message-module/message/message.module'
 import { ReactModule } from './modules/message-module/react/react.module'
-import { BotModule } from './modules/bot-module/bot/bot.module';
-import { CommandModule } from './modules/bot-module/command/command.module';
-import * as Joi from 'joi'
 
 @Module({
     imports: [

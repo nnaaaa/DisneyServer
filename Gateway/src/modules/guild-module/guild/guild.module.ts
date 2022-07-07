@@ -18,6 +18,7 @@ import { RoleService } from '../role/role.service'
 import { UserModule } from '../../auth-module/user/user.module'
 import { GuildGateway } from './guild.gateway'
 import { GuildService } from './guild.service'
+import { GuildController } from './guild.controller'
 
 @Module({
     imports: [
@@ -44,5 +45,6 @@ import { GuildService } from './guild.service'
         EmojiModule,
         MemberModule,
     ],
+    controllers: [GuildController],
 })
 export class GuildModule {}

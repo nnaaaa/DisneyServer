@@ -1,8 +1,10 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
+import { BotEntity } from 'src/entities/bot.entity'
 import { MemberEntity } from 'src/entities/member.entity'
 import { UserEntity } from 'src/entities/user.entity'
 import { MemberRepository } from 'src/repositories/userJoinGuild.repository'
+import { BotDto } from 'src/shared/dtos/bot.dto'
 import { GuildDto } from 'src/shared/dtos/guild.dto'
 import { FindOptionsRelations, FindOptionsWhere } from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
@@ -24,21 +26,27 @@ export class MemberService {
         private memberRepository: MemberRepository,
         private messageService: MessageService,
         private reactService: ReactService
-    ) { }
+    ) {}
 
     async save(joinGuild: MemberEntity) {
         return await this.memberRepository.save(joinGuild)
     }
-    async create(guildOfMember: GuildDto, user: UserEntity) {
+    async create(guildOfMember: GuildDto, userOrBot: UserEntity | BotDto) {
         const joinGuild = this.memberRepository.create({
             guild: guildOfMember,
-            user,
             roles: [],
             joinedChannels: [],
         })
 
-        joinGuild.nickname = user.name
-        joinGuild.avatarUrl = user.avatarUrl
+        joinGuild.nickname = userOrBot.name
+        joinGuild.avatarUrl = userOrBot.avatarUrl
+
+        if (userOrBot.constructor.name === UserEntity.name) {
+            joinGuild.user = userOrBot as UserEntity
+        }
+        if (userOrBot.constructor.name === BotDto.name) {
+            joinGuild.bot = userOrBot as BotEntity
+        }
 
         return joinGuild
     }
@@ -74,8 +82,12 @@ export class MemberService {
             const members = await this.findManyWithRelation(findCondition)
 
             for (const member of members) {
-                await this.messageService.deleteMany({ author: {memberId:member.memberId } })
-                await this.reactService.deleteMany({ author: {memberId:member.memberId } })
+                await this.messageService.deleteMany({
+                    author: { memberId: member.memberId },
+                })
+                await this.reactService.deleteMany({
+                    author: { memberId: member.memberId },
+                })
             }
 
             await this.memberRepository.remove(members)
@@ -89,9 +101,12 @@ export class MemberService {
             const member = await this.findOneWithRelation(findCondition)
 
             if (member) {
-                
-                await this.messageService.deleteMany({ author: {memberId:member.memberId } })
-                await this.reactService.deleteMany({ author: {memberId:member.memberId } })
+                await this.messageService.deleteMany({
+                    author: { memberId: member.memberId },
+                })
+                await this.reactService.deleteMany({
+                    author: { memberId: member.memberId },
+                })
 
                 await this.memberRepository.remove(member)
             }

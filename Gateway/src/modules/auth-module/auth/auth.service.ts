@@ -22,17 +22,21 @@ export class AuthService {
         private jwtService: JwtService,
         private userService: UserService,
         private mailService: MailService
-    ) { }
+    ) {}
 
     verifyToken(token: string) {
         return this.jwtService.verify(token)
     }
 
-    async getAccessToken(userId: string) {
+    async getBotAccessToken(botId: string) {
+        return this.jwtService.sign({ botId })
+    }
+
+    async getUserAccessToken(userId: string) {
         return this.jwtService.sign({ userId }, { expiresIn: '1d' })
     }
 
-    async getRefreshToken(userId: string) {
+    async getUserRefreshToken(userId: string) {
         return this.jwtService.sign({ userId }, { expiresIn: '30d' })
     }
 
@@ -48,11 +52,9 @@ export class AuthService {
             this.mailService.registerConfirm(userRegisterDto, digitCode)
 
             await this.userService.create(userRegisterDto, digitCode)
-        }
-        else {
+        } else {
             await this.userService.create(userRegisterDto)
         }
-
     }
 
     async createAuthChangePassword({ account }: ForgetPasswordDto) {

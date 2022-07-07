@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
+import {
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
+} from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ChannelEntity } from 'src/entities/channel.entity'
 import { ChannelRepository } from 'src/repositories/channel.repository'
@@ -15,7 +19,7 @@ export class ChannelService {
     public readonly channelRelations: FindOptionsRelations<ChannelEntity> = {
         // messages: true,
         roles: { members: { user: true } },
-        members: { user: true }
+        members: { user: true },
         // members: this.memberService.guildMemberRelations,
         // roles: this.roleService.roleRelations,
     }
@@ -25,7 +29,7 @@ export class ChannelService {
         private channelRepository: ChannelRepository,
         private messageService: MessageService,
         private memberService: MemberService
-    ) { }
+    ) {}
 
     async save(category: ChannelEntity) {
         return await this.channelRepository.save(category)
@@ -73,11 +77,12 @@ export class ChannelService {
             const channel = await this.findOneWithRelation(findCondition)
 
             if (channel) {
-                await this.messageService.deleteMany({ channel: { channelId: channel.channelId } })
+                await this.messageService.deleteMany({
+                    channel: { channelId: channel.channelId },
+                })
 
                 await this.channelRepository.remove(channel)
             }
-
         } catch (e) {
             throw new InternalServerErrorException(e)
         }
@@ -89,12 +94,15 @@ export class ChannelService {
 
             const removeChildren = []
             for (const channel of channels) {
-                removeChildren.push(this.messageService.deleteMany({ channel: { channelId: channel.channelId } }))
+                removeChildren.push(
+                    this.messageService.deleteMany({
+                        channel: { channelId: channel.channelId },
+                    })
+                )
             }
             await Promise.all(removeChildren)
-            
+
             await this.channelRepository.remove(channels)
- 
         } catch (e) {
             throw new InternalServerErrorException(e)
         }
@@ -118,13 +126,11 @@ export class ChannelService {
             memberId,
         })
         if (!member || !channel) throw new NotFoundException()
-        member.joinedChannels = member.joinedChannels.filter((c) => c.channelId !== channelId)
-        channel.members = channel.members.filter(
-            (member) => member.memberId !== memberId
+        member.joinedChannels = member.joinedChannels.filter(
+            (c) => c.channelId !== channelId
         )
+        channel.members = channel.members.filter((member) => member.memberId !== memberId)
         await this.save(channel)
         return { channel, member }
     }
-
 }
-

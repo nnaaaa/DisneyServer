@@ -61,7 +61,6 @@ export class ReactService {
         }
     }
 
-
     async reactToMessage(
         emojiOfReactDto: EmojiDto,
         messageOfReactDto: MessageDto,

@@ -9,20 +9,17 @@ import {
 import { ApiBearerAuth } from '@nestjs/swagger'
 import { AuthUser } from 'src/shared/decorators/auth-user.decorator'
 import { UserEntity } from 'src/entities/user.entity'
-import { JwtGuard } from 'src/modules/auth-module/auth/guards/jwt.guard'
+import { JwtUserGuard } from 'src/modules/auth-module/auth/guards/jwtUser.guard'
 import { UserService } from './user.service'
 
 @Controller('user')
 @UseInterceptors(CacheInterceptor)
 @ApiBearerAuth()
-@UseGuards(JwtGuard)
+@UseGuards(JwtUserGuard)
 export class UserController {
     constructor(private userService: UserService) {}
 
     @Get('getProfile')
-    @ApiBearerAuth()
-    @UseGuards(JwtGuard)
-    @UseInterceptors(CacheInterceptor)
     async getUser(@AuthUser() authUser: UserEntity) {
         return authUser
     }

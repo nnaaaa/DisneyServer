@@ -1,18 +1,19 @@
 import { forwardRef, Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
-import { ClientsModule } from '@nestjs/microservices'
 import { PassportModule } from '@nestjs/passport'
-import { Service, ServiceName } from 'src/shared/microservice/services'
+import { BotModule } from 'src/modules/bot-module/bot/bot.module'
+import { BotService } from 'src/modules/bot-module/bot/bot.service'
 import { MailModule } from '../mail/mail.module'
 import { MailService } from '../mail/mail.service'
 import { UserModule } from '../user/user.module'
 import { UserService } from '../user/user.service'
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
+import { BotJwtStrategy } from './strategies/bot.strategy'
 import { FacebookStrategy } from './strategies/facebook.strategy'
 import { GoogleStrategy } from './strategies/google.strategy'
-import { JwtStrategy } from './strategies/jwt.strategy'
+import { UserJwtStrategy } from './strategies/jwt.strategy'
 import { LocalStrategy } from './strategies/local.strategy'
 import { RefreshTokenStrategy } from './strategies/refresh.strategy'
 
@@ -26,20 +27,23 @@ import { RefreshTokenStrategy } from './strategies/refresh.strategy'
         }),
         PassportModule,
         forwardRef(() => UserModule),
+        forwardRef(() => BotModule),
         MailModule,
     ],
     providers: [
+        BotService,
         UserService,
         MailService,
         ConfigService,
         AuthService,
         LocalStrategy,
-        JwtStrategy,
+        UserJwtStrategy,
+        BotJwtStrategy,
         RefreshTokenStrategy,
         FacebookStrategy,
-        GoogleStrategy
+        GoogleStrategy,
     ],
     controllers: [AuthController],
-    exports: [UserModule, JwtModule],
+    exports: [BotModule, UserModule, JwtModule, MailModule],
 })
 export class AuthModule {}

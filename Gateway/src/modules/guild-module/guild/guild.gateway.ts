@@ -11,7 +11,7 @@ import { AuthWSUser } from 'src/shared/decorators/auth-user.decorator'
 import { UserEntity } from 'src/entities/user.entity'
 import { GuildSocketEmit } from 'src/shared/socket/emit'
 import { GuildSocketEvent } from 'src/shared/socket/event'
-import { JwtWsGuard } from '../../auth-module/auth/guards/jwtWS.guard'
+import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
 import { MemberService } from '../member/member.service'
 import { RoleService } from '../role/role.service'
 import { CreateGuildDto } from './dtos/createGuild.dto'
@@ -28,12 +28,12 @@ export class GuildGateway {
 
     constructor(
         private guildService: GuildService,
-        private memberService: MemberService,
-        // private roleService: RoleService
-    ) {}
+        private memberService: MemberService
+    ) // private roleService: RoleService
+    {}
 
     /** @return GuildEntity after save */
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @SubscribeMessage(GuildSocketEvent.CREATE)
     @UsePipes(new ValidationPipe())
     async create(
@@ -48,7 +48,7 @@ export class GuildGateway {
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['UPDATE_GUILD'])
     @UseGuards(GuildPermissionGuard)
     @SubscribeMessage(GuildSocketEvent.UPDATE)
@@ -70,7 +70,7 @@ export class GuildGateway {
     }
 
     /** @return GuildEntity */
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @SubscribeMessage(GuildSocketEvent.GET_ONE)
     async getOne(@MessageBody() guildId: string, @AuthWSUser() authUser: UserEntity) {
         try {
@@ -109,7 +109,7 @@ export class GuildGateway {
     }
 
     /** @return GuildEntity[] */
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @SubscribeMessage(GuildSocketEvent.GET_JOINED)
     async getOfMe(@AuthWSUser() { userId }: UserEntity) {
         try {
@@ -124,11 +124,11 @@ export class GuildGateway {
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['DELETE_GUILD'])
     @UseGuards(GuildPermissionGuard)
     @SubscribeMessage(GuildSocketEvent.DELETE)
-    async delete(@MessageBody() guildId: string) {
+    async delete(@MessageBody('guildId') guildId: string) {
         try {
             await this.guildService.deleteOne({ guildId })
             this.server.emit(`${GuildSocketEmit.DELETE}/${guildId}`)

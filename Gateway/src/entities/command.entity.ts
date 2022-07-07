@@ -1,7 +1,4 @@
-import {
-    Column,
-    Entity, ManyToOne, PrimaryGeneratedColumn
-} from 'typeorm'
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { BotEntity } from './bot.entity'
 
 @Entity()
@@ -12,7 +9,7 @@ export class CommandEntity {
     @Column()
     name: string
 
-    @Column()
+    @Column({ type: 'longtext' })
     description: string
 
     /** @relationship */

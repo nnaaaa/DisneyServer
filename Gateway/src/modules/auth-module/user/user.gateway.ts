@@ -19,7 +19,7 @@ import { UserEntity } from 'src/entities/user.entity'
 import { UserBeFriendEntity } from 'src/entities/userBeFriend.entity'
 import { UserSocketEmit } from 'src/shared/socket/emit'
 import { UserSocketEvent } from 'src/shared/socket/event'
-import { JwtWsGuard } from '../auth/guards/jwtWS.guard'
+import { JwtUserWsGuard } from '../auth/guards/jwtWSUser.guard'
 import { UpdateProfileDto } from './dtos/updateProfile.dto'
 import { UserService } from './user.service'
 
@@ -31,7 +31,7 @@ export class UserGateway {
 
     constructor(private userService: UserService) {}
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @SubscribeMessage(UserSocketEvent.ONLINE)
     async get(@AuthWSUser() authUser: UserEntity) {
         try {
@@ -49,7 +49,7 @@ export class UserGateway {
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @SubscribeMessage(UserSocketEvent.UPDATE_PROFILE)
     @UsePipes(new ValidationPipe())
     async update(
@@ -69,7 +69,7 @@ export class UserGateway {
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @SubscribeMessage(UserSocketEvent.ADD_FRIEND)
     @UseInterceptors(ClassSerializerInterceptor)
     async addFriend(@MessageBody() friendId: string, @AuthWSUser() authUser: UserEntity) {
@@ -82,7 +82,7 @@ export class UserGateway {
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @SubscribeMessage(UserSocketEvent.ACCEPT_FRIEND)
     async acceptFriend(
         @MessageBody() friendId: string,
@@ -100,7 +100,7 @@ export class UserGateway {
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @SubscribeMessage(UserSocketEvent.BLOCK_FRIEND)
     async block(@MessageBody() friendId: string, @AuthWSUser() authUser: UserEntity) {
         try {

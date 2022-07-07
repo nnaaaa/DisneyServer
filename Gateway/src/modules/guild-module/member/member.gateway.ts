@@ -7,12 +7,13 @@ import {
     WsException,
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
-import { AuthWSUser } from 'src/shared/decorators/auth-user.decorator'
 import { UserEntity } from 'src/entities/user.entity'
+import { AuthWSUser } from 'src/shared/decorators/auth-user.decorator'
+import { BotDto } from 'src/shared/dtos/bot.dto'
 import { GuildDto } from 'src/shared/dtos/guild.dto'
 import { MemberSocketEmit } from 'src/shared/socket/emit'
 import { MemberSocketEvent } from 'src/shared/socket/event'
-import { JwtWsGuard } from '../../auth-module/auth/guards/jwtWS.guard'
+import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
 import { UpdateMemberDto } from './dtos/updateMember.dto'
 import { MemberService } from './member.service'
 
@@ -24,10 +25,44 @@ export class MemberGateway {
 
     constructor(private memberService: MemberService) {}
 
+    // @Get('/getJoined')
+    @UseGuards(JwtUserWsGuard)
+    @SubscribeMessage(MemberSocketEvent.GET_JOINED)
+    async getOfMe(@AuthWSUser() { userId }: UserEntity) {
+        const joinedGuilds = await this.memberService.findManyWithRelation({
+            user: { userId },
+        })
+        return joinedGuilds
+    }
+
     /** @return GuildEntity which user have joined */
-    @UseGuards(JwtWsGuard)
-    @SubscribeMessage(MemberSocketEvent.JOIN)
-    async joinGuild(
+    @UseGuards(JwtUserWsGuard)
+    @SubscribeMessage(MemberSocketEvent.BOT_JOIN)
+    async botJoinGuild(
+        @MessageBody('guild') guildOfMemberDto: GuildDto,
+        @MessageBody('bot') botDto: BotDto
+    ) {
+        try {
+            const newMember = await this.memberService.create(guildOfMemberDto, botDto)
+
+            const savedMember = await this.memberService.save(newMember)
+
+            this.server.emit(
+                `${guildOfMemberDto.guildId}/${MemberSocketEmit.JOIN}`,
+                savedMember
+            )
+
+            return newMember
+        } catch (e) {
+            this.logger.error(e)
+            throw new WsException(e)
+        }
+    }
+
+    /** @return GuildEntity which user have joined */
+    @UseGuards(JwtUserWsGuard)
+    @SubscribeMessage(MemberSocketEvent.USER_JOIN)
+    async userJoinGuild(
         @MessageBody('guild') guildOfMemberDto: GuildDto,
         @AuthWSUser() authUser: UserEntity
     ) {
@@ -62,12 +97,12 @@ export class MemberGateway {
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @SubscribeMessage(MemberSocketEvent.LEAVE)
     async leaveGuild(@MessageBody() memberId: string) {
         try {
             const memberLeaveGuild = await this.memberService.deleteOne({ memberId })
-            console.log(memberLeaveGuild)
+
             this.server.emit(`${MemberSocketEmit.LEAVE}/${memberId}`, memberLeaveGuild)
         } catch (e) {
             this.logger.error(e)
@@ -75,7 +110,7 @@ export class MemberGateway {
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @UsePipes(new ValidationPipe())
     @SubscribeMessage(MemberSocketEvent.UPDATE)
     async updateMember(@MessageBody() updateMemberDto: UpdateMemberDto) {
@@ -93,7 +128,7 @@ export class MemberGateway {
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @SubscribeMessage(MemberSocketEvent.ONLINE)
     memberOnline(@MessageBody() memberId: string) {
         this.server.emit(`${MemberSocketEmit.ONLINE}/${memberId}`)

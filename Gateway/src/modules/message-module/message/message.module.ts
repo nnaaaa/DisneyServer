@@ -12,4 +12,4 @@ import { MessageService } from './message.service'
     providers: [ReactService, MessageService, MessageGateway],
     exports: [TypeOrmModule, MessageService, ReactModule],
 })
-export class MessageModule { }
+export class MessageModule {}

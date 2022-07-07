@@ -12,7 +12,7 @@ import { GuildDto } from 'src/shared/dtos'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { ChannelCtgSocketEmit } from 'src/shared/socket/emit'
 import { ChannelCtgSocketEvent } from 'src/shared/socket/event'
-import { JwtWsGuard } from '../../auth-module/auth/guards/jwtWS.guard'
+import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
 import { ChannelCategoryService } from './channel-category.service'
 import { CreateChannelCtgDto } from './dtos/createChannelCtg.dto'
 import { UpdateChannelCtgDto } from './dtos/updateChannelCtg.dto'
@@ -27,7 +27,7 @@ export class ChannelCategoryGateway {
     constructor(private channelCtgService: ChannelCategoryService) {}
 
     @SubscribeMessage(ChannelCtgSocketEvent.CREATE)
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['CREATE_CHANNEL'])
     @UseGuards(GuildPermissionGuard)
     @UsePipes(new ValidationPipe())
@@ -56,11 +56,11 @@ export class ChannelCategoryGateway {
     }
 
     @SubscribeMessage(ChannelCtgSocketEvent.UPDATE)
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['UPDATE_CHANNEL'])
     @UseGuards(GuildPermissionGuard)
     @UsePipes(new ValidationPipe())
-    async update(@MessageBody() updateChannelCtgDto: UpdateChannelCtgDto) {
+    async update(@MessageBody('categoryId') updateChannelCtgDto: UpdateChannelCtgDto) {
         try {
             await this.channelCtgService.updateOne(
                 { categoryId: updateChannelCtgDto.categoryId },
@@ -78,7 +78,7 @@ export class ChannelCategoryGateway {
     }
 
     @SubscribeMessage(ChannelCtgSocketEvent.DELETE)
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['DELETE_CHANNEL'])
     @UseGuards(GuildPermissionGuard)
     async delete(@MessageBody() categoryId: string) {

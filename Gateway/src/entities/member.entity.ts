@@ -1,11 +1,13 @@
+import { Default } from 'src/shared/default'
 import {
     Column,
     CreateDateColumn,
-    Entity, JoinTable,
+    Entity,
+    JoinTable,
     ManyToMany,
     ManyToOne,
     OneToMany,
-    PrimaryGeneratedColumn
+    PrimaryGeneratedColumn,
 } from 'typeorm'
 import { BotEntity } from './bot.entity'
 import { ChannelEntity } from './channel.entity'
@@ -26,20 +28,21 @@ export class MemberEntity {
     @Column()
     nickname: string
 
-    @Column({ nullable: true })
+    @Column({ default: Default.userAvatar })
     avatarUrl: string
 
     /** @relationship */
     @ManyToOne(() => UserEntity, (type) => type.joinedGuilds, {
         onDelete: 'CASCADE',
+        nullable: true,
     })
-    user: UserEntity
+    user?: UserEntity
 
     @ManyToOne(() => BotEntity, (type) => type.joinedGuilds, {
         onDelete: 'CASCADE',
+        nullable: true,
     })
-    bot: BotEntity
-
+    bot?: BotEntity
 
     @ManyToOne(() => GuildEntity, (type) => type.members)
     guild: GuildEntity
@@ -59,6 +62,4 @@ export class MemberEntity {
 
     @OneToMany(() => ReactEntity, (type) => type.author, { cascade: true })
     sentReacts: ReactEntity[]
-
-
 }

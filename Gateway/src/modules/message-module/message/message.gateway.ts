@@ -8,11 +8,11 @@ import {
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
 import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
-import { ChannelDto, MemberDto } from 'src/shared/dtos'
+import { ChannelDto, MemberDto, MessageDto } from 'src/shared/dtos'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { MessageSocketEmit } from 'src/shared/socket/emit'
 import { MessageSocketEvent } from 'src/shared/socket/event'
-import { JwtWsGuard } from '../../auth-module/auth/guards/jwtWS.guard'
+import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
 import { CreateMessageDto } from './dtos/createMessage.dto'
 import { UpdateMessageDto } from './dtos/updateMessage.dto'
 import { MessageService } from './message.service'
@@ -26,7 +26,7 @@ export class MessageGateway {
 
     constructor(private messageService: MessageService) {}
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['CREATE_MESSAGE'])
     @UseGuards(GuildPermissionGuard)
     @SubscribeMessage(MessageSocketEvent.CREATE)
@@ -34,15 +34,17 @@ export class MessageGateway {
     async create(
         @MessageBody('message') createMessageDto: CreateMessageDto,
         @MessageBody('channel') destinationDto: ChannelDto,
-        @MessageBody('member') authorDto: MemberDto
+        @MessageBody('member') authorDto: MemberDto,
+        @MessageBody('replyTo') replyTo: string
     ) {
         try {
-            const newMessage = this.messageService.create(
+            const newMessage = await this.messageService.create(
                 createMessageDto,
                 destinationDto,
-                authorDto
+                authorDto,
+                replyTo
             )
-            
+
             const savedMessage = await this.messageService.save(newMessage)
 
             this.server.emit(
@@ -57,7 +59,7 @@ export class MessageGateway {
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['UPDATE_MESSAGE'])
     @UseGuards(GuildPermissionGuard)
     @SubscribeMessage(MessageSocketEvent.UPDATE)
@@ -76,11 +78,11 @@ export class MessageGateway {
         }
     }
 
-    @UseGuards(JwtWsGuard)
+    @UseGuards(JwtUserWsGuard)
     @RolePermissions(['DELETE_MESSAGE'])
     @UseGuards(GuildPermissionGuard)
     @SubscribeMessage(MessageSocketEvent.DELETE)
-    async delete(@MessageBody() messageId: string) {
+    async delete(@MessageBody('messageId') messageId: string) {
         try {
             this.messageService.deleteOne({ messageId })
 

@@ -12,7 +12,7 @@ import { FriendStatus, UserBeFriendEntity } from 'src/entities/userBeFriend.enti
 import { UserRegisterDto } from 'src/modules/auth-module/auth/dtos/userRegister.dto'
 import { UserRepository } from 'src/repositories/user.repository'
 import { UserBeFriendRepository } from 'src/repositories/userBeFriend.repository'
-import { FindOptionsSelect, FindOptionsWhere } from 'typeorm'
+import { FindOptionsRelations, FindOptionsSelect, FindOptionsWhere } from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import {
     NewPassordWithSMSDto,
@@ -26,7 +26,7 @@ export class UserService {
         leftUser: true,
         rightUser: true,
     }
-    public readonly userRelations = {
+    public readonly userRelations: FindOptionsRelations<UserEntity> = {
         friends: this.beFriendRelations,
     }
 

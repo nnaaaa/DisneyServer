@@ -10,7 +10,12 @@ import { ChannelGateway } from './channel.gateway'
 import { ChannelService } from './channel.service'
 
 @Module({
-    imports: [AuthModule, TypeOrmModule.forFeature([ChannelEntity]), MessageModule, MemberModule],
+    imports: [
+        AuthModule,
+        TypeOrmModule.forFeature([ChannelEntity]),
+        MessageModule,
+        MemberModule,
+    ],
     providers: [MemberService, MessageService, ChannelGateway, ChannelService],
     exports: [TypeOrmModule, ChannelService, MessageModule],
 })

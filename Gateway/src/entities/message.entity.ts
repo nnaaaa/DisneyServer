@@ -2,6 +2,7 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    JoinTable,
     ManyToOne,
     OneToMany,
     OneToOne,
@@ -16,7 +17,7 @@ export class MessageEntity {
     @PrimaryGeneratedColumn('uuid')
     messageId: string
 
-    @Column()
+    @Column({ type: 'longtext' })
     content: string
 
     @Column({ type: 'simple-array' })
@@ -35,7 +36,11 @@ export class MessageEntity {
     @OneToMany(() => ReactEntity, (type) => type.message, { cascade: true })
     reacts: ReactEntity[]
 
-    /** @unidirection */
-    @OneToOne(() => MessageEntity, { cascade: true, nullable: true })
+    /** @selfrelation */
+    @ManyToOne(() => MessageEntity, (type) => type.replies, { nullable: true })
+    // @JoinTable({ joinColumn: { name: 'messageId' } })
     replyTo: MessageEntity
+
+    @OneToMany(() => MessageEntity, (type) => type.replyTo, { cascade: true })
+    replies: MessageEntity[]
 }
