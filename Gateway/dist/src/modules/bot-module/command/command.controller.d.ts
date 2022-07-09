@@ -1,5 +1,6 @@
 import { CommandService } from './command.service'
 import { CreateCommandDto } from './dtos/createCommand.dto'
+import { UpdateCommandDto } from './dtos/updateCommand.dto'
 export declare class CommandController {
     private commandService
     constructor(commandService: CommandService)
@@ -9,7 +10,7 @@ export declare class CommandController {
     ): Promise<import('../../../entities/command.entity').CommandEntity>
     update(
         commandId: string,
-        updateCommandDto: CreateCommandDto
+        updateCommandDto: UpdateCommandDto
     ): Promise<import('../../../entities/command.entity').CommandEntity>
     delete(
         commandId: string

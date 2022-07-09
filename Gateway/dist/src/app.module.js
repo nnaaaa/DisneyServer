@@ -37,7 +37,6 @@ const role_module_1 = require('./modules/guild-module/role/role.module')
 const emoji_module_1 = require('./modules/message-module/emoji/emoji.module')
 const message_module_1 = require('./modules/message-module/message/message.module')
 const react_module_1 = require('./modules/message-module/react/react.module')
-const argument_module_1 = require('./modules/bot-module/argument/argument.module')
 let AppModule = class AppModule {}
 AppModule = __decorate(
     [
@@ -93,7 +92,6 @@ AppModule = __decorate(
                 react_module_1.ReactModule,
                 bot_module_1.BotModule,
                 command_module_1.CommandModule,
-                argument_module_1.ArgumentModule,
             ],
             providers: [],
         }),

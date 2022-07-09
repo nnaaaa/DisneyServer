@@ -11,6 +11,7 @@ import {
 import { ApiTags } from '@nestjs/swagger'
 import { CommandService } from './command.service'
 import { CreateCommandDto } from './dtos/createCommand.dto'
+import { UpdateCommandDto } from './dtos/updateCommand.dto'
 
 @ApiTags('command')
 @UseInterceptors(CacheInterceptor)
@@ -36,7 +37,7 @@ export class CommandController {
     @Put('/:commandId')
     async update(
         @Param('commandId') commandId: string,
-        @Body() updateCommandDto: CreateCommandDto
+        @Body() updateCommandDto: UpdateCommandDto
     ) {
         const command = await this.commandService.updateOne(
             { commandId },

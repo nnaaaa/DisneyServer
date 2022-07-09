@@ -99,6 +99,7 @@ let BotService = class BotService {
     async findByGuild(guildEntity) {
         const botList = await this.botRepository
             .createQueryBuilder('bot')
+            .leftJoinAndSelect('bot.commands', 'command')
             .innerJoin('bot.joinedGuilds', 'member')
             .innerJoin('member.guild', 'guild')
             .where('guild.guildId = :guildId', { guildId: guildEntity.guildId })

@@ -12,6 +12,7 @@ import { UserEntity } from 'src/entities/user.entity'
 import { JwtWsGuard } from 'src/modules/auth-module/auth/guards/jwtWS.guard'
 import { BotService } from 'src/modules/bot-module/bot/bot.service'
 import { GuildService } from 'src/modules/guild-module/guild/guild.service'
+import { Algorithm } from 'src/shared/algorithms'
 import { AuthWSUser } from 'src/shared/decorators/auth-user.decorator'
 import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
 import { ChannelDto, MemberDto } from 'src/shared/dtos'
@@ -89,16 +90,28 @@ export class MessageGateway {
             )
 
             //emit to bot clients
-            botList.forEach((bot) => {
-                const botName = savedMessage.content.split('.')?.[0]
-                if (botName && botName === bot.name) {
-                    this.server.emit(
-                        `${bot.botId}/${SocketNamespace.MESSAGE}/${MessageSocketEmit.CREATE}`,
-                        savedMessage,
-                        guild
+            const inspected = Algorithm.inspectCommand(savedMessage.content)
+
+            if (inspected) {
+                botList.forEach((bot) => {
+                    const { botName, args, commandName } = inspected
+
+                    const isMatchCommand = bot.commands.some(
+                        (command) =>
+                            command.name === commandName &&
+                            command.args.length === args.length
                     )
-                }
-            })
+
+                    if (botName && botName === bot.name && isMatchCommand) {
+                        this.server.emit(
+                            `${bot.botId}/${SocketNamespace.MESSAGE}/${MessageSocketEmit.CREATE}`,
+                            savedMessage,
+                            inspected,
+                            guild
+                        )
+                    }
+                })
+            }
 
             //emit to bot manager
             this.server.emit(

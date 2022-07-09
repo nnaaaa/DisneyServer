@@ -37,6 +37,7 @@ const common_1 = require('@nestjs/common')
 const swagger_1 = require('@nestjs/swagger')
 const command_service_1 = require('./command.service')
 const createCommand_dto_1 = require('./dtos/createCommand.dto')
+const updateCommand_dto_1 = require('./dtos/updateCommand.dto')
 let CommandController = class CommandController {
     constructor(commandService) {
         this.commandService = commandService
@@ -79,7 +80,7 @@ __decorate(
         __param(0, (0, common_1.Param)('commandId')),
         __param(1, (0, common_1.Body)()),
         __metadata('design:type', Function),
-        __metadata('design:paramtypes', [String, createCommand_dto_1.CreateCommandDto]),
+        __metadata('design:paramtypes', [String, updateCommand_dto_1.UpdateCommandDto]),
         __metadata('design:returntype', Promise),
     ],
     CommandController.prototype,

@@ -25,47 +25,39 @@ var __metadata =
             return Reflect.metadata(k, v)
     }
 Object.defineProperty(exports, '__esModule', { value: true })
-exports.CommandEntity = void 0
-const typeorm_1 = require('typeorm')
-const bot_entity_1 = require('./bot.entity')
-let CommandEntity = class CommandEntity {}
+exports.UpdateCommandDto = void 0
+const class_validator_1 = require('class-validator')
+class UpdateCommandDto {}
 __decorate(
-    [(0, typeorm_1.PrimaryGeneratedColumn)('uuid'), __metadata('design:type', String)],
-    CommandEntity.prototype,
-    'commandId',
-    void 0
-)
-__decorate(
-    [(0, typeorm_1.Column)(), __metadata('design:type', String)],
-    CommandEntity.prototype,
+    [
+        (0, class_validator_1.IsOptional)(),
+        (0, class_validator_1.IsString)(),
+        __metadata('design:type', String),
+    ],
+    UpdateCommandDto.prototype,
     'name',
     void 0
 )
 __decorate(
-    [(0, typeorm_1.Column)({ type: 'longtext' }), __metadata('design:type', String)],
-    CommandEntity.prototype,
+    [
+        (0, class_validator_1.IsOptional)(),
+        (0, class_validator_1.IsString)(),
+        __metadata('design:type', String),
+    ],
+    UpdateCommandDto.prototype,
     'description',
     void 0
 )
 __decorate(
     [
-        (0, typeorm_1.ManyToOne)(
-            () => bot_entity_1.BotEntity,
-            (type) => type.commands,
-            { onDelete: 'CASCADE' }
-        ),
-        __metadata('design:type', bot_entity_1.BotEntity),
+        (0, class_validator_1.IsOptional)(),
+        (0, class_validator_1.IsArray)(),
+        (0, class_validator_1.IsString)({ each: true }),
+        __metadata('design:type', Array),
     ],
-    CommandEntity.prototype,
-    'bot',
-    void 0
-)
-__decorate(
-    [(0, typeorm_1.Column)({ type: 'simple-array' }), __metadata('design:type', Array)],
-    CommandEntity.prototype,
+    UpdateCommandDto.prototype,
     'args',
     void 0
 )
-CommandEntity = __decorate([(0, typeorm_1.Entity)()], CommandEntity)
-exports.CommandEntity = CommandEntity
-//# sourceMappingURL=command.entity.js.map
+exports.UpdateCommandDto = UpdateCommandDto
+//# sourceMappingURL=updateCommand.dto.js.map

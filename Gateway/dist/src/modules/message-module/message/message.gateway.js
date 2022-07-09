@@ -40,6 +40,7 @@ const socket_io_1 = require('socket.io')
 const jwtWS_guard_1 = require('../../auth-module/auth/guards/jwtWS.guard')
 const bot_service_1 = require('../../bot-module/bot/bot.service')
 const guild_service_1 = require('../../guild-module/guild/guild.service')
+const algorithms_1 = require('../../../shared/algorithms')
 const auth_user_decorator_1 = require('../../../shared/decorators/auth-user.decorator')
 const role_permission_decorator_1 = require('../../../shared/decorators/role-permission.decorator')
 const dtos_1 = require('../../../shared/dtos')
@@ -90,20 +91,25 @@ let MessageGateway = (MessageGateway_1 = class MessageGateway {
                 `${destinationDto.channelId}/${emit_1.MessageSocketEmit.CREATE}`,
                 savedMessage
             )
-            botList.forEach((bot) => {
-                var _a
-                const botName =
-                    (_a = savedMessage.content.split('.')) === null || _a === void 0
-                        ? void 0
-                        : _a[0]
-                if (botName && botName === bot.name) {
-                    this.server.emit(
-                        `${bot.botId}/${namespace_1.SocketNamespace.MESSAGE}/${emit_1.MessageSocketEmit.CREATE}`,
-                        savedMessage,
-                        guild
+            const inspected = algorithms_1.Algorithm.inspectCommand(savedMessage.content)
+            if (inspected) {
+                botList.forEach((bot) => {
+                    const { botName, args, commandName } = inspected
+                    const isMatchCommand = bot.commands.some(
+                        (command) =>
+                            command.name === commandName &&
+                            command.args.length === args.length
                     )
-                }
-            })
+                    if (botName && botName === bot.name && isMatchCommand) {
+                        this.server.emit(
+                            `${bot.botId}/${namespace_1.SocketNamespace.MESSAGE}/${emit_1.MessageSocketEmit.CREATE}`,
+                            savedMessage,
+                            inspected,
+                            guild
+                        )
+                    }
+                })
+            }
             this.server.emit(
                 `botManager/${
                     userOrBot === null || userOrBot === void 0 ? void 0 : userOrBot.botId
