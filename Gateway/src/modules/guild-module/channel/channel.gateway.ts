@@ -56,7 +56,7 @@ export class ChannelGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -77,7 +77,7 @@ export class ChannelGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
         // this.updateNotify(updateChannelDto as ChannelEntity)
     }
@@ -92,7 +92,7 @@ export class ChannelGateway {
             this.server.emit(`${ChannelSocketEmit.DELETE}/${channelId}`)
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -113,7 +113,7 @@ export class ChannelGateway {
             })
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -134,7 +134,7 @@ export class ChannelGateway {
             })
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 

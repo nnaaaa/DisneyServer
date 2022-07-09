@@ -20,6 +20,9 @@ export declare class MessageService {
     findOneWithRelation(
         findCondition: FindOptionsWhere<MessageEntity>
     ): Promise<MessageEntity>
+    findManyWithRelation(
+        findCondition: FindOptionsWhere<MessageEntity>
+    ): Promise<MessageEntity[]>
     findMany(findCondition: FindOptionsWhere<MessageEntity>): Promise<MessageEntity[]>
     updateOne(updateMessageDto: UpdateMessageDto): Promise<MessageEntity>
     deleteOne(findCondition: FindOptionsWhere<MessageEntity>): Promise<MessageEntity>

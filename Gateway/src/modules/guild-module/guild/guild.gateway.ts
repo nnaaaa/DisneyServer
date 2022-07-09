@@ -44,7 +44,7 @@ export class GuildGateway {
             return await this.guildService.createTemplateGuild(createGuildDto, authUser)
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -65,7 +65,7 @@ export class GuildGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -104,7 +104,7 @@ export class GuildGateway {
             // return guild
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -119,7 +119,7 @@ export class GuildGateway {
             return joinedGuilds
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -133,7 +133,7 @@ export class GuildGateway {
             this.server.emit(`${GuildSocketEmit.DELETE}/${guildId}`)
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 }

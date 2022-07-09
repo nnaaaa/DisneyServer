@@ -1,4 +1,9 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common'
+import {
+    ConflictException,
+    Inject,
+    Injectable,
+    InternalServerErrorException,
+} from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { BotEntity } from 'src/entities/bot.entity'
 import { MemberEntity } from 'src/entities/member.entity'
@@ -10,6 +15,8 @@ import { FindOptionsRelations, FindOptionsWhere } from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import { MessageService } from '../../message-module/message/message.service'
 import { ReactService } from '../../message-module/react/react.service'
+import { GuildService } from '../guild/guild.service'
+import { RoleService } from '../role/role.service'
 @Injectable()
 export class MemberService {
     public readonly guildMemberRelations: FindOptionsRelations<MemberEntity> = {
@@ -126,5 +133,35 @@ export class MemberService {
         } catch (e) {
             throw new InternalServerErrorException(e)
         }
+    }
+
+    async botJoin(guildOfMemberDto: GuildDto, botDto: BotDto) {
+        const isJoined = await this.findOneWithRelation({
+            guild: guildOfMemberDto,
+            bot: { botId: botDto.botId },
+        })
+
+        if (isJoined) throw new ConflictException('Bot is already joined')
+
+        const newMember = await this.createByBot(guildOfMemberDto, botDto)
+
+        const savedMember = await this.save(newMember)
+
+        return savedMember
+    }
+
+    async userJoin(guildOfMemberDto: GuildDto, userDto: UserEntity) {
+        const isJoined = await this.findOneWithRelation({
+            guild: guildOfMemberDto,
+            user: { userId: userDto.userId },
+        })
+
+        if (isJoined) throw new ConflictException('User is already joined')
+
+        const newMember = await this.createByUser(guildOfMemberDto, userDto)
+
+        const savedMember = await this.save(newMember)
+
+        return savedMember
     }
 }

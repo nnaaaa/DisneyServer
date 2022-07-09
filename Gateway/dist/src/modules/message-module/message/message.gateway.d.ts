@@ -1,4 +1,6 @@
 import { Server } from 'socket.io'
+import { BotEntity } from 'src/entities/bot.entity'
+import { UserEntity } from 'src/entities/user.entity'
 import { BotService } from 'src/modules/bot-module/bot/bot.service'
 import { GuildService } from 'src/modules/guild-module/guild/guild.service'
 import { ChannelDto, MemberDto } from 'src/shared/dtos'
@@ -16,12 +18,14 @@ export declare class MessageGateway {
         guildService: GuildService,
         botService: BotService
     )
+    find(botId: string): Promise<any>
     create(
         createMessageDto: CreateMessageDto,
         destinationDto: ChannelDto,
         authorDto: MemberDto,
-        replyTo: string
-    ): Promise<void>
-    update(updateMessageDto: UpdateMessageDto): Promise<void>
-    delete(messageId: string): Promise<void>
+        replyTo: string,
+        userOrBot: BotEntity | UserEntity
+    ): Promise<any>
+    update(updateMessageDto: UpdateMessageDto): Promise<any>
+    delete(messageId: string): Promise<any>
 }

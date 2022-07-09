@@ -52,7 +52,7 @@ export class ChannelCategoryGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -74,7 +74,7 @@ export class ChannelCategoryGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -89,7 +89,7 @@ export class ChannelCategoryGateway {
             this.server.emit(`${ChannelCtgSocketEmit.DELETE}/${categoryId}`)
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 }

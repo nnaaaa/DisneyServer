@@ -37,14 +37,17 @@ exports.MessageGateway = void 0
 const common_1 = require('@nestjs/common')
 const websockets_1 = require('@nestjs/websockets')
 const socket_io_1 = require('socket.io')
+const jwtWS_guard_1 = require('../../auth-module/auth/guards/jwtWS.guard')
 const bot_service_1 = require('../../bot-module/bot/bot.service')
 const guild_service_1 = require('../../guild-module/guild/guild.service')
+const auth_user_decorator_1 = require('../../../shared/decorators/auth-user.decorator')
 const role_permission_decorator_1 = require('../../../shared/decorators/role-permission.decorator')
 const dtos_1 = require('../../../shared/dtos')
 const permission_guard_1 = require('../../../shared/guards/permission.guard')
 const emit_1 = require('../../../shared/socket/emit')
 const event_1 = require('../../../shared/socket/event')
 const namespace_1 = require('../../../shared/socket/namespace')
+const typeorm_1 = require('typeorm')
 const jwtWSUser_guard_1 = require('../../auth-module/auth/guards/jwtWSUser.guard')
 const createMessage_dto_1 = require('./dtos/createMessage.dto')
 const updateMessage_dto_1 = require('./dtos/updateMessage.dto')
@@ -56,7 +59,23 @@ let MessageGateway = (MessageGateway_1 = class MessageGateway {
         this.botService = botService
         this.logger = new common_1.Logger(MessageGateway_1.name)
     }
-    async create(createMessageDto, destinationDto, authorDto, replyTo) {
+    async find(botId) {
+        try {
+            const bot = await this.botService.findOneWithRelation({ botId })
+            const messages = await this.messageService.findManyWithRelation({
+                author: {
+                    memberId: (0, typeorm_1.In)(
+                        bot.joinedGuilds.map((guild) => guild.memberId)
+                    ),
+                },
+            })
+            return messages
+        } catch (e) {
+            this.logger.error(e)
+            return e
+        }
+    }
+    async create(createMessageDto, destinationDto, authorDto, replyTo, userOrBot) {
         try {
             const newMessage = await this.messageService.create(
                 createMessageDto,
@@ -85,9 +104,17 @@ let MessageGateway = (MessageGateway_1 = class MessageGateway {
                     )
                 }
             })
+            this.server.emit(
+                `botManager/${
+                    userOrBot === null || userOrBot === void 0 ? void 0 : userOrBot.botId
+                }/${namespace_1.SocketNamespace.MESSAGE}/${
+                    emit_1.MessageSocketEmit.CREATE
+                }`,
+                savedMessage
+            )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async update(updateMessageDto) {
@@ -99,7 +126,7 @@ let MessageGateway = (MessageGateway_1 = class MessageGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async delete(messageId) {
@@ -108,7 +135,7 @@ let MessageGateway = (MessageGateway_1 = class MessageGateway {
             this.server.emit(`${emit_1.MessageSocketEmit.DELETE}/${messageId}`, messageId)
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
 })
@@ -121,6 +148,20 @@ __decorate(
 __decorate(
     [
         (0, common_1.UseGuards)(jwtWSUser_guard_1.JwtUserWsGuard),
+        (0, common_1.UsePipes)(new common_1.ValidationPipe()),
+        (0, websockets_1.SubscribeMessage)(event_1.MessageSocketEvent.FIND),
+        __param(0, (0, websockets_1.MessageBody)('botId')),
+        __metadata('design:type', Function),
+        __metadata('design:paramtypes', [String]),
+        __metadata('design:returntype', Promise),
+    ],
+    MessageGateway.prototype,
+    'find',
+    null
+)
+__decorate(
+    [
+        (0, common_1.UseGuards)(jwtWS_guard_1.JwtWsGuard),
         (0, role_permission_decorator_1.RolePermissions)(['CREATE_MESSAGE']),
         (0, common_1.UseGuards)(permission_guard_1.GuildPermissionGuard),
         (0, websockets_1.SubscribeMessage)(event_1.MessageSocketEvent.CREATE),
@@ -129,12 +170,14 @@ __decorate(
         __param(1, (0, websockets_1.MessageBody)('channel')),
         __param(2, (0, websockets_1.MessageBody)('member')),
         __param(3, (0, websockets_1.MessageBody)('replyTo')),
+        __param(4, (0, auth_user_decorator_1.AuthWSUser)()),
         __metadata('design:type', Function),
         __metadata('design:paramtypes', [
             createMessage_dto_1.CreateMessageDto,
             dtos_1.ChannelDto,
             dtos_1.MemberDto,
             String,
+            Object,
         ]),
         __metadata('design:returntype', Promise),
     ],

@@ -18,7 +18,7 @@ import { GenSecretKeyDto } from './dtos/genSecretKey.dto'
 export class BotService {
     public readonly botRelations: FindOptionsRelations<BotEntity> = {
         commands: true,
-        joinedGuilds: true,
+        joinedGuilds: { guild: true },
     }
     constructor(
         @InjectRepository(BotEntity) private botRepository: BotRepository,

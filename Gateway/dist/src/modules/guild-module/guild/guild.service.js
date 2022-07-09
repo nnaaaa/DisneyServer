@@ -141,8 +141,8 @@ let GuildService = class GuildService {
         const savedMember = await this.memberService.save(member)
         const role = await this.roleService.create(
             {
-                name: default_1.Default.everyOneRoleName,
-                permissions: default_1.Default.everyOnePermission,
+                name: default_1.Default.adminRoleName,
+                permissions: default_1.Default.adminPermission,
             },
             savedGuild
         )

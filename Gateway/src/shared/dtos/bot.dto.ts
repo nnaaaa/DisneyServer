@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsString, IsUrl, IsUUID } from 'class-validator'
+import { IsArray, IsNotEmpty, IsString, IsUrl, IsUUID } from 'class-validator'
+import { Permission } from 'src/entities/role.entity'
 
 export class BotDto {
     @IsUUID()
@@ -12,4 +13,8 @@ export class BotDto {
     @IsNotEmpty()
     @IsUrl()
     avatarUrl: string
+
+    @IsNotEmpty()
+    @IsArray()
+    requiredPermissions: Permission[]
 }

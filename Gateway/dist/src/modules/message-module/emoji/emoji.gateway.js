@@ -62,7 +62,7 @@ let EmojiGateway = (EmojiGateway_1 = class EmojiGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async update(updateEmojiDto) {
@@ -74,7 +74,7 @@ let EmojiGateway = (EmojiGateway_1 = class EmojiGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async delete(emojiId) {
@@ -83,7 +83,7 @@ let EmojiGateway = (EmojiGateway_1 = class EmojiGateway {
             this.server.emit(`${emit_1.EmojiSocketEmit.DELETE}/${emojiId}`, emojiId)
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
 })

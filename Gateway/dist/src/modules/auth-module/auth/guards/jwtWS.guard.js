@@ -37,9 +37,11 @@ const common_1 = require('@nestjs/common')
 const jwt_1 = require('@nestjs/jwt')
 const websockets_1 = require('@nestjs/websockets')
 const user_service_1 = require('../../user/user.service')
+const bot_service_1 = require('../../../bot-module/bot/bot.service')
 let JwtWsGuard = class JwtWsGuard {
-    constructor(userService, jwtService) {
+    constructor(userService, botService, jwtService) {
         this.userService = userService
+        this.botService = botService
         this.jwtService = jwtService
     }
     async canActivate(context) {
@@ -53,12 +55,39 @@ let JwtWsGuard = class JwtWsGuard {
                 .trim()
             if (!accessToken) throw new websockets_1.WsException('Token is required')
             const tokenPayload = this.jwtService.verify(accessToken)
-            const user = await this.userService.findOne({
-                userId: tokenPayload.userId,
-            })
-            if (!user) throw new websockets_1.WsException('Not found user')
-            client.user = user
-            return true
+            if (
+                tokenPayload === null || tokenPayload === void 0
+                    ? void 0
+                    : tokenPayload.userId
+            ) {
+                const user = await this.userService.findOne({
+                    userId:
+                        tokenPayload === null || tokenPayload === void 0
+                            ? void 0
+                            : tokenPayload.userId,
+                })
+                if (user) {
+                    client.user = user
+                    return true
+                }
+            }
+            if (
+                tokenPayload === null || tokenPayload === void 0
+                    ? void 0
+                    : tokenPayload.botId
+            ) {
+                const bot = await this.botService.findOneWithRelation({
+                    botId:
+                        tokenPayload === null || tokenPayload === void 0
+                            ? void 0
+                            : tokenPayload.botId,
+                })
+                if (bot) {
+                    client.user = bot
+                    return true
+                }
+            }
+            return false
         } catch (_a) {
             return false
         }
@@ -68,8 +97,13 @@ JwtWsGuard = __decorate(
     [
         (0, common_1.Injectable)(),
         __param(0, (0, common_1.Inject)(user_service_1.UserService)),
-        __param(1, (0, common_1.Inject)(jwt_1.JwtService)),
-        __metadata('design:paramtypes', [user_service_1.UserService, jwt_1.JwtService]),
+        __param(1, (0, common_1.Inject)(bot_service_1.BotService)),
+        __param(2, (0, common_1.Inject)(jwt_1.JwtService)),
+        __metadata('design:paramtypes', [
+            user_service_1.UserService,
+            bot_service_1.BotService,
+            jwt_1.JwtService,
+        ]),
     ],
     JwtWsGuard
 )

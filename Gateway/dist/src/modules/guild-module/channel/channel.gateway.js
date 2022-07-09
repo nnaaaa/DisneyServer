@@ -68,7 +68,7 @@ let ChannelGateway = (ChannelGateway_1 = class ChannelGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async update(updateChannelDto) {
@@ -83,7 +83,7 @@ let ChannelGateway = (ChannelGateway_1 = class ChannelGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async delete(channelId) {
@@ -92,7 +92,7 @@ let ChannelGateway = (ChannelGateway_1 = class ChannelGateway {
             this.server.emit(`${emit_1.ChannelSocketEmit.DELETE}/${channelId}`)
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async addMember(memberChannelDto) {
@@ -109,7 +109,7 @@ let ChannelGateway = (ChannelGateway_1 = class ChannelGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async removeMember(memberChannelDto) {
@@ -126,7 +126,7 @@ let ChannelGateway = (ChannelGateway_1 = class ChannelGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
 })

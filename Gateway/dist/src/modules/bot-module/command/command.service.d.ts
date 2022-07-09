@@ -1,4 +1,3 @@
-import { BotEntity } from 'src/entities/bot.entity'
 import { CommandEntity } from 'src/entities/command.entity'
 import { CommandRepository } from 'src/repositories/command.repository'
 import { DeepPartial, FindOptionsWhere } from 'typeorm'
@@ -12,5 +11,5 @@ export declare class CommandService {
         updateCondition: DeepPartial<CommandEntity>
     ): Promise<CommandEntity>
     deleteOne(findCondition: FindOptionsWhere<CommandEntity>): Promise<CommandEntity>
-    findOne(findCondition: FindOptionsWhere<BotEntity>): Promise<CommandEntity>
+    findOne(findCondition: FindOptionsWhere<CommandEntity>): Promise<CommandEntity>
 }

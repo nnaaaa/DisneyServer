@@ -42,6 +42,7 @@ export declare enum RoleSocketEvent {
     REMOVE_FROM_CHANNEL = 'removeFromChannel',
 }
 export declare enum MessageSocketEvent {
+    FIND = 'find',
     CREATE = 'create',
     UPDATE = 'update',
     DELETE = 'delete',

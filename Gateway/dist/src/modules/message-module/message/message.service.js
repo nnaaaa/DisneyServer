@@ -73,6 +73,13 @@ let MessageService = class MessageService {
             where: findCondition,
         })
     }
+    async findManyWithRelation(findCondition) {
+        return this.messageRepository.find({
+            relations: this.messageRelations,
+            where: findCondition,
+            order: { createdAt: 'DESC' },
+        })
+    }
     async findMany(findCondition) {
         return await this.messageRepository.find({
             where: findCondition,

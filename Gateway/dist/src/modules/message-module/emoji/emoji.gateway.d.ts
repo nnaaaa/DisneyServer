@@ -8,7 +8,7 @@ export declare class EmojiGateway {
     private readonly logger
     server: Server
     constructor(emojiService: EmojiService)
-    create(createEmojiDto: CreateEmojiDto, guildOfEmoji: GuildDto): Promise<void>
-    update(updateEmojiDto: UpdateEmojiDto): Promise<void>
-    delete(emojiId: string): Promise<void>
+    create(createEmojiDto: CreateEmojiDto, guildOfEmoji: GuildDto): Promise<any>
+    update(updateEmojiDto: UpdateEmojiDto): Promise<any>
+    delete(emojiId: string): Promise<any>
 }

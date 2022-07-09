@@ -27,6 +27,7 @@ var __metadata =
 Object.defineProperty(exports, '__esModule', { value: true })
 exports.CommandEntity = void 0
 const typeorm_1 = require('typeorm')
+const argument_entity_1 = require('./argument.entity')
 const bot_entity_1 = require('./bot.entity')
 let CommandEntity = class CommandEntity {}
 __decorate(
@@ -58,6 +59,19 @@ __decorate(
     ],
     CommandEntity.prototype,
     'bot',
+    void 0
+)
+__decorate(
+    [
+        (0, typeorm_1.OneToMany)(
+            () => argument_entity_1.ArgumentEntity,
+            (type) => type.command,
+            { cascade: true }
+        ),
+        __metadata('design:type', Array),
+    ],
+    CommandEntity.prototype,
+    'args',
     void 0
 )
 CommandEntity = __decorate([(0, typeorm_1.Entity)()], CommandEntity)

@@ -41,6 +41,7 @@ const user_entity_1 = require('../../../entities/user.entity')
 const auth_user_decorator_1 = require('../../../shared/decorators/auth-user.decorator')
 const bot_dto_1 = require('../../../shared/dtos/bot.dto')
 const guild_dto_1 = require('../../../shared/dtos/guild.dto')
+const ws_exception_1 = require('../../../shared/exceptions/ws.exception')
 const emit_1 = require('../../../shared/socket/emit')
 const event_1 = require('../../../shared/socket/event')
 const namespace_1 = require('../../../shared/socket/namespace')
@@ -60,35 +61,27 @@ let MemberGateway = (MemberGateway_1 = class MemberGateway {
     }
     async botJoinGuild(guildOfMemberDto, botDto) {
         try {
-            const newMember = await this.memberService.createByBot(
-                guildOfMemberDto,
-                botDto
-            )
-            const savedMember = await this.memberService.save(newMember)
+            const botMember = await this.memberService.botJoin(guildOfMemberDto, botDto)
             this.server.emit(
                 `${guildOfMemberDto.guildId}/${emit_1.MemberSocketEmit.JOIN}`,
-                savedMember
+                botMember
             )
-            return newMember
+            return botMember
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async userJoinGuild(guildOfMemberDto, authUser) {
         try {
-            const newMember = await this.memberService.createByUser(
-                guildOfMemberDto,
-                authUser
-            )
-            const savedMember = await this.memberService.save(newMember)
+            const member = await this.memberService.userJoin(guildOfMemberDto, authUser)
             this.server.emit(
                 `${guildOfMemberDto.guildId}/${emit_1.MemberSocketEmit.JOIN}`,
-                savedMember
+                member
             )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async leaveGuild(memberId) {
@@ -100,7 +93,7 @@ let MemberGateway = (MemberGateway_1 = class MemberGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async updateMember(updateMemberDto) {
@@ -216,6 +209,7 @@ MemberGateway = MemberGateway_1 = __decorate(
             cors: { origin: '*' },
             namespace: namespace_1.SocketNamespace.MEMBER,
         }),
+        (0, common_1.UseFilters)(ws_exception_1.WebsocketExceptionsFilter),
         __metadata('design:paramtypes', [member_service_1.MemberService]),
     ],
     MemberGateway

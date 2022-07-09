@@ -48,7 +48,7 @@ export class ReactGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -70,7 +70,7 @@ export class ReactGateway {
             this.server.emit(`${ReactSocketEmit.UPDATE}/${reactId}`, updatedReact)
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -85,7 +85,7 @@ export class ReactGateway {
             this.server.emit(`${ReactSocketEmit.DELETE}/${reactId}`, reactId)
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 }

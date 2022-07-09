@@ -55,6 +55,13 @@ export class MessageService {
             where: findCondition,
         })
     }
+    async findManyWithRelation(findCondition: FindOptionsWhere<MessageEntity>) {
+        return this.messageRepository.find({
+            relations: this.messageRelations,
+            where: findCondition,
+            order: { createdAt: 'DESC' },
+        })
+    }
     async findMany(findCondition: FindOptionsWhere<MessageEntity>) {
         return await this.messageRepository.find({
             // relations: this.messageRelations,

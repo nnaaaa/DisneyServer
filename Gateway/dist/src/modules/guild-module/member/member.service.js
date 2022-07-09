@@ -131,6 +131,26 @@ let MemberService = class MemberService {
             throw new common_1.InternalServerErrorException(e)
         }
     }
+    async botJoin(guildOfMemberDto, botDto) {
+        const isJoined = await this.findOneWithRelation({
+            guild: guildOfMemberDto,
+            bot: { botId: botDto.botId },
+        })
+        if (isJoined) throw new common_1.ConflictException('Bot is already joined')
+        const newMember = await this.createByBot(guildOfMemberDto, botDto)
+        const savedMember = await this.save(newMember)
+        return savedMember
+    }
+    async userJoin(guildOfMemberDto, userDto) {
+        const isJoined = await this.findOneWithRelation({
+            guild: guildOfMemberDto,
+            user: { userId: userDto.userId },
+        })
+        if (isJoined) throw new common_1.ConflictException('User is already joined')
+        const newMember = await this.createByUser(guildOfMemberDto, userDto)
+        const savedMember = await this.save(newMember)
+        return savedMember
+    }
 }
 MemberService = __decorate(
     [

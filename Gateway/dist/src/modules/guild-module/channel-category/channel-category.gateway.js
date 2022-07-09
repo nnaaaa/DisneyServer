@@ -67,7 +67,7 @@ let ChannelCategoryGateway = (ChannelCategoryGateway_1 = class ChannelCategoryGa
             )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async update(updateChannelCtgDto) {
@@ -82,7 +82,7 @@ let ChannelCategoryGateway = (ChannelCategoryGateway_1 = class ChannelCategoryGa
             )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async delete(categoryId) {
@@ -91,7 +91,7 @@ let ChannelCategoryGateway = (ChannelCategoryGateway_1 = class ChannelCategoryGa
             this.server.emit(`${emit_1.ChannelCtgSocketEmit.DELETE}/${categoryId}`)
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
 })

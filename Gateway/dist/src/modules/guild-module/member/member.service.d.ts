@@ -32,4 +32,6 @@ export declare class MemberService {
     ): Promise<MemberEntity>
     deleteMany(findCondition: FindOptionsWhere<MemberEntity>): Promise<void>
     deleteOne(findCondition: FindOptionsWhere<MemberEntity>): Promise<MemberEntity>
+    botJoin(guildOfMemberDto: GuildDto, botDto: BotDto): Promise<MemberEntity>
+    userJoin(guildOfMemberDto: GuildDto, userDto: UserEntity): Promise<MemberEntity>
 }

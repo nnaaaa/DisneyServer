@@ -62,9 +62,10 @@ let RoleGateway = (RoleGateway_1 = class RoleGateway {
                 `${guild.guildId}/${emit_1.RoleSocketEmit.CREATE}`,
                 savedRole
             )
+            return savedRole
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async update(updateRoleDto) {
@@ -74,7 +75,7 @@ let RoleGateway = (RoleGateway_1 = class RoleGateway {
             this.server.emit(`${emit_1.RoleSocketEmit.UPDATE}/${roleId}`, updateRoleDto)
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async delete(roleId) {
@@ -83,7 +84,7 @@ let RoleGateway = (RoleGateway_1 = class RoleGateway {
             this.server.emit(`${emit_1.RoleSocketEmit.DELETE}/${roleId}`)
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async addToMember(memberRoleDto) {
@@ -93,9 +94,10 @@ let RoleGateway = (RoleGateway_1 = class RoleGateway {
                 member,
                 role,
             })
+            return { member, role }
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async removeFromMember(memberRoleDto) {
@@ -112,7 +114,7 @@ let RoleGateway = (RoleGateway_1 = class RoleGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async addToChannel(channelRoleDto) {
@@ -124,7 +126,7 @@ let RoleGateway = (RoleGateway_1 = class RoleGateway {
             })
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async removeFromChannel(channelRoleDto) {
@@ -141,7 +143,7 @@ let RoleGateway = (RoleGateway_1 = class RoleGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
 })
@@ -209,7 +211,7 @@ __decorate(
         (0, common_1.UseGuards)(permission_guard_1.GuildPermissionGuard),
         (0, common_1.UsePipes)(new common_1.ValidationPipe()),
         (0, websockets_1.SubscribeMessage)(event_1.RoleSocketEvent.ADD_TO_MEMBER),
-        __param(0, (0, websockets_1.MessageBody)()),
+        __param(0, (0, websockets_1.MessageBody)('role')),
         __metadata('design:type', Function),
         __metadata('design:paramtypes', [memberRole_dto_1.MemberRoleDto]),
         __metadata('design:returntype', Promise),
@@ -224,7 +226,7 @@ __decorate(
         (0, role_permission_decorator_1.RolePermissions)(['UPDATE_ROLE']),
         (0, common_1.UseGuards)(permission_guard_1.GuildPermissionGuard),
         (0, websockets_1.SubscribeMessage)(event_1.RoleSocketEvent.REMOVE_FROM_MEMBER),
-        __param(0, (0, websockets_1.MessageBody)()),
+        __param(0, (0, websockets_1.MessageBody)('role')),
         __metadata('design:type', Function),
         __metadata('design:paramtypes', [memberRole_dto_1.MemberRoleDto]),
         __metadata('design:returntype', Promise),
@@ -240,7 +242,7 @@ __decorate(
         (0, common_1.UseGuards)(permission_guard_1.GuildPermissionGuard),
         (0, common_1.UsePipes)(new common_1.ValidationPipe()),
         (0, websockets_1.SubscribeMessage)(event_1.RoleSocketEvent.ADD_TO_CHANNEL),
-        __param(0, (0, websockets_1.MessageBody)()),
+        __param(0, (0, websockets_1.MessageBody)('role')),
         __metadata('design:type', Function),
         __metadata('design:paramtypes', [channelRole_dto_1.ChannelRoleDto]),
         __metadata('design:returntype', Promise),
@@ -255,7 +257,7 @@ __decorate(
         (0, role_permission_decorator_1.RolePermissions)(['UPDATE_ROLE']),
         (0, common_1.UseGuards)(permission_guard_1.GuildPermissionGuard),
         (0, websockets_1.SubscribeMessage)(event_1.RoleSocketEvent.REMOVE_FROM_CHANNEL),
-        __param(0, (0, websockets_1.MessageBody)()),
+        __param(0, (0, websockets_1.MessageBody)('role')),
         __metadata('design:type', Function),
         __metadata('design:paramtypes', [channelRole_dto_1.ChannelRoleDto]),
         __metadata('design:returntype', Promise),

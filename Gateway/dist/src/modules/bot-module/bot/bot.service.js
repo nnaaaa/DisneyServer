@@ -44,7 +44,7 @@ let BotService = class BotService {
         this.authService = authService
         this.botRelations = {
             commands: true,
-            joinedGuilds: true,
+            joinedGuilds: { guild: true },
         }
     }
     async save(bot) {

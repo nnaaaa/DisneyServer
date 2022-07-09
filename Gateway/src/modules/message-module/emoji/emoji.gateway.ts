@@ -47,7 +47,7 @@ export class EmojiGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -66,7 +66,7 @@ export class EmojiGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -81,7 +81,7 @@ export class EmojiGateway {
             this.server.emit(`${EmojiSocketEmit.DELETE}/${emojiId}`, emojiId)
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 }

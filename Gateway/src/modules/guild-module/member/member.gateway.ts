@@ -1,4 +1,4 @@
-import { Logger, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Logger, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
 import {
     MessageBody,
     SubscribeMessage,
@@ -11,6 +11,7 @@ import { UserEntity } from 'src/entities/user.entity'
 import { AuthWSUser } from 'src/shared/decorators/auth-user.decorator'
 import { BotDto } from 'src/shared/dtos/bot.dto'
 import { GuildDto } from 'src/shared/dtos/guild.dto'
+import { WebsocketExceptionsFilter } from 'src/shared/exceptions/ws.exception'
 import { MemberSocketEmit } from 'src/shared/socket/emit'
 import { MemberSocketEvent } from 'src/shared/socket/event'
 import { SocketNamespace } from 'src/shared/socket/namespace'
@@ -19,6 +20,7 @@ import { UpdateMemberDto } from './dtos/updateMember.dto'
 import { MemberService } from './member.service'
 
 @WebSocketGateway({ cors: { origin: '*' }, namespace: SocketNamespace.MEMBER })
+@UseFilters(WebsocketExceptionsFilter)
 export class MemberGateway {
     private readonly logger = new Logger(MemberGateway.name)
     @WebSocketServer()
@@ -44,22 +46,17 @@ export class MemberGateway {
         @MessageBody('bot') botDto: BotDto
     ) {
         try {
-            const newMember = await this.memberService.createByBot(
-                guildOfMemberDto,
-                botDto
-            )
-
-            const savedMember = await this.memberService.save(newMember)
+            const botMember = await this.memberService.botJoin(guildOfMemberDto, botDto)
 
             this.server.emit(
                 `${guildOfMemberDto.guildId}/${MemberSocketEmit.JOIN}`,
-                savedMember
+                botMember
             )
 
-            return newMember
+            return botMember
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -71,16 +68,11 @@ export class MemberGateway {
         @AuthWSUser() authUser: UserEntity
     ) {
         try {
-            const newMember = await this.memberService.createByUser(
-                guildOfMemberDto,
-                authUser
-            )
-
-            const savedMember = await this.memberService.save(newMember)
+            const member = await this.memberService.userJoin(guildOfMemberDto, authUser)
 
             this.server.emit(
                 `${guildOfMemberDto.guildId}/${MemberSocketEmit.JOIN}`,
-                savedMember
+                member
             )
 
             // if channel was private, it wouldn't been seen
@@ -100,7 +92,7 @@ export class MemberGateway {
             // return newMember
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -113,7 +105,7 @@ export class MemberGateway {
             this.server.emit(`${MemberSocketEmit.LEAVE}/${memberId}`, memberLeaveGuild)
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 

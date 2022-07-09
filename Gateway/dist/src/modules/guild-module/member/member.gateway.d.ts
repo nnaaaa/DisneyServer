@@ -12,12 +12,9 @@ export declare class MemberGateway {
     getOfMe({
         userId,
     }: UserEntity): Promise<import('../../../entities/member.entity').MemberEntity[]>
-    botJoinGuild(
-        guildOfMemberDto: GuildDto,
-        botDto: BotDto
-    ): Promise<import('../../../entities/member.entity').MemberEntity>
-    userJoinGuild(guildOfMemberDto: GuildDto, authUser: UserEntity): Promise<void>
-    leaveGuild(memberId: string): Promise<void>
+    botJoinGuild(guildOfMemberDto: GuildDto, botDto: BotDto): Promise<any>
+    userJoinGuild(guildOfMemberDto: GuildDto, authUser: UserEntity): Promise<any>
+    leaveGuild(memberId: string): Promise<any>
     updateMember(updateMemberDto: UpdateMemberDto): Promise<void>
     memberOnline(memberId: string): void
 }

@@ -63,7 +63,7 @@ let ReactGateway = (ReactGateway_1 = class ReactGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async update(reactId, emojiOfReactDto) {
@@ -75,7 +75,7 @@ let ReactGateway = (ReactGateway_1 = class ReactGateway {
             this.server.emit(`${emit_1.ReactSocketEmit.UPDATE}/${reactId}`, updatedReact)
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async delete(reactId) {
@@ -84,7 +84,7 @@ let ReactGateway = (ReactGateway_1 = class ReactGateway {
             this.server.emit(`${emit_1.ReactSocketEmit.DELETE}/${reactId}`, reactId)
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
 })

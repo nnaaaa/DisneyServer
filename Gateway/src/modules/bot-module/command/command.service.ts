@@ -62,7 +62,7 @@ export class CommandService {
         }
     }
 
-    async findOne(findCondition: FindOptionsWhere<BotEntity>) {
+    async findOne(findCondition: FindOptionsWhere<CommandEntity>) {
         return await this.commandRepository.findOne({
             where: findCondition,
         })

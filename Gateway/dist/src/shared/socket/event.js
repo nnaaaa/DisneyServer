@@ -64,6 +64,7 @@ var RoleSocketEvent
 })((RoleSocketEvent = exports.RoleSocketEvent || (exports.RoleSocketEvent = {})))
 var MessageSocketEvent
 ;(function (MessageSocketEvent) {
+    MessageSocketEvent['FIND'] = 'find'
     MessageSocketEvent['CREATE'] = 'create'
     MessageSocketEvent['UPDATE'] = 'update'
     MessageSocketEvent['DELETE'] = 'delete'

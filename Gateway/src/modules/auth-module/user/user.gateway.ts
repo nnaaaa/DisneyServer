@@ -46,7 +46,7 @@ export class UserGateway {
             return user
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -66,7 +66,7 @@ export class UserGateway {
             this.server.emit(`${UserSocketEmit.UPDATE_PROFILE}/${user.userId}`, user)
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -79,7 +79,7 @@ export class UserGateway {
             this.friendInteractionNotify(UserSocketEmit.ADD_FRIEND, beFriend)
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -97,7 +97,7 @@ export class UserGateway {
             this.friendInteractionNotify(UserSocketEmit.ACCEPT_FRIEND, beFriend)
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -112,7 +112,7 @@ export class UserGateway {
             this.friendInteractionNotify(UserSocketEmit.BLOCK_FRIEND, blockedFriend)
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 

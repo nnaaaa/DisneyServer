@@ -102,7 +102,7 @@ export class RoleService {
             memberId,
         })
         if (!member || !role) throw new NotFoundException()
-        member.roles.push(role)
+
         role.members.push(member)
         await this.save(role)
         return { role, member }

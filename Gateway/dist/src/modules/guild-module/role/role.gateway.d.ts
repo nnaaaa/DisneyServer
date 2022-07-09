@@ -10,11 +10,11 @@ export declare class RoleGateway {
     private readonly logger
     server: Server
     constructor(roleService: RoleService)
-    create(createDto: CreateRoleDto, guild: GuildDto): Promise<void>
-    update(updateRoleDto: UpdateRoleDto): Promise<void>
-    delete(roleId: string): Promise<void>
-    addToMember(memberRoleDto: MemberRoleDto): Promise<void>
-    removeFromMember(memberRoleDto: MemberRoleDto): Promise<void>
-    addToChannel(channelRoleDto: ChannelRoleDto): Promise<void>
-    removeFromChannel(channelRoleDto: ChannelRoleDto): Promise<void>
+    create(createDto: CreateRoleDto, guild: GuildDto): Promise<any>
+    update(updateRoleDto: UpdateRoleDto): Promise<any>
+    delete(roleId: string): Promise<any>
+    addToMember(memberRoleDto: MemberRoleDto): Promise<any>
+    removeFromMember(memberRoleDto: MemberRoleDto): Promise<any>
+    addToChannel(channelRoleDto: ChannelRoleDto): Promise<any>
+    removeFromChannel(channelRoleDto: ChannelRoleDto): Promise<any>
 }

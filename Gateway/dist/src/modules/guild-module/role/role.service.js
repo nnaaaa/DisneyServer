@@ -112,7 +112,6 @@ let RoleService = class RoleService {
             memberId,
         })
         if (!member || !role) throw new common_1.NotFoundException()
-        member.roles.push(role)
         role.members.push(member)
         await this.save(role)
         return { role, member }

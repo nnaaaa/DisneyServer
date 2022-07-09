@@ -44,9 +44,11 @@ export class RoleGateway {
             const savedRole = await this.roleService.save(role)
 
             this.server.emit(`${guild.guildId}/${RoleSocketEmit.CREATE}`, savedRole)
+
+            return savedRole
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -64,7 +66,7 @@ export class RoleGateway {
             this.server.emit(`${RoleSocketEmit.UPDATE}/${roleId}`, updateRoleDto)
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -78,7 +80,7 @@ export class RoleGateway {
             this.server.emit(`${RoleSocketEmit.DELETE}/${roleId}`)
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -87,7 +89,7 @@ export class RoleGateway {
     @UseGuards(GuildPermissionGuard)
     @UsePipes(new ValidationPipe())
     @SubscribeMessage(RoleSocketEvent.ADD_TO_MEMBER)
-    async addToMember(@MessageBody() memberRoleDto: MemberRoleDto) {
+    async addToMember(@MessageBody('role') memberRoleDto: MemberRoleDto) {
         try {
             const { member, role } = await this.roleService.addToMember(memberRoleDto)
 
@@ -95,9 +97,11 @@ export class RoleGateway {
                 member,
                 role,
             })
+
+            return { member, role }
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -105,7 +109,7 @@ export class RoleGateway {
     @RolePermissions(['UPDATE_ROLE'])
     @UseGuards(GuildPermissionGuard)
     @SubscribeMessage(RoleSocketEvent.REMOVE_FROM_MEMBER)
-    async removeFromMember(@MessageBody() memberRoleDto: MemberRoleDto) {
+    async removeFromMember(@MessageBody('role') memberRoleDto: MemberRoleDto) {
         try {
             const { member, role } = await this.roleService.removeFromMember(
                 memberRoleDto
@@ -116,7 +120,7 @@ export class RoleGateway {
             })
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -125,7 +129,7 @@ export class RoleGateway {
     @UseGuards(GuildPermissionGuard)
     @UsePipes(new ValidationPipe())
     @SubscribeMessage(RoleSocketEvent.ADD_TO_CHANNEL)
-    async addToChannel(@MessageBody() channelRoleDto: ChannelRoleDto) {
+    async addToChannel(@MessageBody('role') channelRoleDto: ChannelRoleDto) {
         try {
             const { role, channel } = await this.roleService.addToChannel(channelRoleDto)
 
@@ -135,7 +139,7 @@ export class RoleGateway {
             })
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -143,7 +147,7 @@ export class RoleGateway {
     @RolePermissions(['UPDATE_ROLE'])
     @UseGuards(GuildPermissionGuard)
     @SubscribeMessage(RoleSocketEvent.REMOVE_FROM_CHANNEL)
-    async removeFromChannel(@MessageBody() channelRoleDto: ChannelRoleDto) {
+    async removeFromChannel(@MessageBody('role') channelRoleDto: ChannelRoleDto) {
         try {
             const { role, channel } = await this.roleService.removeFromChannel(
                 channelRoleDto
@@ -154,7 +158,7 @@ export class RoleGateway {
             })
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 }

@@ -24,7 +24,7 @@ export class GuildService {
 
     constructor(
         private channelCtgService: ChannelCategoryService,
-        private roleService: RoleService,
+        public readonly roleService: RoleService,
         private memberService: MemberService,
         private emojiService: EmojiService,
         @InjectRepository(GuildEntity) private guildRepository: GuildRepository
@@ -123,7 +123,7 @@ export class GuildService {
         const savedMember = await this.memberService.save(member)
 
         const role = await this.roleService.create(
-            { name: Default.everyOneRoleName, permissions: Default.everyOnePermission },
+            { name: Default.adminRoleName, permissions: Default.adminPermission },
             savedGuild
         )
 

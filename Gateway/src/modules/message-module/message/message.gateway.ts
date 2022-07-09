@@ -7,14 +7,19 @@ import {
     WsException,
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
+import { BotEntity } from 'src/entities/bot.entity'
+import { UserEntity } from 'src/entities/user.entity'
+import { JwtWsGuard } from 'src/modules/auth-module/auth/guards/jwtWS.guard'
 import { BotService } from 'src/modules/bot-module/bot/bot.service'
 import { GuildService } from 'src/modules/guild-module/guild/guild.service'
+import { AuthWSUser } from 'src/shared/decorators/auth-user.decorator'
 import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
 import { ChannelDto, MemberDto } from 'src/shared/dtos'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { MessageSocketEmit } from 'src/shared/socket/emit'
 import { MessageSocketEvent } from 'src/shared/socket/event'
 import { SocketNamespace } from 'src/shared/socket/namespace'
+import { In } from 'typeorm'
 import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
 import { CreateMessageDto } from './dtos/createMessage.dto'
 import { UpdateMessageDto } from './dtos/updateMessage.dto'
@@ -34,6 +39,25 @@ export class MessageGateway {
     ) {}
 
     @UseGuards(JwtUserWsGuard)
+    @UsePipes(new ValidationPipe())
+    @SubscribeMessage(MessageSocketEvent.FIND)
+    async find(@MessageBody('botId') botId: string) {
+        try {
+            const bot = await this.botService.findOneWithRelation({ botId })
+            const messages = await this.messageService.findManyWithRelation({
+                author: { memberId: In(bot.joinedGuilds.map((guild) => guild.memberId)) },
+            })
+
+            // this.server.emit(`${MessageSocketEmit.FIND}`, messages)
+
+            return messages
+        } catch (e) {
+            this.logger.error(e)
+            return e
+        }
+    }
+
+    @UseGuards(JwtWsGuard)
     @RolePermissions(['CREATE_MESSAGE'])
     @UseGuards(GuildPermissionGuard)
     @SubscribeMessage(MessageSocketEvent.CREATE)
@@ -42,7 +66,8 @@ export class MessageGateway {
         @MessageBody('message') createMessageDto: CreateMessageDto,
         @MessageBody('channel') destinationDto: ChannelDto,
         @MessageBody('member') authorDto: MemberDto,
-        @MessageBody('replyTo') replyTo: string
+        @MessageBody('replyTo') replyTo: string,
+        @AuthWSUser() userOrBot: BotEntity | UserEntity
     ) {
         try {
             const newMessage = await this.messageService.create(
@@ -57,11 +82,13 @@ export class MessageGateway {
             const guild = await this.guildService.findByMessage(savedMessage)
             const botList = await this.botService.findByGuild(guild)
 
+            //emit to guild channels
             this.server.emit(
                 `${destinationDto.channelId}/${MessageSocketEmit.CREATE}`,
                 savedMessage
             )
 
+            //emit to bot clients
             botList.forEach((bot) => {
                 const botName = savedMessage.content.split('.')?.[0]
                 if (botName && botName === bot.name) {
@@ -72,9 +99,17 @@ export class MessageGateway {
                     )
                 }
             })
+
+            //emit to bot manager
+            this.server.emit(
+                `botManager/${(userOrBot as BotEntity)?.botId}/${
+                    SocketNamespace.MESSAGE
+                }/${MessageSocketEmit.CREATE}`,
+                savedMessage
+            )
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -93,7 +128,7 @@ export class MessageGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 
@@ -108,7 +143,7 @@ export class MessageGateway {
             this.server.emit(`${MessageSocketEmit.DELETE}/${messageId}`, messageId)
         } catch (e) {
             this.logger.error(e)
-            throw new WsException(e)
+            return e
         }
     }
 }

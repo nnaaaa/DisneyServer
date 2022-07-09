@@ -14,9 +14,9 @@ export declare class ChannelGateway {
         createChannelDto: CreateChannelDto,
         categoryDto: ChannelCategoryDto,
         firstMemberDto: MemberDto
-    ): Promise<void>
-    update(updateChannelDto: UpdateChannelDto): Promise<void>
-    delete(channelId: string): Promise<void>
-    addMember(memberChannelDto: MemberChannelDto): Promise<void>
-    removeMember(memberChannelDto: MemberChannelDto): Promise<void>
+    ): Promise<any>
+    update(updateChannelDto: UpdateChannelDto): Promise<any>
+    delete(channelId: string): Promise<any>
+    addMember(memberChannelDto: MemberChannelDto): Promise<any>
+    removeMember(memberChannelDto: MemberChannelDto): Promise<any>
 }

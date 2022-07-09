@@ -60,7 +60,7 @@ let GuildGateway = (GuildGateway_1 = class GuildGateway {
             return await this.guildService.createTemplateGuild(createGuildDto, authUser)
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async update(updateGuildDto) {
@@ -75,7 +75,7 @@ let GuildGateway = (GuildGateway_1 = class GuildGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async getOne(guildId, authUser) {
@@ -91,7 +91,7 @@ let GuildGateway = (GuildGateway_1 = class GuildGateway {
             return { guild, member }
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async getOfMe({ userId }) {
@@ -102,7 +102,7 @@ let GuildGateway = (GuildGateway_1 = class GuildGateway {
             return joinedGuilds
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async delete(guildId) {
@@ -111,7 +111,7 @@ let GuildGateway = (GuildGateway_1 = class GuildGateway {
             this.server.emit(`${emit_1.GuildSocketEmit.DELETE}/${guildId}`)
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
 })

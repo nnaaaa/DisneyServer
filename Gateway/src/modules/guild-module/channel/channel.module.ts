@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ChannelEntity } from 'src/entities/channel.entity'
 import { AuthModule } from '../../auth-module/auth/auth.module'

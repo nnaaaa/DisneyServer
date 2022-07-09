@@ -10,7 +10,7 @@ export declare class ReactGateway {
         emojiOfReactDto: EmojiDto,
         messageOfReactDto: MessageDto,
         authorOfReactDto: MemberDto
-    ): Promise<void>
-    update(reactId: string, emojiOfReactDto: EmojiDto): Promise<void>
-    delete(reactId: string): Promise<void>
+    ): Promise<any>
+    update(reactId: string, emojiOfReactDto: EmojiDto): Promise<any>
+    delete(reactId: string): Promise<any>
 }

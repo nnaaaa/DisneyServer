@@ -8,7 +8,7 @@ export declare class ChannelCategoryGateway {
     private readonly logger
     server: Server
     constructor(channelCtgService: ChannelCategoryService)
-    create(createChannelCtgDto: CreateChannelCtgDto, guild: GuildDto): Promise<void>
-    update(updateChannelCtgDto: UpdateChannelCtgDto): Promise<void>
-    delete(categoryId: string): Promise<void>
+    create(createChannelCtgDto: CreateChannelCtgDto, guild: GuildDto): Promise<any>
+    update(updateChannelCtgDto: UpdateChannelCtgDto): Promise<any>
+    delete(categoryId: string): Promise<any>
 }

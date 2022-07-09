@@ -9,10 +9,10 @@ export declare class UserGateway {
     private readonly logger
     readonly server: Server
     constructor(userService: UserService)
-    get(authUser: UserEntity): Promise<UserEntity>
-    update(authUser: UserEntity, newProfile: UpdateProfileDto): Promise<void>
-    addFriend(friendId: string, authUser: UserEntity): Promise<void>
-    acceptFriend(friendId: string, authUser: UserEntity): Promise<void>
-    block(friendId: string, authUser: UserEntity): Promise<void>
+    get(authUser: UserEntity): Promise<any>
+    update(authUser: UserEntity, newProfile: UpdateProfileDto): Promise<any>
+    addFriend(friendId: string, authUser: UserEntity): Promise<any>
+    acceptFriend(friendId: string, authUser: UserEntity): Promise<any>
+    block(friendId: string, authUser: UserEntity): Promise<any>
     friendInteractionNotify(event: UserSocketEmit, befriend: UserBeFriendEntity): void
 }

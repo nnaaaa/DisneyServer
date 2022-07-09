@@ -60,7 +60,7 @@ let UserGateway = (UserGateway_1 = class UserGateway {
             return user
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async update(authUser, newProfile) {
@@ -75,7 +75,7 @@ let UserGateway = (UserGateway_1 = class UserGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async addFriend(friendId, authUser) {
@@ -84,7 +84,7 @@ let UserGateway = (UserGateway_1 = class UserGateway {
             this.friendInteractionNotify(emit_1.UserSocketEmit.ADD_FRIEND, beFriend)
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async acceptFriend(friendId, authUser) {
@@ -96,7 +96,7 @@ let UserGateway = (UserGateway_1 = class UserGateway {
             this.friendInteractionNotify(emit_1.UserSocketEmit.ACCEPT_FRIEND, beFriend)
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     async block(friendId, authUser) {
@@ -111,7 +111,7 @@ let UserGateway = (UserGateway_1 = class UserGateway {
             )
         } catch (e) {
             this.logger.error(e)
-            throw new websockets_1.WsException(e)
+            return e
         }
     }
     friendInteractionNotify(event, befriend) {

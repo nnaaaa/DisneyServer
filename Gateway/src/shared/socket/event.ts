@@ -50,6 +50,7 @@ export enum RoleSocketEvent {
 }
 
 export enum MessageSocketEvent {
+    FIND = 'find',
     CREATE = 'create',
     UPDATE = 'update',
     DELETE = 'delete',

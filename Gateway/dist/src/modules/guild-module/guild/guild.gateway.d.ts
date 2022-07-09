@@ -10,20 +10,9 @@ export declare class GuildGateway {
     private readonly logger
     readonly server: Server
     constructor(guildService: GuildService, memberService: MemberService)
-    create(
-        authUser: UserEntity,
-        createGuildDto: CreateGuildDto
-    ): Promise<import('../../../entities/guild.entity').GuildEntity>
-    update(updateGuildDto: UpdateGuildDto): Promise<void>
-    getOne(
-        guildId: string,
-        authUser: UserEntity
-    ): Promise<{
-        guild: import('../../../entities/guild.entity').GuildEntity
-        member: import('../../../entities/member.entity').MemberEntity
-    }>
-    getOfMe({
-        userId,
-    }: UserEntity): Promise<import('../../../entities/member.entity').MemberEntity[]>
-    delete(guildId: string): Promise<void>
+    create(authUser: UserEntity, createGuildDto: CreateGuildDto): Promise<any>
+    update(updateGuildDto: UpdateGuildDto): Promise<any>
+    getOne(guildId: string, authUser: UserEntity): Promise<any>
+    getOfMe({ userId }: UserEntity): Promise<any>
+    delete(guildId: string): Promise<any>
 }

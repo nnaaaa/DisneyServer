@@ -15,6 +15,7 @@ import { RoleModule } from './modules/guild-module/role/role.module'
 import { EmojiModule } from './modules/message-module/emoji/emoji.module'
 import { MessageModule } from './modules/message-module/message/message.module'
 import { ReactModule } from './modules/message-module/react/react.module'
+import { ArgumentModule } from './modules/bot-module/argument/argument.module'
 
 @Module({
     imports: [
@@ -72,6 +73,7 @@ import { ReactModule } from './modules/message-module/react/react.module'
         ReactModule,
         BotModule,
         CommandModule,
+        ArgumentModule,
     ],
     providers: [],
 })
