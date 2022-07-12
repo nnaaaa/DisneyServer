@@ -52,7 +52,7 @@ let BotService = class BotService {
     }
     async create(createBotDto) {
         const bot = this.botRepository.create(
-            Object.assign({ requiredPermissions: [] }, createBotDto)
+            Object.assign({ requiredPermissions: [], commands: [] }, createBotDto)
         )
         bot.secretKey = await this.authService.getBotAccessToken(bot.botId)
         return bot

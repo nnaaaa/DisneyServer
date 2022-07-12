@@ -85,25 +85,30 @@ let MessageGateway = (MessageGateway_1 = class MessageGateway {
                 replyTo
             )
             const savedMessage = await this.messageService.save(newMessage)
-            const guild = await this.guildService.findByMessage(savedMessage)
+            const [message, guild] = await Promise.all([
+                this.messageService.findOneWithRelation({
+                    messageId: savedMessage.messageId,
+                }),
+                this.guildService.findByMessage(savedMessage),
+            ])
             const botList = await this.botService.findByGuild(guild)
             this.server.emit(
                 `${destinationDto.channelId}/${emit_1.MessageSocketEmit.CREATE}`,
-                savedMessage
+                message
             )
-            const inspected = algorithms_1.Algorithm.inspectCommand(savedMessage.content)
+            const inspected = algorithms_1.Algorithm.inspectCommand(message.content)
+            console.log(inspected)
             if (inspected) {
                 botList.forEach((bot) => {
-                    const { botName, args, commandName } = inspected
+                    const { botName, args, name } = inspected
                     const isMatchCommand = bot.commands.some(
                         (command) =>
-                            command.name === commandName &&
-                            command.args.length === args.length
+                            command.name === name && command.args.length === args.length
                     )
                     if (botName && botName === bot.name && isMatchCommand) {
                         this.server.emit(
                             `${bot.botId}/${namespace_1.SocketNamespace.MESSAGE}/${emit_1.MessageSocketEmit.CREATE}`,
-                            savedMessage,
+                            message,
                             inspected,
                             guild
                         )

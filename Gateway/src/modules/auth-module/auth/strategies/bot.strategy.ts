@@ -16,7 +16,7 @@ export class BotJwtStrategy extends PassportStrategy(Strategy, 'botJwt') {
     constructor(configService: ConfigService, private botService: BotService) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            ignoreExpiration: false,
+            ignoreExpiration: true,
             secretOrKey: configService.get<string>('TOKEN_SECRET_KEY'),
             passReqToCallback: true,
         })

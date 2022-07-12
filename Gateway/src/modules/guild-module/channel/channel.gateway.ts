@@ -4,22 +4,21 @@ import {
     SubscribeMessage,
     WebSocketGateway,
     WebSocketServer,
-    WsException,
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
 import { MemberEntity } from 'src/entities/member.entity'
+import { JwtWsGuard } from 'src/modules/auth-module/auth/guards/jwtWS.guard'
+import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
 import { MemberDto } from 'src/shared/dtos'
+import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { ChannelSocketEmit } from 'src/shared/socket/emit'
 import { ChannelSocketEvent } from 'src/shared/socket/event'
-import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
+import { SocketNamespace } from 'src/shared/socket/namespace'
 import { ChannelCategoryDto } from '../../../shared/dtos/channel-category.dto'
 import { ChannelService } from './channel.service'
 import { CreateChannelDto } from './dtos/createChannel.dto'
 import { MemberChannelDto } from './dtos/memberChannel.dto'
 import { UpdateChannelDto } from './dtos/updateChannel.dto'
-import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
-import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
-import { SocketNamespace } from 'src/shared/socket/namespace'
 
 @WebSocketGateway({ cors: { origin: '*' }, namespace: SocketNamespace.CHANNEL })
 export class ChannelGateway {
@@ -31,7 +30,7 @@ export class ChannelGateway {
     constructor(private channelService: ChannelService) {}
 
     @SubscribeMessage(ChannelSocketEvent.CREATE)
-    @UseGuards(JwtUserWsGuard)
+    @UseGuards(JwtWsGuard)
     @RolePermissions(['CREATE_CHANNEL'])
     @UseGuards(GuildPermissionGuard)
     @UsePipes(new ValidationPipe())
@@ -61,11 +60,11 @@ export class ChannelGateway {
     }
 
     @SubscribeMessage(ChannelSocketEvent.UPDATE)
-    @UseGuards(JwtUserWsGuard)
+    @UseGuards(JwtWsGuard)
     @RolePermissions(['UPDATE_CHANNEL'])
     @UseGuards(GuildPermissionGuard)
     @UsePipes(new ValidationPipe())
-    async update(@MessageBody() updateChannelDto: UpdateChannelDto) {
+    async update(@MessageBody('channel') updateChannelDto: UpdateChannelDto) {
         try {
             const channel = await this.channelService.updateOne(
                 { channelId: updateChannelDto.channelId },
@@ -82,7 +81,7 @@ export class ChannelGateway {
         // this.updateNotify(updateChannelDto as ChannelEntity)
     }
     @SubscribeMessage(ChannelSocketEvent.DELETE)
-    @UseGuards(JwtUserWsGuard)
+    @UseGuards(JwtWsGuard)
     @RolePermissions(['DELETE_CHANNEL'])
     @UseGuards(GuildPermissionGuard)
     async delete(@MessageBody('channelId') channelId: string) {
@@ -97,11 +96,11 @@ export class ChannelGateway {
     }
 
     @SubscribeMessage(ChannelSocketEvent.ADD_MEMBER)
-    @UseGuards(JwtUserWsGuard)
+    @UseGuards(JwtWsGuard)
     @RolePermissions(['UPDATE_CHANNEL'])
     @UseGuards(GuildPermissionGuard)
     @UsePipes(new ValidationPipe())
-    async addMember(@MessageBody() memberChannelDto: MemberChannelDto) {
+    async addMember(@MessageBody('channel') memberChannelDto: MemberChannelDto) {
         try {
             const { channel, member } = await this.channelService.addMember(
                 memberChannelDto
@@ -118,11 +117,11 @@ export class ChannelGateway {
     }
 
     @SubscribeMessage(ChannelSocketEvent.REMOVE_MEMBER)
-    @UseGuards(JwtUserWsGuard)
+    @UseGuards(JwtWsGuard)
     @RolePermissions(['UPDATE_CHANNEL'])
     @UseGuards(GuildPermissionGuard)
     @UsePipes(new ValidationPipe())
-    async removeMember(@MessageBody() memberChannelDto: MemberChannelDto) {
+    async removeMember(@MessageBody('channel') memberChannelDto: MemberChannelDto) {
         try {
             const { channel, member } = await this.channelService.removeMember(
                 memberChannelDto

@@ -26,7 +26,7 @@ export class CommandService {
             throw new ConflictException()
         }
 
-        const command = this.commandRepository.create(createCommandDto)
+        const command = this.commandRepository.create({ args: [], ...createCommandDto })
 
         return command
     }

@@ -49,7 +49,9 @@ let CommandService = class CommandService {
         if (isExistCommand) {
             throw new common_1.ConflictException()
         }
-        const command = this.commandRepository.create(createCommandDto)
+        const command = this.commandRepository.create(
+            Object.assign({ args: [] }, createCommandDto)
+        )
         return command
     }
     async updateOne(findCondition, updateCondition) {

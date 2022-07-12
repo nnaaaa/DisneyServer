@@ -53,6 +53,8 @@ let JwtUserWsGuard = class JwtUserWsGuard {
                 .trim()
             if (!accessToken) throw new websockets_1.WsException('Token is required')
             const tokenPayload = this.jwtService.verify(accessToken)
+            if (!tokenPayload.userId)
+                throw new websockets_1.WsException('Token is invalid')
             const user = await this.userService.findOne({
                 userId: tokenPayload.userId,
             })

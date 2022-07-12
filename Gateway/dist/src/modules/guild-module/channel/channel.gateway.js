@@ -37,18 +37,18 @@ exports.ChannelGateway = void 0
 const common_1 = require('@nestjs/common')
 const websockets_1 = require('@nestjs/websockets')
 const socket_io_1 = require('socket.io')
+const jwtWS_guard_1 = require('../../auth-module/auth/guards/jwtWS.guard')
+const role_permission_decorator_1 = require('../../../shared/decorators/role-permission.decorator')
 const dtos_1 = require('../../../shared/dtos')
+const permission_guard_1 = require('../../../shared/guards/permission.guard')
 const emit_1 = require('../../../shared/socket/emit')
 const event_1 = require('../../../shared/socket/event')
-const jwtWSUser_guard_1 = require('../../auth-module/auth/guards/jwtWSUser.guard')
+const namespace_1 = require('../../../shared/socket/namespace')
 const channel_category_dto_1 = require('../../../shared/dtos/channel-category.dto')
 const channel_service_1 = require('./channel.service')
 const createChannel_dto_1 = require('./dtos/createChannel.dto')
 const memberChannel_dto_1 = require('./dtos/memberChannel.dto')
 const updateChannel_dto_1 = require('./dtos/updateChannel.dto')
-const permission_guard_1 = require('../../../shared/guards/permission.guard')
-const role_permission_decorator_1 = require('../../../shared/decorators/role-permission.decorator')
-const namespace_1 = require('../../../shared/socket/namespace')
 let ChannelGateway = (ChannelGateway_1 = class ChannelGateway {
     constructor(channelService) {
         this.channelService = channelService
@@ -139,7 +139,7 @@ __decorate(
 __decorate(
     [
         (0, websockets_1.SubscribeMessage)(event_1.ChannelSocketEvent.CREATE),
-        (0, common_1.UseGuards)(jwtWSUser_guard_1.JwtUserWsGuard),
+        (0, common_1.UseGuards)(jwtWS_guard_1.JwtWsGuard),
         (0, role_permission_decorator_1.RolePermissions)(['CREATE_CHANNEL']),
         (0, common_1.UseGuards)(permission_guard_1.GuildPermissionGuard),
         (0, common_1.UsePipes)(new common_1.ValidationPipe()),
@@ -161,11 +161,11 @@ __decorate(
 __decorate(
     [
         (0, websockets_1.SubscribeMessage)(event_1.ChannelSocketEvent.UPDATE),
-        (0, common_1.UseGuards)(jwtWSUser_guard_1.JwtUserWsGuard),
+        (0, common_1.UseGuards)(jwtWS_guard_1.JwtWsGuard),
         (0, role_permission_decorator_1.RolePermissions)(['UPDATE_CHANNEL']),
         (0, common_1.UseGuards)(permission_guard_1.GuildPermissionGuard),
         (0, common_1.UsePipes)(new common_1.ValidationPipe()),
-        __param(0, (0, websockets_1.MessageBody)()),
+        __param(0, (0, websockets_1.MessageBody)('channel')),
         __metadata('design:type', Function),
         __metadata('design:paramtypes', [updateChannel_dto_1.UpdateChannelDto]),
         __metadata('design:returntype', Promise),
@@ -177,7 +177,7 @@ __decorate(
 __decorate(
     [
         (0, websockets_1.SubscribeMessage)(event_1.ChannelSocketEvent.DELETE),
-        (0, common_1.UseGuards)(jwtWSUser_guard_1.JwtUserWsGuard),
+        (0, common_1.UseGuards)(jwtWS_guard_1.JwtWsGuard),
         (0, role_permission_decorator_1.RolePermissions)(['DELETE_CHANNEL']),
         (0, common_1.UseGuards)(permission_guard_1.GuildPermissionGuard),
         __param(0, (0, websockets_1.MessageBody)('channelId')),
@@ -192,11 +192,11 @@ __decorate(
 __decorate(
     [
         (0, websockets_1.SubscribeMessage)(event_1.ChannelSocketEvent.ADD_MEMBER),
-        (0, common_1.UseGuards)(jwtWSUser_guard_1.JwtUserWsGuard),
+        (0, common_1.UseGuards)(jwtWS_guard_1.JwtWsGuard),
         (0, role_permission_decorator_1.RolePermissions)(['UPDATE_CHANNEL']),
         (0, common_1.UseGuards)(permission_guard_1.GuildPermissionGuard),
         (0, common_1.UsePipes)(new common_1.ValidationPipe()),
-        __param(0, (0, websockets_1.MessageBody)()),
+        __param(0, (0, websockets_1.MessageBody)('channel')),
         __metadata('design:type', Function),
         __metadata('design:paramtypes', [memberChannel_dto_1.MemberChannelDto]),
         __metadata('design:returntype', Promise),
@@ -208,11 +208,11 @@ __decorate(
 __decorate(
     [
         (0, websockets_1.SubscribeMessage)(event_1.ChannelSocketEvent.REMOVE_MEMBER),
-        (0, common_1.UseGuards)(jwtWSUser_guard_1.JwtUserWsGuard),
+        (0, common_1.UseGuards)(jwtWS_guard_1.JwtWsGuard),
         (0, role_permission_decorator_1.RolePermissions)(['UPDATE_CHANNEL']),
         (0, common_1.UseGuards)(permission_guard_1.GuildPermissionGuard),
         (0, common_1.UsePipes)(new common_1.ValidationPipe()),
-        __param(0, (0, websockets_1.MessageBody)()),
+        __param(0, (0, websockets_1.MessageBody)('channel')),
         __metadata('design:type', Function),
         __metadata('design:paramtypes', [memberChannel_dto_1.MemberChannelDto]),
         __metadata('design:returntype', Promise),

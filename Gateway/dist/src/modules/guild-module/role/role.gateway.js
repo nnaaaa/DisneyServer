@@ -180,7 +180,7 @@ __decorate(
         (0, common_1.UseGuards)(permission_guard_1.GuildPermissionGuard),
         (0, common_1.UsePipes)(new common_1.ValidationPipe()),
         (0, websockets_1.SubscribeMessage)(event_1.RoleSocketEvent.UPDATE),
-        __param(0, (0, websockets_1.MessageBody)()),
+        __param(0, (0, websockets_1.MessageBody)('role')),
         __metadata('design:type', Function),
         __metadata('design:paramtypes', [updateRole_dto_1.UpdateRoleDto]),
         __metadata('design:returntype', Promise),

@@ -32,6 +32,7 @@ export class BotService {
     async create(createBotDto: CreateBotDto) {
         const bot = this.botRepository.create({
             requiredPermissions: [],
+            commands: [],
             ...createBotDto,
         })
 

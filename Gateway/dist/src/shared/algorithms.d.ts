@@ -6,8 +6,8 @@ export declare class Algorithm {
     static inspectCommand(command: string):
         | false
         | {
-              args: string[]
+              args: any[]
               botName: string
-              commandName: string
+              name: string
           }
 }

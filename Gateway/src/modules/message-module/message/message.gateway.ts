@@ -80,32 +80,37 @@ export class MessageGateway {
 
             const savedMessage = await this.messageService.save(newMessage)
 
-            const guild = await this.guildService.findByMessage(savedMessage)
+            const [message, guild] = await Promise.all([
+                this.messageService.findOneWithRelation({
+                    messageId: savedMessage.messageId,
+                }),
+                this.guildService.findByMessage(savedMessage),
+            ])
+
             const botList = await this.botService.findByGuild(guild)
 
             //emit to guild channels
             this.server.emit(
                 `${destinationDto.channelId}/${MessageSocketEmit.CREATE}`,
-                savedMessage
+                message
             )
 
             //emit to bot clients
-            const inspected = Algorithm.inspectCommand(savedMessage.content)
+            const inspected = Algorithm.inspectCommand(message.content)
 
             if (inspected) {
                 botList.forEach((bot) => {
-                    const { botName, args, commandName } = inspected
+                    const { botName, args, name } = inspected
 
                     const isMatchCommand = bot.commands.some(
                         (command) =>
-                            command.name === commandName &&
-                            command.args.length === args.length
+                            command.name === name && command.args.length === args.length
                     )
 
                     if (botName && botName === bot.name && isMatchCommand) {
                         this.server.emit(
                             `${bot.botId}/${SocketNamespace.MESSAGE}/${MessageSocketEmit.CREATE}`,
-                            savedMessage,
+                            message,
                             inspected,
                             guild
                         )

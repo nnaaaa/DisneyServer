@@ -106,6 +106,8 @@ export class GuildService {
     async findByMessage(messagEntity: MessageEntity) {
         const guild = this.guildRepository
             .createQueryBuilder('guild')
+            .leftJoinAndSelect('guild.categories', 'categories')
+            .leftJoinAndSelect('categories.channels', 'channels')
             .innerJoin('guild.categories', 'category')
             .innerJoin('category.channels', 'channel')
             .where('channel.channelId = :channelId', {

@@ -38,7 +38,7 @@ let BotJwtStrategy = class BotJwtStrategy extends (0, passport_1.PassportStrateg
     constructor(configService, botService) {
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
-            ignoreExpiration: false,
+            ignoreExpiration: true,
             secretOrKey: configService.get('TOKEN_SECRET_KEY'),
             passReqToCallback: true,
         })

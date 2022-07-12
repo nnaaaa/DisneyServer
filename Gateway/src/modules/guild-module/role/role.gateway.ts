@@ -57,7 +57,7 @@ export class RoleGateway {
     @UseGuards(GuildPermissionGuard)
     @UsePipes(new ValidationPipe())
     @SubscribeMessage(RoleSocketEvent.UPDATE)
-    async update(@MessageBody() updateRoleDto: UpdateRoleDto) {
+    async update(@MessageBody('role') updateRoleDto: UpdateRoleDto) {
         try {
             const { roleId } = updateRoleDto
 
