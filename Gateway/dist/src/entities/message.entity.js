@@ -28,9 +28,9 @@ var MessageEntity_1
 Object.defineProperty(exports, '__esModule', { value: true })
 exports.MessageEntity = void 0
 const typeorm_1 = require('typeorm')
+const action_entity_1 = require('./action.entity')
 const channel_entity_1 = require('./channel.entity')
 const member_entity_1 = require('./member.entity')
-const react_entity_1 = require('./react.entity')
 let MessageEntity = (MessageEntity_1 = class MessageEntity {})
 __decorate(
     [(0, typeorm_1.PrimaryGeneratedColumn)('uuid'), __metadata('design:type', String)],
@@ -39,7 +39,7 @@ __decorate(
     void 0
 )
 __decorate(
-    [(0, typeorm_1.Column)({ type: 'longtext' }), __metadata('design:type', String)],
+    [(0, typeorm_1.Column)({ type: 'text' }), __metadata('design:type', String)],
     MessageEntity.prototype,
     'content',
     void 0
@@ -54,6 +54,19 @@ __decorate(
     [(0, typeorm_1.CreateDateColumn)(), __metadata('design:type', Date)],
     MessageEntity.prototype,
     'createdAt',
+    void 0
+)
+__decorate(
+    [
+        (0, typeorm_1.OneToOne)(
+            () => action_entity_1.ActionEntity,
+            (type) => type.message,
+            { onUpdate: 'CASCADE' }
+        ),
+        __metadata('design:type', action_entity_1.ActionEntity),
+    ],
+    MessageEntity.prototype,
+    'action',
     void 0
 )
 __decorate(
@@ -78,19 +91,6 @@ __decorate(
     ],
     MessageEntity.prototype,
     'author',
-    void 0
-)
-__decorate(
-    [
-        (0, typeorm_1.OneToMany)(
-            () => react_entity_1.ReactEntity,
-            (type) => type.message,
-            { cascade: true }
-        ),
-        __metadata('design:type', Array),
-    ],
-    MessageEntity.prototype,
-    'reacts',
     void 0
 )
 __decorate(

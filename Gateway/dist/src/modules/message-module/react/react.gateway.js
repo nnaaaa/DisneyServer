@@ -44,21 +44,18 @@ const emit_1 = require('../../../shared/socket/emit')
 const event_1 = require('../../../shared/socket/event')
 const namespace_1 = require('../../../shared/socket/namespace')
 const jwtWSUser_guard_1 = require('../../auth-module/auth/guards/jwtWSUser.guard')
+const createReact_dto_1 = require('./dtos/createReact.dto')
 const react_service_1 = require('./react.service')
 let ReactGateway = (ReactGateway_1 = class ReactGateway {
     constructor(reactService) {
         this.reactService = reactService
         this.logger = new common_1.Logger(ReactGateway_1.name)
     }
-    async create(emojiOfReactDto, messageOfReactDto, authorOfReactDto) {
+    async create(createReactDto) {
         try {
-            const react = await this.reactService.reactToMessage(
-                emojiOfReactDto,
-                messageOfReactDto,
-                authorOfReactDto
-            )
+            const react = await this.reactService.reactToMessage(createReactDto)
             this.server.emit(
-                `${messageOfReactDto.messageId}/${emit_1.ReactSocketEmit.CREATE}`,
+                `${createReactDto.action.actionId}/${emit_1.ReactSocketEmit.CREATE}`,
                 react
             )
         } catch (e) {
@@ -101,15 +98,9 @@ __decorate(
         (0, common_1.UseGuards)(permission_guard_1.GuildPermissionGuard),
         (0, websockets_1.SubscribeMessage)(event_1.ReactSocketEvent.CREATE),
         (0, common_1.UsePipes)(new common_1.ValidationPipe()),
-        __param(0, (0, websockets_1.MessageBody)('emoji')),
-        __param(1, (0, websockets_1.MessageBody)('message')),
-        __param(2, (0, websockets_1.MessageBody)('author')),
+        __param(0, (0, websockets_1.MessageBody)()),
         __metadata('design:type', Function),
-        __metadata('design:paramtypes', [
-            dtos_1.EmojiDto,
-            dtos_1.MessageDto,
-            dtos_1.MemberDto,
-        ]),
+        __metadata('design:paramtypes', [createReact_dto_1.CreateReactDto]),
         __metadata('design:returntype', Promise),
     ],
     ReactGateway.prototype,

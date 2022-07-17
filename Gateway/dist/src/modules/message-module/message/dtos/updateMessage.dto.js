@@ -27,7 +27,8 @@ var __metadata =
 Object.defineProperty(exports, '__esModule', { value: true })
 exports.UpdateMessageDto = void 0
 const class_validator_1 = require('class-validator')
-class UpdateMessageDto {}
+const createMessage_dto_1 = require('./createMessage.dto')
+class UpdateMessageDto extends createMessage_dto_1.CreateMessageDto {}
 __decorate(
     [
         (0, class_validator_1.IsUUID)(),
@@ -36,26 +37,6 @@ __decorate(
     ],
     UpdateMessageDto.prototype,
     'messageId',
-    void 0
-)
-__decorate(
-    [
-        (0, class_validator_1.IsString)(),
-        (0, class_validator_1.IsOptional)(),
-        __metadata('design:type', String),
-    ],
-    UpdateMessageDto.prototype,
-    'content',
-    void 0
-)
-__decorate(
-    [
-        (0, class_validator_1.IsArray)(),
-        (0, class_validator_1.IsOptional)(),
-        __metadata('design:type', String),
-    ],
-    UpdateMessageDto.prototype,
-    'images',
     void 0
 )
 exports.UpdateMessageDto = UpdateMessageDto

@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { AppModule } from './app.module'
+import * as morgan from 'morgan'
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule)
@@ -14,6 +15,7 @@ async function bootstrap() {
     )
 
     app.enableCors({ exposedHeaders: ['accessToken', 'refreshToken'] })
+    app.use(morgan('dev'))
 
     const config = new DocumentBuilder()
         .setTitle('Disney Server')

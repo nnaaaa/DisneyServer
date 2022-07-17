@@ -4,16 +4,16 @@ import {
     SubscribeMessage,
     WebSocketGateway,
     WebSocketServer,
-    WsException,
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
 import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
-import { EmojiDto, MemberDto, MessageDto } from 'src/shared/dtos'
+import { EmojiDto } from 'src/shared/dtos'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { ReactSocketEmit } from 'src/shared/socket/emit'
 import { ReactSocketEvent } from 'src/shared/socket/event'
 import { SocketNamespace } from 'src/shared/socket/namespace'
 import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
+import { CreateReactDto } from './dtos/createReact.dto'
 import { ReactService } from './react.service'
 
 @WebSocketGateway({ cors: { origin: '*' }, namespace: SocketNamespace.REACT })
@@ -30,20 +30,12 @@ export class ReactGateway {
     @UseGuards(GuildPermissionGuard)
     @SubscribeMessage(ReactSocketEvent.CREATE)
     @UsePipes(new ValidationPipe())
-    async create(
-        @MessageBody('emoji') emojiOfReactDto: EmojiDto,
-        @MessageBody('message') messageOfReactDto: MessageDto,
-        @MessageBody('author') authorOfReactDto: MemberDto
-    ) {
+    async create(@MessageBody() createReactDto: CreateReactDto) {
         try {
-            const react = await this.reactService.reactToMessage(
-                emojiOfReactDto,
-                messageOfReactDto,
-                authorOfReactDto
-            )
+            const react = await this.reactService.reactToMessage(createReactDto)
 
             this.server.emit(
-                `${messageOfReactDto.messageId}/${ReactSocketEmit.CREATE}`,
+                `${createReactDto.action.actionId}/${ReactSocketEmit.CREATE}`,
                 react
             )
         } catch (e) {

@@ -26,7 +26,7 @@ var __metadata =
     }
 Object.defineProperty(exports, '__esModule', { value: true })
 exports.GuildEntity = void 0
-const default_1 = require('../shared/default')
+const constant_1 = require('../shared/utils/constant')
 const typeorm_1 = require('typeorm')
 const channelCategory_entity_1 = require('./channelCategory.entity')
 const role_entity_1 = require('./role.entity')
@@ -47,7 +47,7 @@ __decorate(
 )
 __decorate(
     [
-        (0, typeorm_1.Column)({ default: default_1.Default.guildAvatar }),
+        (0, typeorm_1.Column)({ default: constant_1.Constant.guildAvatar }),
         __metadata('design:type', String),
     ],
     GuildEntity.prototype,

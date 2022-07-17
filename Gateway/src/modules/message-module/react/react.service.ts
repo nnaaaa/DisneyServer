@@ -1,12 +1,14 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common'
+import {
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
+} from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { EmojiEntity } from 'src/entities/emoji.entity'
 import { ReactEntity } from 'src/entities/react.entity'
 import { ReactRepository } from 'src/repositories/react.repository'
 import { EmojiDto } from 'src/shared/dtos/emoji.dto'
-import { MemberDto } from 'src/shared/dtos/member.dto'
-import { MessageDto } from 'src/shared/dtos/message.dto'
 import { DeepPartial, FindOptionsRelations, FindOptionsWhere } from 'typeorm'
+import { CreateReactDto } from './dtos/createReact.dto'
 
 @Injectable()
 export class ReactService {
@@ -37,9 +39,11 @@ export class ReactService {
         try {
             const react = await this.findOneWithRelation({ reactId })
 
-            react.emoji = emojiOfReactDto as EmojiEntity
+            if (react) {
+                this.reactRepository.merge(react, { emoji: emojiOfReactDto })
 
-            return await this.save(react)
+                return await this.save(react)
+            } else throw new NotFoundException()
         } catch (e) {
             throw new InternalServerErrorException(e)
         }
@@ -61,16 +65,8 @@ export class ReactService {
         }
     }
 
-    async reactToMessage(
-        emojiOfReactDto: EmojiDto,
-        messageOfReactDto: MessageDto,
-        authorOfReactDto: MemberDto
-    ) {
-        const react = this.create({
-            author: authorOfReactDto,
-            message: messageOfReactDto,
-            emoji: emojiOfReactDto,
-        })
+    async reactToMessage(createReactDto: CreateReactDto) {
+        const react = this.create(createReactDto)
 
         return await this.save(react)
     }

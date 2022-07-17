@@ -27,9 +27,9 @@ var __metadata =
 Object.defineProperty(exports, '__esModule', { value: true })
 exports.ReactEntity = void 0
 const typeorm_1 = require('typeorm')
+const action_entity_1 = require('./action.entity')
 const emoji_entity_1 = require('./emoji.entity')
 const member_entity_1 = require('./member.entity')
-const message_entity_1 = require('./message.entity')
 let ReactEntity = class ReactEntity {}
 __decorate(
     [(0, typeorm_1.PrimaryGeneratedColumn)('uuid'), __metadata('design:type', String)],
@@ -52,13 +52,13 @@ __decorate(
 __decorate(
     [
         (0, typeorm_1.ManyToOne)(
-            () => message_entity_1.MessageEntity,
+            () => action_entity_1.ActionEntity,
             (type) => type.reacts
         ),
-        __metadata('design:type', message_entity_1.MessageEntity),
+        __metadata('design:type', action_entity_1.ActionEntity),
     ],
     ReactEntity.prototype,
-    'message',
+    'action',
     void 0
 )
 __decorate(

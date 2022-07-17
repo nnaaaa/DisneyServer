@@ -37,11 +37,11 @@ const common_1 = require('@nestjs/common')
 const typeorm_1 = require('@nestjs/typeorm')
 const message_entity_1 = require('../../../entities/message.entity')
 const message_repository_1 = require('../../../repositories/message.repository')
-const react_service_1 = require('../react/react.service')
+const action_service_1 = require('../action/action.service')
 let MessageService = class MessageService {
-    constructor(messageRepository, reactService) {
+    constructor(messageRepository, actionService) {
         this.messageRepository = messageRepository
-        this.reactService = reactService
+        this.actionService = actionService
         this.messageRelations = {
             author: true,
             channel: true,
@@ -99,14 +99,6 @@ let MessageService = class MessageService {
     async deleteOne(findCondition) {
         try {
             const message = await this.findOneWithRelation(findCondition)
-            if (message) {
-                const reacts = []
-                for (const react of message.reacts) {
-                    reacts.push(this.reactService.deleteOne({ reactId: react.reactId }))
-                }
-                await Promise.all(reacts)
-                await this.messageRepository.remove(message)
-            }
             return message
         } catch (e) {
             throw new common_1.InternalServerErrorException(e)
@@ -116,13 +108,6 @@ let MessageService = class MessageService {
         try {
             const messages = await this.findMany(findCondition)
             const reacts = []
-            for (const message of messages) {
-                reacts.push(
-                    this.reactService.deleteMany({
-                        message: { messageId: message.messageId },
-                    })
-                )
-            }
             await Promise.all(reacts)
             await this.messageRepository.remove(messages)
         } catch (e) {
@@ -136,7 +121,7 @@ MessageService = __decorate(
         __param(0, (0, typeorm_1.InjectRepository)(message_entity_1.MessageEntity)),
         __metadata('design:paramtypes', [
             message_repository_1.MessageRepository,
-            react_service_1.ReactService,
+            action_service_1.ActionService,
         ]),
     ],
     MessageService

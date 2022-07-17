@@ -26,7 +26,7 @@ var __metadata =
     }
 Object.defineProperty(exports, '__esModule', { value: true })
 exports.UserEntity = void 0
-const default_1 = require('../shared/default')
+const constant_1 = require('../shared/utils/constant')
 const typeorm_1 = require('typeorm')
 const bot_entity_1 = require('./bot.entity')
 const member_entity_1 = require('./member.entity')
@@ -52,7 +52,7 @@ __decorate(
 )
 __decorate(
     [
-        (0, typeorm_1.Column)({ default: default_1.Default.userAvatar }),
+        (0, typeorm_1.Column)({ default: constant_1.Constant.userAvatar }),
         __metadata('design:type', String),
     ],
     UserEntity.prototype,

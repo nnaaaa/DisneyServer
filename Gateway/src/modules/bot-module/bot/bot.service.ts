@@ -1,5 +1,6 @@
 import {
     ForbiddenException,
+    Inject,
     Injectable,
     InternalServerErrorException,
     NotFoundException,
@@ -8,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { BotEntity } from 'src/entities/bot.entity'
 import { GuildEntity } from 'src/entities/guild.entity'
 import { AuthService } from 'src/modules/auth-module/auth/auth.service'
+import { MemberService } from 'src/modules/guild-module/member/member.service'
 import { BotRepository } from 'src/repositories/bot.repository'
 import { FindOptionsRelations, FindOptionsWhere } from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
@@ -22,7 +24,8 @@ export class BotService {
     }
     constructor(
         @InjectRepository(BotEntity) private botRepository: BotRepository,
-        private authService: AuthService
+        private authService: AuthService,
+        @Inject(MemberService) private memberService: MemberService
     ) {}
 
     async save(bot: BotEntity) {
@@ -71,7 +74,9 @@ export class BotService {
 
     async deleteOne(findCondition: FindOptionsWhere<BotEntity>) {
         try {
-            let bot = await this.findOneWithRelation(findCondition)
+            const bot = await this.findOneWithRelation(findCondition)
+
+            this.memberService.deleteMany({ bot: { botId: bot.botId } })
 
             return await this.botRepository.remove(bot)
         } catch (e) {

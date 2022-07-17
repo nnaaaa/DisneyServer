@@ -5,7 +5,7 @@ import {
     UnauthorizedException,
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { Algorithm } from 'src/shared/algorithms'
+import { Algorithm } from 'src/shared/utils/algorithms'
 import { MailService } from '../mail/mail.service'
 import { UserService } from '../user/user.service'
 import {

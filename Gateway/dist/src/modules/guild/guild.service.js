@@ -129,7 +129,7 @@ let GuildService = class GuildService {
         const member = await this.memberService.create(savedGuild, creator)
         const savedMember = await this.memberService.save(member)
         const role = await this.roleService.create(
-            { name: default_1.Default.everyOneRoleName },
+            { name: default_1.Constant.everyOneRoleName },
             savedGuild
         )
         savedMember.roles = [role]

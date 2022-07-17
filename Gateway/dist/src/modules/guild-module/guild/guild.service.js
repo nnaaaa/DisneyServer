@@ -37,7 +37,7 @@ const common_1 = require('@nestjs/common')
 const typeorm_1 = require('@nestjs/typeorm')
 const guild_entity_1 = require('../../../entities/guild.entity')
 const guild_repository_1 = require('../../../repositories/guild.repository')
-const default_1 = require('../../../shared/default')
+const constant_1 = require('../../../shared/utils/constant')
 const channel_category_service_1 = require('../channel-category/channel-category.service')
 const emoji_service_1 = require('../../message-module/emoji/emoji.service')
 const member_service_1 = require('../member/member.service')
@@ -143,8 +143,8 @@ let GuildService = class GuildService {
         const savedMember = await this.memberService.save(member)
         const role = await this.roleService.create(
             {
-                name: default_1.Default.adminRoleName,
-                permissions: default_1.Default.adminPermission,
+                name: constant_1.Constant.adminRoleName,
+                permissions: constant_1.Constant.adminPermission,
             },
             savedGuild
         )

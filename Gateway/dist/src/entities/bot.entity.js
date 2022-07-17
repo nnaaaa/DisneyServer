@@ -26,7 +26,7 @@ var __metadata =
     }
 Object.defineProperty(exports, '__esModule', { value: true })
 exports.BotEntity = void 0
-const default_1 = require('../shared/default')
+const constant_1 = require('../shared/utils/constant')
 const typeorm_1 = require('typeorm')
 const command_entity_1 = require('./command.entity')
 const member_entity_1 = require('./member.entity')
@@ -40,7 +40,7 @@ __decorate(
 )
 __decorate(
     [
-        (0, typeorm_1.Column)({ default: default_1.Default.botAvatar }),
+        (0, typeorm_1.Column)({ default: constant_1.Constant.botAvatar }),
         __metadata('design:type', String),
     ],
     BotEntity.prototype,
@@ -54,7 +54,7 @@ __decorate(
     void 0
 )
 __decorate(
-    [(0, typeorm_1.Column)({ type: 'longtext' }), __metadata('design:type', String)],
+    [(0, typeorm_1.Column)({ type: 'text' }), __metadata('design:type', String)],
     BotEntity.prototype,
     'description',
     void 0

@@ -1,6 +1,7 @@
 import { BotEntity } from 'src/entities/bot.entity'
 import { GuildEntity } from 'src/entities/guild.entity'
 import { AuthService } from 'src/modules/auth-module/auth/auth.service'
+import { MemberService } from 'src/modules/guild-module/member/member.service'
 import { BotRepository } from 'src/repositories/bot.repository'
 import { FindOptionsRelations, FindOptionsWhere } from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
@@ -9,8 +10,13 @@ import { GenSecretKeyDto } from './dtos/genSecretKey.dto'
 export declare class BotService {
     private botRepository
     private authService
+    private memberService
     readonly botRelations: FindOptionsRelations<BotEntity>
-    constructor(botRepository: BotRepository, authService: AuthService)
+    constructor(
+        botRepository: BotRepository,
+        authService: AuthService,
+        memberService: MemberService
+    )
     save(bot: BotEntity): Promise<BotEntity>
     create(createBotDto: CreateBotDto): Promise<BotEntity>
     findOneWithRelation(findCondition: FindOptionsWhere<BotEntity>): Promise<BotEntity>

@@ -8,6 +8,7 @@ import {
     OneToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm'
+import { ActionEntity } from './action.entity'
 import { ChannelEntity } from './channel.entity'
 import { MemberEntity } from './member.entity'
 import { ReactEntity } from './react.entity'
@@ -17,7 +18,7 @@ export class MessageEntity {
     @PrimaryGeneratedColumn('uuid')
     messageId: string
 
-    @Column({ type: 'longtext' })
+    @Column({ type: 'text' })
     content: string
 
     @Column({ type: 'simple-array' })
@@ -27,14 +28,14 @@ export class MessageEntity {
     createdAt: Date
 
     /** @relationship */
+    @OneToOne(() => ActionEntity, (type) => type.message, { onUpdate: 'CASCADE' })
+    action: ActionEntity
+
     @ManyToOne(() => ChannelEntity, (type) => type.messages)
     channel: ChannelEntity
 
     @ManyToOne(() => MemberEntity, (type) => type.sentMessages)
     author: MemberEntity
-
-    @OneToMany(() => ReactEntity, (type) => type.message, { cascade: true })
-    reacts: ReactEntity[]
 
     /** @selfrelation */
     @ManyToOne(() => MessageEntity, (type) => type.replies, { nullable: true })

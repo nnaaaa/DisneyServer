@@ -58,8 +58,10 @@ let ReactService = class ReactService {
     async updateOne(reactId, emojiOfReactDto) {
         try {
             const react = await this.findOneWithRelation({ reactId })
-            react.emoji = emojiOfReactDto
-            return await this.save(react)
+            if (react) {
+                this.reactRepository.merge(react, { emoji: emojiOfReactDto })
+                return await this.save(react)
+            } else throw new common_1.NotFoundException()
         } catch (e) {
             throw new common_1.InternalServerErrorException(e)
         }
@@ -78,12 +80,8 @@ let ReactService = class ReactService {
             throw new common_1.InternalServerErrorException(e)
         }
     }
-    async reactToMessage(emojiOfReactDto, messageOfReactDto, authorOfReactDto) {
-        const react = this.create({
-            author: authorOfReactDto,
-            message: messageOfReactDto,
-            emoji: emojiOfReactDto,
-        })
+    async reactToMessage(createReactDto) {
+        const react = this.create(createReactDto)
         return await this.save(react)
     }
 }

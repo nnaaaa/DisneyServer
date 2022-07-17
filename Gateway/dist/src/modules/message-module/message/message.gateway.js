@@ -40,7 +40,7 @@ const socket_io_1 = require('socket.io')
 const jwtWS_guard_1 = require('../../auth-module/auth/guards/jwtWS.guard')
 const bot_service_1 = require('../../bot-module/bot/bot.service')
 const guild_service_1 = require('../../guild-module/guild/guild.service')
-const algorithms_1 = require('../../../shared/algorithms')
+const algorithms_1 = require('../../../shared/utils/algorithms')
 const auth_user_decorator_1 = require('../../../shared/decorators/auth-user.decorator')
 const role_permission_decorator_1 = require('../../../shared/decorators/role-permission.decorator')
 const dtos_1 = require('../../../shared/dtos')
@@ -97,7 +97,6 @@ let MessageGateway = (MessageGateway_1 = class MessageGateway {
                 message
             )
             const inspected = algorithms_1.Algorithm.inspectCommand(message.content)
-            console.log(inspected)
             if (inspected) {
                 botList.forEach((bot) => {
                     const { botName, args, name } = inspected

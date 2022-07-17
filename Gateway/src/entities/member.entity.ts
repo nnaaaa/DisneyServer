@@ -1,4 +1,4 @@
-import { Default } from 'src/shared/default'
+import { Constant } from 'src/shared/utils/constant'
 import {
     Column,
     CreateDateColumn,
@@ -28,7 +28,7 @@ export class MemberEntity {
     @Column()
     nickname: string
 
-    @Column({ default: Default.userAvatar })
+    @Column({ default: Constant.userAvatar })
     avatarUrl: string
 
     /** @relationship */
@@ -39,7 +39,6 @@ export class MemberEntity {
     user?: UserEntity
 
     @ManyToOne(() => BotEntity, (type) => type.joinedGuilds, {
-        onDelete: 'CASCADE',
         nullable: true,
     })
     bot?: BotEntity
@@ -49,7 +48,6 @@ export class MemberEntity {
 
     @ManyToMany(() => RoleEntity, (type) => type.members, {
         cascade: true,
-        onDelete: 'CASCADE',
     })
     @JoinTable()
     roles: RoleEntity[]

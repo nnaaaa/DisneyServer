@@ -1,4 +1,4 @@
-import { Default } from 'src/shared/default'
+import { Constant } from 'src/shared/utils/constant'
 import {
     Column,
     CreateDateColumn,
@@ -21,7 +21,7 @@ export class UserEntity {
     @Column()
     name: string
 
-    @Column({ default: Default.userAvatar })
+    @Column({ default: Constant.userAvatar })
     avatarUrl: string
 
     @CreateDateColumn()

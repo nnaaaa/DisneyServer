@@ -1,4 +1,4 @@
-import { Default } from 'src/shared/default'
+import { Constant } from 'src/shared/utils/constant'
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { CommandEntity } from './command.entity'
 import { MemberEntity } from './member.entity'
@@ -10,13 +10,13 @@ export class BotEntity {
     @PrimaryGeneratedColumn('uuid')
     botId: string
 
-    @Column({ default: Default.botAvatar })
+    @Column({ default: Constant.botAvatar })
     avatarUrl: string
 
     @Column({ unique: true })
     name: string
 
-    @Column({ type: 'longtext' })
+    @Column({ type: 'text' })
     description: string
 
     @Column()

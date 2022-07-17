@@ -24,8 +24,8 @@ const common_1 = require('@nestjs/common')
 const typeorm_1 = require('@nestjs/typeorm')
 const message_entity_1 = require('../../../entities/message.entity')
 const auth_module_1 = require('../../auth-module/auth/auth.module')
-const react_module_1 = require('../react/react.module')
-const react_service_1 = require('../react/react.service')
+const action_module_1 = require('../action/action.module')
+const action_service_1 = require('../action/action.service')
 const message_gateway_1 = require('./message.gateway')
 const message_service_1 = require('./message.service')
 let MessageModule = class MessageModule {}
@@ -35,17 +35,17 @@ MessageModule = __decorate(
             imports: [
                 typeorm_1.TypeOrmModule.forFeature([message_entity_1.MessageEntity]),
                 auth_module_1.AuthModule,
-                react_module_1.ReactModule,
+                action_module_1.ActionModule,
             ],
             providers: [
-                react_service_1.ReactService,
+                action_service_1.ActionService,
                 message_service_1.MessageService,
                 message_gateway_1.MessageGateway,
             ],
             exports: [
                 typeorm_1.TypeOrmModule,
                 message_service_1.MessageService,
-                react_module_1.ReactModule,
+                action_module_1.ActionModule,
             ],
         }),
     ],

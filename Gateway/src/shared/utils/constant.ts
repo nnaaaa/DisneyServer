@@ -1,6 +1,6 @@
 import { Permission } from 'src/entities/role.entity'
 
-export class Default {
+export class Constant {
     static userAvatar =
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSg0TvzLdISKVVtNk9XTFlKS8_4dn4dzYcvlo-YtNb_33-prHxuDnLHSuk8GNnBWw3awb8&usqp=CAU'
     static botAvatar =

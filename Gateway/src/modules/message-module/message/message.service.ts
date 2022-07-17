@@ -4,7 +4,7 @@ import { MessageEntity } from 'src/entities/message.entity'
 import { MessageRepository } from 'src/repositories/message.repository'
 import { ChannelDto, MemberDto } from 'src/shared/dtos'
 import { FindOptionsRelations, FindOptionsWhere } from 'typeorm'
-import { ReactService } from '../react/react.service'
+import { ActionService } from '../action/action.service'
 import { CreateMessageDto } from './dtos/createMessage.dto'
 import { UpdateMessageDto } from './dtos/updateMessage.dto'
 
@@ -19,7 +19,7 @@ export class MessageService {
 
     constructor(
         @InjectRepository(MessageEntity) private messageRepository: MessageRepository,
-        private reactService: ReactService
+        private actionService: ActionService
     ) {}
 
     async save(message: MessageEntity) {
@@ -86,15 +86,15 @@ export class MessageService {
     async deleteOne(findCondition: FindOptionsWhere<MessageEntity>) {
         try {
             const message = await this.findOneWithRelation(findCondition)
-            if (message) {
-                const reacts = []
-                for (const react of message.reacts) {
-                    reacts.push(this.reactService.deleteOne({ reactId: react.reactId }))
-                }
-                await Promise.all(reacts)
+            // if (message) {
+            //     const reacts = []
+            //     for (const react of message.reacts) {
+            //         reacts.push(this.reactService.deleteOne({ reactId: react.reactId }))
+            //     }
+            //     await Promise.all(reacts)
 
-                await this.messageRepository.remove(message)
-            }
+            //     await this.messageRepository.remove(message)
+            // }
             return message
         } catch (e) {
             throw new InternalServerErrorException(e)
@@ -106,13 +106,13 @@ export class MessageService {
             const messages = await this.findMany(findCondition)
 
             const reacts = []
-            for (const message of messages) {
-                reacts.push(
-                    this.reactService.deleteMany({
-                        message: { messageId: message.messageId },
-                    })
-                )
-            }
+            // for (const message of messages) {
+            //     reacts.push(
+            //         this.reactService.deleteMany({
+            //             message: { messageId: message.messageId },
+            //         })
+            //     )
+            // }
             await Promise.all(reacts)
 
             await this.messageRepository.remove(messages)

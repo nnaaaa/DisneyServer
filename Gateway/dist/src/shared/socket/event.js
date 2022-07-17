@@ -1,6 +1,8 @@
 'use strict'
 Object.defineProperty(exports, '__esModule', { value: true })
-exports.ReactSocketEvent =
+exports.ButtonSocketEvent =
+    exports.ActionSocketEvent =
+    exports.ReactSocketEvent =
     exports.EmojiSocketEvent =
     exports.MessageSocketEvent =
     exports.RoleSocketEvent =
@@ -81,4 +83,16 @@ var ReactSocketEvent
     ReactSocketEvent['UPDATE'] = 'update'
     ReactSocketEvent['DELETE'] = 'delete'
 })((ReactSocketEvent = exports.ReactSocketEvent || (exports.ReactSocketEvent = {})))
+var ActionSocketEvent
+;(function (ActionSocketEvent) {
+    ActionSocketEvent['CREATE'] = 'create'
+    ActionSocketEvent['UPDATE'] = 'update'
+    ActionSocketEvent['DELETE'] = 'delete'
+})((ActionSocketEvent = exports.ActionSocketEvent || (exports.ActionSocketEvent = {})))
+var ButtonSocketEvent
+;(function (ButtonSocketEvent) {
+    ButtonSocketEvent['CREATE'] = 'create'
+    ButtonSocketEvent['UPDATE'] = 'update'
+    ButtonSocketEvent['DELETE'] = 'delete'
+})((ButtonSocketEvent = exports.ButtonSocketEvent || (exports.ButtonSocketEvent = {})))
 //# sourceMappingURL=event.js.map

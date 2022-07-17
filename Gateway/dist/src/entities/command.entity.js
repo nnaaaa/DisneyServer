@@ -42,7 +42,7 @@ __decorate(
     void 0
 )
 __decorate(
-    [(0, typeorm_1.Column)({ type: 'longtext' }), __metadata('design:type', String)],
+    [(0, typeorm_1.Column)({ type: 'text' }), __metadata('design:type', String)],
     CommandEntity.prototype,
     'description',
     void 0

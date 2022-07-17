@@ -1,16 +1,8 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString, IsUrl, IsUUID } from 'class-validator'
+import { IsNotEmpty, IsUUID } from 'class-validator'
+import { CreateMessageDto } from './createMessage.dto'
 
-export class UpdateMessageDto {
+export class UpdateMessageDto extends CreateMessageDto {
     @IsUUID()
     @IsNotEmpty()
     messageId: string
-
-    @IsString()
-    @IsOptional()
-    content: string
-
-    @IsArray()
-    // @IsUrl({ each: true })
-    @IsOptional()
-    images: string
 }

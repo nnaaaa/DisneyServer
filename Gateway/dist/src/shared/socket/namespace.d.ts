@@ -8,4 +8,6 @@ export declare enum SocketNamespace {
     EMOJI = 'emoji',
     REACT = 'react',
     MESSAGE = 'message',
+    ACTION = 'action',
+    BUTTON = 'button',
 }

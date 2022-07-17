@@ -1,7 +1,7 @@
 import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { ActionEntity } from './action.entity'
 import { EmojiEntity } from './emoji.entity'
 import { MemberEntity } from './member.entity'
-import { MessageEntity } from './message.entity'
 
 @Entity()
 export class ReactEntity {
@@ -11,8 +11,8 @@ export class ReactEntity {
     @ManyToOne(() => MemberEntity, (type) => type.sentReacts)
     author: MemberEntity
 
-    @ManyToOne(() => MessageEntity, (type) => type.reacts)
-    message: MessageEntity
+    @ManyToOne(() => ActionEntity, (type) => type.reacts)
+    action: ActionEntity
 
     @ManyToOne(() => EmojiEntity, (type) => type.reacts)
     emoji: EmojiEntity

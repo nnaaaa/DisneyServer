@@ -26,7 +26,7 @@ var __metadata =
     }
 Object.defineProperty(exports, '__esModule', { value: true })
 exports.MemberEntity = void 0
-const default_1 = require('../shared/default')
+const constant_1 = require('../shared/utils/constant')
 const typeorm_1 = require('typeorm')
 const bot_entity_1 = require('./bot.entity')
 const channel_entity_1 = require('./channel.entity')
@@ -56,7 +56,7 @@ __decorate(
 )
 __decorate(
     [
-        (0, typeorm_1.Column)({ default: default_1.Default.userAvatar }),
+        (0, typeorm_1.Column)({ default: constant_1.Constant.userAvatar }),
         __metadata('design:type', String),
     ],
     MemberEntity.prototype,
@@ -85,7 +85,6 @@ __decorate(
             () => bot_entity_1.BotEntity,
             (type) => type.joinedGuilds,
             {
-                onDelete: 'CASCADE',
                 nullable: true,
             }
         ),
@@ -114,7 +113,6 @@ __decorate(
             (type) => type.members,
             {
                 cascade: true,
-                onDelete: 'CASCADE',
             }
         ),
         (0, typeorm_1.JoinTable)(),

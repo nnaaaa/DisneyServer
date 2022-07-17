@@ -15,6 +15,8 @@ import { RoleModule } from './modules/guild-module/role/role.module'
 import { EmojiModule } from './modules/message-module/emoji/emoji.module'
 import { MessageModule } from './modules/message-module/message/message.module'
 import { ReactModule } from './modules/message-module/react/react.module'
+import { ActionModule } from './modules/message-module/action/action.module'
+import { ButtonModule } from './modules/message-module/button/button.module'
 
 @Module({
     imports: [
@@ -27,6 +29,7 @@ import { ReactModule } from './modules/message-module/react/react.module'
                 password: configService.get('DB_PASSWORD'),
                 database: configService.get('DB_DB'),
                 type: 'mysql',
+                // logging:true,
                 synchronize: true,
                 dropSchema: false,
                 autoLoadEntities: true,
@@ -72,6 +75,8 @@ import { ReactModule } from './modules/message-module/react/react.module'
         ReactModule,
         BotModule,
         CommandModule,
+        ActionModule,
+        ButtonModule,
     ],
     providers: [],
 })

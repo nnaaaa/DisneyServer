@@ -1,6 +1,8 @@
 'use strict'
 Object.defineProperty(exports, '__esModule', { value: true })
-exports.ReactSocketEmit =
+exports.ButtonSocketEmit =
+    exports.ActionSocketEmit =
+    exports.ReactSocketEmit =
     exports.EmojiSocketEmit =
     exports.MessageSocketEmit =
     exports.RoleSocketEmit =
@@ -75,4 +77,16 @@ var ReactSocketEmit
     ReactSocketEmit['UPDATE'] = 'update'
     ReactSocketEmit['DELETE'] = 'delete'
 })((ReactSocketEmit = exports.ReactSocketEmit || (exports.ReactSocketEmit = {})))
+var ActionSocketEmit
+;(function (ActionSocketEmit) {
+    ActionSocketEmit['CREATE'] = 'create'
+    ActionSocketEmit['UPDATE'] = 'update'
+    ActionSocketEmit['DELETE'] = 'delete'
+})((ActionSocketEmit = exports.ActionSocketEmit || (exports.ActionSocketEmit = {})))
+var ButtonSocketEmit
+;(function (ButtonSocketEmit) {
+    ButtonSocketEmit['CREATE'] = 'create'
+    ButtonSocketEmit['UPDATE'] = 'update'
+    ButtonSocketEmit['DELETE'] = 'delete'
+})((ButtonSocketEmit = exports.ButtonSocketEmit || (exports.ButtonSocketEmit = {})))
 //# sourceMappingURL=emit.js.map

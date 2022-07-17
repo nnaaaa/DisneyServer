@@ -12,5 +12,7 @@ var SocketNamespace
     SocketNamespace['EMOJI'] = 'emoji'
     SocketNamespace['REACT'] = 'react'
     SocketNamespace['MESSAGE'] = 'message'
+    SocketNamespace['ACTION'] = 'action'
+    SocketNamespace['BUTTON'] = 'button'
 })((SocketNamespace = exports.SocketNamespace || (exports.SocketNamespace = {})))
 //# sourceMappingURL=namespace.js.map

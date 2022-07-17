@@ -37,11 +37,13 @@ const common_1 = require('@nestjs/common')
 const typeorm_1 = require('@nestjs/typeorm')
 const bot_entity_1 = require('../../../entities/bot.entity')
 const auth_service_1 = require('../../auth-module/auth/auth.service')
+const member_service_1 = require('../../guild-module/member/member.service')
 const bot_repository_1 = require('../../../repositories/bot.repository')
 let BotService = class BotService {
-    constructor(botRepository, authService) {
+    constructor(botRepository, authService, memberService) {
         this.botRepository = botRepository
         this.authService = authService
+        this.memberService = memberService
         this.botRelations = {
             commands: true,
             joinedGuilds: { guild: true },
@@ -80,7 +82,8 @@ let BotService = class BotService {
     }
     async deleteOne(findCondition) {
         try {
-            let bot = await this.findOneWithRelation(findCondition)
+            const bot = await this.findOneWithRelation(findCondition)
+            this.memberService.deleteMany({ bot: { botId: bot.botId } })
             return await this.botRepository.remove(bot)
         } catch (e) {
             throw new common_1.InternalServerErrorException()
@@ -111,9 +114,11 @@ BotService = __decorate(
     [
         (0, common_1.Injectable)(),
         __param(0, (0, typeorm_1.InjectRepository)(bot_entity_1.BotEntity)),
+        __param(2, (0, common_1.Inject)(member_service_1.MemberService)),
         __metadata('design:paramtypes', [
             bot_repository_1.BotRepository,
             auth_service_1.AuthService,
+            member_service_1.MemberService,
         ]),
     ],
     BotService

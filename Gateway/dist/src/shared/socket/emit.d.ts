@@ -51,3 +51,13 @@ export declare enum ReactSocketEmit {
     UPDATE = 'update',
     DELETE = 'delete',
 }
+export declare enum ActionSocketEmit {
+    CREATE = 'create',
+    UPDATE = 'update',
+    DELETE = 'delete',
+}
+export declare enum ButtonSocketEmit {
+    CREATE = 'create',
+    UPDATE = 'update',
+    DELETE = 'delete',
+}

@@ -57,3 +57,13 @@ export declare enum ReactSocketEvent {
     UPDATE = 'update',
     DELETE = 'delete',
 }
+export declare enum ActionSocketEvent {
+    CREATE = 'create',
+    UPDATE = 'update',
+    DELETE = 'delete',
+}
+export declare enum ButtonSocketEvent {
+    CREATE = 'create',
+    UPDATE = 'update',
+    DELETE = 'delete',
+}

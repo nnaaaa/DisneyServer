@@ -9,7 +9,7 @@ export class CommandEntity {
     @Column()
     name: string
 
-    @Column({ type: 'longtext' })
+    @Column({ type: 'text' })
     description: string
 
     /** @relationship */

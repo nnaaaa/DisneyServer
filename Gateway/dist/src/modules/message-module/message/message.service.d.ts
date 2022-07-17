@@ -2,14 +2,14 @@ import { MessageEntity } from 'src/entities/message.entity'
 import { MessageRepository } from 'src/repositories/message.repository'
 import { ChannelDto, MemberDto } from 'src/shared/dtos'
 import { FindOptionsRelations, FindOptionsWhere } from 'typeorm'
-import { ReactService } from '../react/react.service'
+import { ActionService } from '../action/action.service'
 import { CreateMessageDto } from './dtos/createMessage.dto'
 import { UpdateMessageDto } from './dtos/updateMessage.dto'
 export declare class MessageService {
     private messageRepository
-    private reactService
+    private actionService
     readonly messageRelations: FindOptionsRelations<MessageEntity>
-    constructor(messageRepository: MessageRepository, reactService: ReactService)
+    constructor(messageRepository: MessageRepository, actionService: ActionService)
     save(message: MessageEntity): Promise<MessageEntity>
     create(
         createMessageDto: CreateMessageDto,

@@ -1,4 +1,4 @@
-import { Default } from 'src/shared/default'
+import { Constant } from 'src/shared/utils/constant'
 import {
     Column,
     Entity,
@@ -39,7 +39,7 @@ export class RoleEntity {
     @Column({ nullable: true })
     icon?: string
 
-    @Column({ default: Default.roleColor })
+    @Column({ default: Constant.roleColor })
     color: string
 
     /** @relationship */
