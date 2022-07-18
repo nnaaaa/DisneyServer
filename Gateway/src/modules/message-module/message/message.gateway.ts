@@ -25,6 +25,8 @@ import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
 import { CreateMessageDto } from './dtos/createMessage.dto'
 import { UpdateMessageDto } from './dtos/updateMessage.dto'
 import { MessageService } from './message.service'
+import { ButtonService } from '../button/button.service'
+import { ActionService } from '../action/action.service'
 
 @WebSocketGateway({ cors: { origin: '*' }, namespace: SocketNamespace.MESSAGE })
 export class MessageGateway {
@@ -36,7 +38,9 @@ export class MessageGateway {
     constructor(
         private messageService: MessageService,
         @Inject(GuildService) private guildService: GuildService,
-        @Inject(BotService) private botService: BotService
+        @Inject(BotService) private botService: BotService,
+        private buttonService: ButtonService,
+        private actionService: ActionService
     ) {}
 
     @UseGuards(JwtUserWsGuard)
@@ -77,6 +81,16 @@ export class MessageGateway {
                 authorDto,
                 replyTo
             )
+
+            const createdAction = await this.actionService.create({})
+            const savedAction = await this.actionService.save(createdAction)
+            
+            for (const button of createMessageDto.action.buttons) {
+                const createdButton = await this.buttonService.create(button, savedAction)
+                savedAction.buttons.push(createdButton)
+            }
+
+            newMessage.action = savedAction
 
             const savedMessage = await this.messageService.save(newMessage)
 

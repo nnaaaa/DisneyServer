@@ -38,7 +38,7 @@ export class MemberGateway {
         return joinedGuilds
     }
 
-    /** @return GuildEntity which user have joined */
+    /** @return GuildEntity which bot have joined */
     @UseGuards(JwtUserWsGuard)
     @SubscribeMessage(MemberSocketEvent.BOT_JOIN)
     async botJoinGuild(
@@ -52,6 +52,8 @@ export class MemberGateway {
                 `${guildOfMemberDto.guildId}/${MemberSocketEmit.JOIN}`,
                 botMember
             )
+
+            this.server.emit(`${botDto.botId}/${SocketNamespace.MEMBER}/${MemberSocketEmit.JOIN}`, botMember)
 
             return botMember
         } catch (e) {
@@ -103,6 +105,11 @@ export class MemberGateway {
             const memberLeaveGuild = await this.memberService.deleteOne({ memberId })
 
             this.server.emit(`${MemberSocketEmit.LEAVE}/${memberId}`, memberLeaveGuild)
+
+
+            if (memberLeaveGuild.bot) {
+                this.server.emit(`${memberLeaveGuild.bot.botId}/${SocketNamespace.MEMBER}/${MemberSocketEmit.LEAVE}`, memberLeaveGuild)
+            }
         } catch (e) {
             this.logger.error(e)
             return e

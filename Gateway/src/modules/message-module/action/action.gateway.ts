@@ -34,7 +34,6 @@ export class ActionGateway {
             const action = await this.actionService.create({
                 message: messageOfActionDto,
             })
-            console.log(action)
 
             const savedAction = await this.actionService.save(action)
 

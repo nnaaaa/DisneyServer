@@ -2,6 +2,7 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    JoinColumn,
     JoinTable,
     ManyToOne,
     OneToMany,
@@ -28,7 +29,8 @@ export class MessageEntity {
     createdAt: Date
 
     /** @relationship */
-    @OneToOne(() => ActionEntity, (type) => type.message, { onUpdate: 'CASCADE' })
+    @OneToOne(() => ActionEntity, (type) => type.message)
+    @JoinColumn()
     action: ActionEntity
 
     @ManyToOne(() => ChannelEntity, (type) => type.messages)

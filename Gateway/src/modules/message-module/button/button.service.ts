@@ -14,7 +14,6 @@ export class ButtonService {
 
     constructor(
         @InjectRepository(ButtonEntity) private buttonRepository: ButtonRepository,
-        private reactService: ReactService
     ) {}
 
     async save(Button: ButtonEntity) {
@@ -26,6 +25,9 @@ export class ButtonService {
             ...createButtonDto,
             action,
         })
+
+        if (!createButtonDto.customId) 
+            newButton.customId = createButtonDto.name
 
         return newButton
     }

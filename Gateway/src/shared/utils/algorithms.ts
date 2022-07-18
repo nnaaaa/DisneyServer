@@ -1,5 +1,5 @@
 export class Algorithm {
-    static commandRegex = new RegExp(/(\w+)\.(\w+)\((((\w|\s)+,)*)+((\w|\s)+)\)/)
+    static commandRegex = new RegExp(/(\w+)\.(\w+)\((((\w|\s)+,)*)+((\w|\s)+)*\)/)
     static argsFuncRegex = new RegExp(/(?:\()(.+)+(?:\))/)
     static funcNameRegex = new RegExp(/(?:\.)(\w+)/)
 

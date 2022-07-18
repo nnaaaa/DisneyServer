@@ -1,111 +1,74 @@
-'use strict'
-var __decorate =
-    (this && this.__decorate) ||
-    function (decorators, target, key, desc) {
-        var c = arguments.length,
-            r =
-                c < 3
-                    ? target
-                    : desc === null
-                    ? (desc = Object.getOwnPropertyDescriptor(target, key))
-                    : desc,
-            d
-        if (typeof Reflect === 'object' && typeof Reflect.decorate === 'function')
-            r = Reflect.decorate(decorators, target, key, desc)
-        else
-            for (var i = decorators.length - 1; i >= 0; i--)
-                if ((d = decorators[i]))
-                    r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r
-        return c > 3 && r && Object.defineProperty(target, key, r), r
-    }
-var __metadata =
-    (this && this.__metadata) ||
-    function (k, v) {
-        if (typeof Reflect === 'object' && typeof Reflect.metadata === 'function')
-            return Reflect.metadata(k, v)
-    }
-var __param =
-    (this && this.__param) ||
-    function (paramIndex, decorator) {
-        return function (target, key) {
-            decorator(target, key, paramIndex)
-        }
-    }
-Object.defineProperty(exports, '__esModule', { value: true })
-exports.JwtWsGuard = void 0
-const common_1 = require('@nestjs/common')
-const jwt_1 = require('@nestjs/jwt')
-const websockets_1 = require('@nestjs/websockets')
-const user_service_1 = require('../../user/user.service')
-const bot_service_1 = require('../../../bot-module/bot/bot.service')
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.JwtWsGuard = void 0;
+const common_1 = require("@nestjs/common");
+const jwt_1 = require("@nestjs/jwt");
+const websockets_1 = require("@nestjs/websockets");
+const user_service_1 = require("../../user/user.service");
+const bot_service_1 = require("../../../bot-module/bot/bot.service");
 let JwtWsGuard = class JwtWsGuard {
     constructor(userService, botService, jwtService) {
-        this.userService = userService
-        this.botService = botService
-        this.jwtService = jwtService
+        this.userService = userService;
+        this.botService = botService;
+        this.jwtService = jwtService;
     }
     async canActivate(context) {
         try {
-            const client = context.switchToWs().getClient()
+            const client = context.switchToWs().getClient();
             if (!client.handshake.headers || !client.handshake.headers.authorization) {
-                throw new websockets_1.WsException('Token is required')
+                throw new websockets_1.WsException('Token is required');
             }
             const accessToken = client.handshake.headers.authorization
                 .replace('Bearer', '')
-                .trim()
-            if (!accessToken) throw new websockets_1.WsException('Token is required')
-            const tokenPayload = this.jwtService.verify(accessToken)
-            if (
-                tokenPayload === null || tokenPayload === void 0
-                    ? void 0
-                    : tokenPayload.userId
-            ) {
+                .trim();
+            if (!accessToken)
+                throw new websockets_1.WsException('Token is required');
+            const tokenPayload = this.jwtService.verify(accessToken);
+            if (tokenPayload === null || tokenPayload === void 0 ? void 0 : tokenPayload.userId) {
                 const user = await this.userService.findOne({
-                    userId:
-                        tokenPayload === null || tokenPayload === void 0
-                            ? void 0
-                            : tokenPayload.userId,
-                })
+                    userId: tokenPayload === null || tokenPayload === void 0 ? void 0 : tokenPayload.userId,
+                });
                 if (user) {
-                    client.user = user
-                    return true
+                    client.user = user;
+                    return true;
                 }
             }
-            if (
-                tokenPayload === null || tokenPayload === void 0
-                    ? void 0
-                    : tokenPayload.botId
-            ) {
+            if (tokenPayload === null || tokenPayload === void 0 ? void 0 : tokenPayload.botId) {
                 const bot = await this.botService.findOneWithRelation({
-                    botId:
-                        tokenPayload === null || tokenPayload === void 0
-                            ? void 0
-                            : tokenPayload.botId,
-                })
+                    botId: tokenPayload === null || tokenPayload === void 0 ? void 0 : tokenPayload.botId,
+                });
                 if (bot) {
-                    client.user = bot
-                    return true
+                    client.user = bot;
+                    return true;
                 }
             }
-            return false
-        } catch (_a) {
-            return false
+            return false;
+        }
+        catch (_a) {
+            return false;
         }
     }
-}
-JwtWsGuard = __decorate(
-    [
-        (0, common_1.Injectable)(),
-        __param(0, (0, common_1.Inject)(user_service_1.UserService)),
-        __param(1, (0, common_1.Inject)(bot_service_1.BotService)),
-        __param(2, (0, common_1.Inject)(jwt_1.JwtService)),
-        __metadata('design:paramtypes', [
-            user_service_1.UserService,
-            bot_service_1.BotService,
-            jwt_1.JwtService,
-        ]),
-    ],
-    JwtWsGuard
-)
-exports.JwtWsGuard = JwtWsGuard
+};
+JwtWsGuard = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, common_1.Inject)(user_service_1.UserService)),
+    __param(1, (0, common_1.Inject)(bot_service_1.BotService)),
+    __param(2, (0, common_1.Inject)(jwt_1.JwtService)),
+    __metadata("design:paramtypes", [user_service_1.UserService,
+        bot_service_1.BotService,
+        jwt_1.JwtService])
+], JwtWsGuard);
+exports.JwtWsGuard = JwtWsGuard;
 //# sourceMappingURL=jwtWS.guard.js.map

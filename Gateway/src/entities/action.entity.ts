@@ -8,10 +8,10 @@ export class ActionEntity {
     @PrimaryGeneratedColumn('uuid')
     actionId: string
 
-    @OneToMany(() => ReactEntity, (react) => react.action, { cascade: true })
+    @OneToMany(() => ReactEntity, (type) => type.action, { cascade: true })
     reacts: ReactEntity[]
 
-    @OneToMany(() => ButtonEntity, (react) => react.action, { cascade: true })
+    @OneToMany(() => ButtonEntity, (type) => type.action, { cascade: true })
     buttons: ButtonEntity[]
 
     @OneToOne(() => MessageEntity, (type) => type.action, { cascade: true })

@@ -1,4 +1,5 @@
-import { IsArray, IsOptional, IsString } from 'class-validator'
+import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator'
+import { CreateActionDto } from '../../action/dtos/createAction.dto'
 
 export class CreateMessageDto {
     @IsString()
@@ -8,4 +9,7 @@ export class CreateMessageDto {
     @IsArray()
     @IsOptional()
     images: string[]
+
+    @ValidateNested()
+    action: CreateActionDto
 }

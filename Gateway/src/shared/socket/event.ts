@@ -78,4 +78,5 @@ export enum ButtonSocketEvent {
     CREATE = 'create',
     UPDATE = 'update',
     DELETE = 'delete',
+    CLICK = 'click',
 }

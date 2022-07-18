@@ -38,6 +38,7 @@ export class MessageService {
             author,
             channel,
         })
+        delete newMessage.action
 
         if (replyTo) {
             const to = await this.findOneWithRelation({ messageId: replyTo })

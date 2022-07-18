@@ -6,6 +6,7 @@ import {
     WebSocketServer,
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
+import { ButtonEntity } from 'src/entities/button.entity'
 import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
 import { ActionDto } from 'src/shared/dtos/action.dto'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
@@ -41,9 +42,11 @@ export class ButtonGateway {
                 actionOfButton
             )
 
+            const savedButton = await this.buttonService.save(button)
+
             this.server.emit(
                 `${actionOfButton.actionId}/${ButtonSocketEmit.CREATE}`,
-                button
+                savedButton
             )
         } catch (e) {
             this.logger.error(e)
@@ -79,6 +82,19 @@ export class ButtonGateway {
             await this.buttonService.deleteOne({ buttonId })
 
             this.server.emit(`${ButtonSocketEmit.DELETE}/${buttonId}`, buttonId)
+        } catch (e) {
+            this.logger.error(e)
+            return e
+        }
+    }
+
+
+    @UseGuards(JwtUserWsGuard)
+    @SubscribeMessage(ButtonSocketEvent.CLICK)
+    @UsePipes(new ValidationPipe())
+    async click(@MessageBody() button: UpdateButtonDto) {
+        try {
+            this.server.emit(`${SocketNamespace.BUTTON}/${ButtonSocketEmit.CLICK}/${button.buttonId}`, button)
         } catch (e) {
             this.logger.error(e)
             return e
