@@ -53,7 +53,10 @@ export class MemberGateway {
                 botMember
             )
 
-            this.server.emit(`${botDto.botId}/${SocketNamespace.MEMBER}/${MemberSocketEmit.JOIN}`, botMember)
+            this.server.emit(
+                `${botDto.botId}/${SocketNamespace.MEMBER}/${MemberSocketEmit.JOIN}`,
+                botMember
+            )
 
             return botMember
         } catch (e) {
@@ -106,9 +109,11 @@ export class MemberGateway {
 
             this.server.emit(`${MemberSocketEmit.LEAVE}/${memberId}`, memberLeaveGuild)
 
-
             if (memberLeaveGuild.bot) {
-                this.server.emit(`${memberLeaveGuild.bot.botId}/${SocketNamespace.MEMBER}/${MemberSocketEmit.LEAVE}`, memberLeaveGuild)
+                this.server.emit(
+                    `${memberLeaveGuild.bot.botId}/${SocketNamespace.MEMBER}/${MemberSocketEmit.LEAVE}`,
+                    memberLeaveGuild
+                )
             }
         } catch (e) {
             this.logger.error(e)

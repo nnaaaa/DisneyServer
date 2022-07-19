@@ -5,6 +5,7 @@ import { MessageRepository } from 'src/repositories/message.repository'
 import { ChannelDto, MemberDto } from 'src/shared/dtos'
 import { FindOptionsRelations, FindOptionsWhere } from 'typeorm'
 import { ActionService } from '../action/action.service'
+import { ButtonService } from '../button/button.service'
 import { CreateMessageDto } from './dtos/createMessage.dto'
 import { UpdateMessageDto } from './dtos/updateMessage.dto'
 
@@ -13,13 +14,18 @@ export class MessageService {
     public readonly messageRelations: FindOptionsRelations<MessageEntity> = {
         author: true,
         channel: true,
+        action: {
+            buttons: true,
+            reacts: true,
+        },
         replies: true,
         replyTo: true,
     }
 
     constructor(
         @InjectRepository(MessageEntity) private messageRepository: MessageRepository,
-        private actionService: ActionService
+        private actionService: ActionService,
+        private buttonService: ButtonService
     ) {}
 
     async save(message: MessageEntity) {
@@ -38,7 +44,18 @@ export class MessageService {
             author,
             channel,
         })
-        delete newMessage.action
+
+        const createdAction = await this.actionService.create({})
+        const savedAction = await this.actionService.save(createdAction)
+
+        if (createMessageDto.action) {
+            for (const button of createMessageDto.action.buttons) {
+                const createdButton = await this.buttonService.create(button, savedAction)
+                savedAction.buttons.push(createdButton)
+            }
+        }
+        newMessage.action = savedAction
+        await this.actionService.save(savedAction)
 
         if (replyTo) {
             const to = await this.findOneWithRelation({ messageId: replyTo })
@@ -48,6 +65,40 @@ export class MessageService {
         }
 
         return newMessage
+    }
+
+    async updateOne(updateMessageDto: UpdateMessageDto) {
+        try {
+            const message = await this.findOneWithRelation({
+                messageId: updateMessageDto.messageId,
+            })
+            if (message) {
+                if (updateMessageDto.action) {
+                    //xóa button cũ
+                    this.buttonService.deleteMany({
+                        action: { actionId: message.action.actionId },
+                    })
+
+                    message.action.buttons = []
+                    for (const button of updateMessageDto.action.buttons) {
+                        const createdButton = await this.buttonService.create(
+                            button,
+                            message.action
+                        )
+                        message.action.buttons.push(createdButton)
+                    }
+                    this.actionService.save(message.action)
+
+                    delete updateMessageDto.action
+                }
+                return await this.save(
+                    this.messageRepository.merge(message, updateMessageDto)
+                )
+            }
+            return null
+        } catch (e) {
+            throw new InternalServerErrorException(e)
+        }
     }
 
     async findOneWithRelation(findCondition: FindOptionsWhere<MessageEntity>) {
@@ -68,20 +119,6 @@ export class MessageService {
             // relations: this.messageRelations,
             where: findCondition,
         })
-    }
-
-    async updateOne(updateMessageDto: UpdateMessageDto) {
-        try {
-            let message = await this.findOneWithRelation({
-                messageId: updateMessageDto.messageId,
-            })
-
-            message = Object.assign(message, updateMessageDto)
-
-            return await this.save(message)
-        } catch (e) {
-            throw new InternalServerErrorException(e)
-        }
     }
 
     async deleteOne(findCondition: FindOptionsWhere<MessageEntity>) {

@@ -1,4 +1,4 @@
 export declare class CreateButtonDto {
-    customId?: string;
-    name: string;
+    customId?: string
+    name: string
 }

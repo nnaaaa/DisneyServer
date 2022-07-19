@@ -22,7 +22,6 @@ export class JwtWsGuard implements CanActivate {
             const accessToken = client.handshake.headers.authorization
                 .replace('Bearer', '')
                 .trim()
-
             if (!accessToken) throw new WsException('Token is required')
             const tokenPayload: UserTokenPayload | BotTokenPayload =
                 this.jwtService.verify(accessToken)

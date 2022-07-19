@@ -10,10 +10,12 @@ import { UpdateButtonDto } from './dto/updateButton.dto'
 
 @Injectable()
 export class ButtonService {
-    public readonly buttonRelations: FindOptionsRelations<ButtonEntity> = {}
+    public readonly buttonRelations: FindOptionsRelations<ButtonEntity> = {
+        action: true,
+    }
 
     constructor(
-        @InjectRepository(ButtonEntity) private buttonRepository: ButtonRepository,
+        @InjectRepository(ButtonEntity) private buttonRepository: ButtonRepository
     ) {}
 
     async save(Button: ButtonEntity) {
@@ -26,8 +28,7 @@ export class ButtonService {
             action,
         })
 
-        if (!createButtonDto.customId) 
-            newButton.customId = createButtonDto.name
+        if (!newButton.customId) newButton.customId = createButtonDto.name
 
         return newButton
     }
@@ -37,6 +38,13 @@ export class ButtonService {
             where: findCondition,
         })
     }
+    async findOneWithRelation(findCondition: FindOptionsWhere<ButtonEntity>) {
+        return await this.buttonRepository.findOne({
+            where: findCondition,
+            relations: this.buttonRelations,
+        })
+    }
+
     async findMany(findCondition: FindOptionsWhere<ButtonEntity>) {
         return this.buttonRepository.find({
             where: findCondition,

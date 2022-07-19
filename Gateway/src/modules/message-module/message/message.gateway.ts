@@ -4,7 +4,6 @@ import {
     SubscribeMessage,
     WebSocketGateway,
     WebSocketServer,
-    WsException,
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
 import { BotEntity } from 'src/entities/bot.entity'
@@ -12,7 +11,6 @@ import { UserEntity } from 'src/entities/user.entity'
 import { JwtWsGuard } from 'src/modules/auth-module/auth/guards/jwtWS.guard'
 import { BotService } from 'src/modules/bot-module/bot/bot.service'
 import { GuildService } from 'src/modules/guild-module/guild/guild.service'
-import { Algorithm } from 'src/shared/utils/algorithms'
 import { AuthWSUser } from 'src/shared/decorators/auth-user.decorator'
 import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
 import { ChannelDto, MemberDto } from 'src/shared/dtos'
@@ -20,13 +18,12 @@ import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { MessageSocketEmit } from 'src/shared/socket/emit'
 import { MessageSocketEvent } from 'src/shared/socket/event'
 import { SocketNamespace } from 'src/shared/socket/namespace'
+import { Algorithm } from 'src/shared/utils/algorithms'
 import { In } from 'typeorm'
 import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
 import { CreateMessageDto } from './dtos/createMessage.dto'
 import { UpdateMessageDto } from './dtos/updateMessage.dto'
 import { MessageService } from './message.service'
-import { ButtonService } from '../button/button.service'
-import { ActionService } from '../action/action.service'
 
 @WebSocketGateway({ cors: { origin: '*' }, namespace: SocketNamespace.MESSAGE })
 export class MessageGateway {
@@ -38,9 +35,7 @@ export class MessageGateway {
     constructor(
         private messageService: MessageService,
         @Inject(GuildService) private guildService: GuildService,
-        @Inject(BotService) private botService: BotService,
-        private buttonService: ButtonService,
-        private actionService: ActionService
+        @Inject(BotService) private botService: BotService
     ) {}
 
     @UseGuards(JwtUserWsGuard)
@@ -52,8 +47,6 @@ export class MessageGateway {
             const messages = await this.messageService.findManyWithRelation({
                 author: { memberId: In(bot.joinedGuilds.map((guild) => guild.memberId)) },
             })
-
-            // this.server.emit(`${MessageSocketEmit.FIND}`, messages)
 
             return messages
         } catch (e) {
@@ -81,19 +74,7 @@ export class MessageGateway {
                 authorDto,
                 replyTo
             )
-
-            const createdAction = await this.actionService.create({})
-            const savedAction = await this.actionService.save(createdAction)
-            
-            for (const button of createMessageDto.action.buttons) {
-                const createdButton = await this.buttonService.create(button, savedAction)
-                savedAction.buttons.push(createdButton)
-            }
-
-            newMessage.action = savedAction
-
             const savedMessage = await this.messageService.save(newMessage)
-
             const [message, guild] = await Promise.all([
                 this.messageService.findOneWithRelation({
                     messageId: savedMessage.messageId,
@@ -111,7 +92,6 @@ export class MessageGateway {
 
             //emit to bot clients
             const inspected = Algorithm.inspectCommand(message.content)
-
             if (inspected) {
                 botList.forEach((bot) => {
                     const { botName, args, name } = inspected
@@ -137,27 +117,42 @@ export class MessageGateway {
                 `botManager/${(userOrBot as BotEntity)?.botId}/${
                     SocketNamespace.MESSAGE
                 }/${MessageSocketEmit.CREATE}`,
-                savedMessage
+                message
             )
+
+            return message
         } catch (e) {
             this.logger.error(e)
             return e
         }
     }
 
-    @UseGuards(JwtUserWsGuard)
+    @UseGuards(JwtWsGuard)
     @RolePermissions(['UPDATE_MESSAGE'])
     @UseGuards(GuildPermissionGuard)
     @SubscribeMessage(MessageSocketEvent.UPDATE)
     @UsePipes(new ValidationPipe())
-    async update(@MessageBody() updateMessageDto: UpdateMessageDto) {
+    async update(
+        @MessageBody('message') updateMessageDto: UpdateMessageDto,
+        @AuthWSUser() userOrBot: BotEntity | UserEntity
+    ) {
         try {
-            this.messageService.updateOne(updateMessageDto)
+            const updatedMessage = await this.messageService.updateOne(updateMessageDto)
 
             this.server.emit(
                 `${MessageSocketEmit.UPDATE}/${updateMessageDto.messageId}`,
                 updateMessageDto
             )
+
+            //emit to bot manager
+            this.server.emit(
+                `botManager/${(userOrBot as BotEntity)?.botId}/${
+                    SocketNamespace.MESSAGE
+                }/${MessageSocketEmit.UPDATE}`,
+                updatedMessage
+            )
+
+            return updatedMessage
         } catch (e) {
             this.logger.error(e)
             return e

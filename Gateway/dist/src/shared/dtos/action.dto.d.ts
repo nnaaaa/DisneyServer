@@ -1,3 +1,3 @@
 export declare class ActionDto {
-    actionId: string;
+    actionId: string
 }

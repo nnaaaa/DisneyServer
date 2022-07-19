@@ -1,2 +1,1 @@
-export declare class ReactModule {
-}
+export declare class ReactModule {}

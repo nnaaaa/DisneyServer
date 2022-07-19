@@ -1,2 +1,1 @@
-export declare class ActionModule {
-}
+export declare class ActionModule {}

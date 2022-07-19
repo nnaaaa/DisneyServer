@@ -4,12 +4,13 @@ import { CreateActionDto } from '../../action/dtos/createAction.dto'
 export class CreateMessageDto {
     @IsString()
     @IsOptional()
-    content: string
+    content?: string
 
     @IsArray()
     @IsOptional()
-    images: string[]
+    images?: string[]
 
     @ValidateNested()
-    action: CreateActionDto
+    @IsOptional()
+    action?: CreateActionDto
 }

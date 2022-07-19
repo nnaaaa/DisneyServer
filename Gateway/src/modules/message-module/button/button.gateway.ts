@@ -67,6 +67,8 @@ export class ButtonGateway {
                 `${ButtonSocketEmit.UPDATE}/${updateButtonDto.buttonId}`,
                 updatedButton
             )
+
+            return updatedButton
         } catch (e) {
             this.logger.error(e)
             return e
@@ -88,13 +90,16 @@ export class ButtonGateway {
         }
     }
 
-
     @UseGuards(JwtUserWsGuard)
     @SubscribeMessage(ButtonSocketEvent.CLICK)
     @UsePipes(new ValidationPipe())
-    async click(@MessageBody() button: UpdateButtonDto) {
+    async click(@MessageBody() buttonDto: UpdateButtonDto) {
         try {
-            this.server.emit(`${SocketNamespace.BUTTON}/${ButtonSocketEmit.CLICK}/${button.buttonId}`, button)
+            const button = await this.buttonService.findOneWithRelation(buttonDto)
+            this.server.emit(
+                `${button.action.actionId}/${SocketNamespace.BUTTON}/${ButtonSocketEmit.CLICK}`,
+                button
+            )
         } catch (e) {
             this.logger.error(e)
             return e

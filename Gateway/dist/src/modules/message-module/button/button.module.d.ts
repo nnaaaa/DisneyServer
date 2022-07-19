@@ -1,2 +1,1 @@
-export declare class ButtonModule {
-}
+export declare class ButtonModule {}
