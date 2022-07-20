@@ -2,17 +2,15 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    JoinColumn,
-    JoinTable,
-    ManyToOne,
+    JoinColumn, ManyToOne,
     OneToMany,
     OneToOne,
     PrimaryGeneratedColumn,
+    UpdateDateColumn
 } from 'typeorm'
 import { ActionEntity } from './action.entity'
 import { ChannelEntity } from './channel.entity'
 import { MemberEntity } from './member.entity'
-import { ReactEntity } from './react.entity'
 
 @Entity()
 export class MessageEntity {
@@ -27,6 +25,9 @@ export class MessageEntity {
 
     @CreateDateColumn()
     createdAt: Date
+
+    @UpdateDateColumn()
+    updatedAt: Date
 
     /** @relationship */
     @OneToOne(() => ActionEntity, (type) => type.message)

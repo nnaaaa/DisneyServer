@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { ButtonStyle } from 'src/entities/button.entity'
 
 export class CreateButtonDto {
     @IsString()
@@ -8,4 +9,12 @@ export class CreateButtonDto {
     @IsString()
     @IsNotEmpty()
     name: string
+
+    @IsEnum(ButtonStyle)
+    @IsOptional()
+    style?: ButtonStyle
+
+    @IsBoolean()
+    @IsOptional()
+    isDisabled: boolean
 }

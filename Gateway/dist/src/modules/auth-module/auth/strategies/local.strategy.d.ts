@@ -1,12 +1,9 @@
-import { Strategy } from 'passport-local'
-import { UserService } from 'src/modules/auth-module/user/user.service'
-declare const LocalStrategy_base: new (...args: any[]) => Strategy
+import { Strategy } from 'passport-local';
+import { UserService } from 'src/modules/auth-module/user/user.service';
+declare const LocalStrategy_base: new (...args: any[]) => Strategy;
 export declare class LocalStrategy extends LocalStrategy_base {
-    private useService
-    constructor(useService: UserService)
-    validate(
-        account: string,
-        password: string
-    ): Promise<import('../../../../entities/user.entity').UserEntity>
+    private useService;
+    constructor(useService: UserService);
+    validate(account: string, password: string): Promise<import("../../../../entities/user.entity").UserEntity>;
 }
-export {}
+export {};

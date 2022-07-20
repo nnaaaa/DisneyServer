@@ -1,1 +1,2 @@
-export declare class CommandModule {}
+export declare class CommandModule {
+}

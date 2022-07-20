@@ -1,7 +1,7 @@
-import { Permission } from 'src/entities/role.entity'
+import { Permission } from 'src/entities/role.entity';
 export declare class BotDto {
-    botId: string
-    name: string
-    avatarUrl: string
-    requiredPermissions: Permission[]
+    botId: string;
+    name: string;
+    avatarUrl: string;
+    requiredPermissions: Permission[];
 }
