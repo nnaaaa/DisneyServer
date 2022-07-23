@@ -1,3 +1,4 @@
 export declare class CreateEmojiDto {
-    imageUrl: string
+    imageUrl: string;
+    name: string;
 }

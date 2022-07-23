@@ -1,4 +1,4 @@
 export declare class GenSecretKeyDto {
-    botId: string
-    oldSecretKey: string
+    botId: string;
+    oldSecretKey: string;
 }

@@ -3,6 +3,7 @@ import { IsArray, ValidateNested } from 'class-validator'
 import { MessageDto } from 'src/shared/dtos'
 import { CreateButtonDto } from '../../button/dto/createButton.dto'
 import { CreateReactDto } from '../../react/dtos/createReact.dto'
+import { CreateSelectDto } from '../../select/dtos/createSelect.dto'
 
 export class CreateActionDto {
     @ValidateNested()
@@ -18,4 +19,9 @@ export class CreateActionDto {
     @IsArray()
     @Type(() => CreateReactDto)
     reacts: CreateReactDto[]
+
+    @ValidateNested({ each: true })
+    @IsArray()
+    @Type(() => CreateSelectDto)
+    selects: CreateSelectDto[]
 }

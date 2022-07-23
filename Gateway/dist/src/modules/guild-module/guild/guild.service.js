@@ -99,6 +99,7 @@ let GuildService = class GuildService {
             .createQueryBuilder('guild')
             .leftJoinAndSelect('guild.categories', 'categories')
             .leftJoinAndSelect('categories.channels', 'channels')
+            .leftJoinAndSelect('guild.emojis', 'emojis')
             .innerJoin('guild.categories', 'category')
             .innerJoin('category.channels', 'channel')
             .where('channel.channelId = :channelId', {

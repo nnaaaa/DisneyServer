@@ -23,7 +23,7 @@ import { MailService } from './mail.service'
                     },
                     preview: true,
                     template: {
-                        dir: join(__dirname, 'templates'),
+                        dir: join(process.cwd(), 'dist/templates/mail'),
                         adapter: new PugAdapter({ inlineCssEnabled: true }), // or new PugAdapter() or new EjsAdapter()
                         options: {
                             strict: true,

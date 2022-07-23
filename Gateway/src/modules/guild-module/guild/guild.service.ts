@@ -24,7 +24,7 @@ export class GuildService {
 
     constructor(
         private channelCtgService: ChannelCategoryService,
-        public readonly roleService: RoleService,
+        private roleService: RoleService,
         private memberService: MemberService,
         private emojiService: EmojiService,
         @InjectRepository(GuildEntity) private guildRepository: GuildRepository
@@ -108,6 +108,7 @@ export class GuildService {
             .createQueryBuilder('guild')
             .leftJoinAndSelect('guild.categories', 'categories')
             .leftJoinAndSelect('categories.channels', 'channels')
+            .leftJoinAndSelect('guild.emojis', 'emojis')
             .innerJoin('guild.categories', 'category')
             .innerJoin('category.channels', 'channel')
             .where('channel.channelId = :channelId', {

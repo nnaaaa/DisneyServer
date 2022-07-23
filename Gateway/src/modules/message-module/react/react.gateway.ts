@@ -23,61 +23,69 @@ export class ReactGateway {
     @WebSocketServer()
     server: Server
 
-    constructor(private reactService: ReactService) {}
+    constructor(private reactService: ReactService) { }
 
-    @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['CUD_REACT'])
-    @UseGuards(GuildPermissionGuard)
+    // @UseGuards(JwtUserWsGuard)
+    // @RolePermissions(['CUD_REACT'])
+    // @UseGuards(GuildPermissionGuard)
     @SubscribeMessage(ReactSocketEvent.CREATE)
     @UsePipes(new ValidationPipe())
     async create(@MessageBody() createReactDto: CreateReactDto) {
         try {
-            const react = await this.reactService.reactToMessage(createReactDto)
-
-            this.server.emit(
-                `${createReactDto.action.actionId}/${ReactSocketEmit.CREATE}`,
-                react
-            )
+            const reactMessage = await this.reactService.reactToMessage(createReactDto)
+            
+            if (reactMessage.type === 'create') {
+                this.server.emit(
+                    `${reactMessage.react.action.actionId}/${SocketNamespace.REACT}/${ReactSocketEmit.CREATE}`,
+                    reactMessage.react
+                )
+            }
+            else if (reactMessage.type === 'delete') {
+                this.server.emit(
+                    `${reactMessage.react.action.actionId}/${SocketNamespace.REACT}/${ReactSocketEmit.DELETE}`,
+                    reactMessage.react
+                )
+            }
         } catch (e) {
             this.logger.error(e)
             return e
         }
     }
 
-    @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['CUD_REACT'])
-    @UseGuards(GuildPermissionGuard)
-    @SubscribeMessage(ReactSocketEvent.UPDATE)
-    @UsePipes(new ValidationPipe())
-    async update(
-        @MessageBody('reactId') reactId: string,
-        @MessageBody('emoji') emojiOfReactDto: EmojiDto
-    ) {
-        try {
-            const updatedReact = await this.reactService.updateOne(
-                reactId,
-                emojiOfReactDto
-            )
+    // @UseGuards(JwtUserWsGuard)
+    // @RolePermissions(['CUD_REACT'])
+    // @UseGuards(GuildPermissionGuard)
+    // @SubscribeMessage(ReactSocketEvent.UPDATE)
+    // @UsePipes(new ValidationPipe())
+    // async update(
+    //     @MessageBody('reactId') reactId: string,
+    //     @MessageBody('emoji') emojiOfReactDto: EmojiDto
+    // ) {
+    //     try {
+    //         const updatedReact = await this.reactService.updateOne(
+    //             reactId,
+    //             emojiOfReactDto
+    //         )
 
-            this.server.emit(`${ReactSocketEmit.UPDATE}/${reactId}`, updatedReact)
-        } catch (e) {
-            this.logger.error(e)
-            return e
-        }
-    }
+    //         this.server.emit(`${ReactSocketEmit.UPDATE}/${reactId}`, updatedReact)
+    //     } catch (e) {
+    //         this.logger.error(e)
+    //         return e
+    //     }
+    // }
 
-    @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['CUD_REACT'])
-    @UseGuards(GuildPermissionGuard)
-    @SubscribeMessage(ReactSocketEvent.DELETE)
-    async delete(@MessageBody('reactId') reactId: string) {
-        try {
-            this.reactService.deleteOne({ reactId })
+    // @UseGuards(JwtUserWsGuard)
+    // @RolePermissions(['CUD_REACT'])
+    // @UseGuards(GuildPermissionGuard)
+    // @SubscribeMessage(ReactSocketEvent.DELETE)
+    // async delete(@MessageBody('reactId') reactId: string) {
+    //     try {
+    //         this.reactService.deleteOne({ reactId })
 
-            this.server.emit(`${ReactSocketEmit.DELETE}/${reactId}`, reactId)
-        } catch (e) {
-            this.logger.error(e)
-            return e
-        }
-    }
+    //         this.server.emit(`${ReactSocketEmit.DELETE}/${reactId}`, reactId)
+    //     } catch (e) {
+    //         this.logger.error(e)
+    //         return e
+    //     }
+    // }
 }

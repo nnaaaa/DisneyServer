@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ButtonEntity = exports.ButtonStyle = void 0;
+const member_entity_1 = require("./member.entity");
 const typeorm_1 = require("typeorm");
 const action_entity_1 = require("./action.entity");
 var ButtonStyle;
@@ -27,7 +28,7 @@ __decorate([
     __metadata("design:type", String)
 ], ButtonEntity.prototype, "buttonId", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ default: '' }),
     __metadata("design:type", String)
 ], ButtonEntity.prototype, "customId", void 0);
 __decorate([
@@ -46,6 +47,10 @@ __decorate([
     (0, typeorm_1.ManyToOne)(() => action_entity_1.ActionEntity, (react) => react.buttons),
     __metadata("design:type", action_entity_1.ActionEntity)
 ], ButtonEntity.prototype, "action", void 0);
+__decorate([
+    (0, typeorm_1.ManyToMany)(() => member_entity_1.MemberEntity),
+    __metadata("design:type", Array)
+], ButtonEntity.prototype, "clickers", void 0);
 ButtonEntity = __decorate([
     (0, typeorm_1.Entity)()
 ], ButtonEntity);

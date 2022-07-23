@@ -17,13 +17,9 @@ exports.ReactGateway = void 0;
 const common_1 = require("@nestjs/common");
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
-const role_permission_decorator_1 = require("../../../shared/decorators/role-permission.decorator");
-const dtos_1 = require("../../../shared/dtos");
-const permission_guard_1 = require("../../../shared/guards/permission.guard");
 const emit_1 = require("../../../shared/socket/emit");
 const event_1 = require("../../../shared/socket/event");
 const namespace_1 = require("../../../shared/socket/namespace");
-const jwtWSUser_guard_1 = require("../../auth-module/auth/guards/jwtWSUser.guard");
 const createReact_dto_1 = require("./dtos/createReact.dto");
 const react_service_1 = require("./react.service");
 let ReactGateway = ReactGateway_1 = class ReactGateway {
@@ -33,28 +29,13 @@ let ReactGateway = ReactGateway_1 = class ReactGateway {
     }
     async create(createReactDto) {
         try {
-            const react = await this.reactService.reactToMessage(createReactDto);
-            this.server.emit(`${createReactDto.action.actionId}/${emit_1.ReactSocketEmit.CREATE}`, react);
-        }
-        catch (e) {
-            this.logger.error(e);
-            return e;
-        }
-    }
-    async update(reactId, emojiOfReactDto) {
-        try {
-            const updatedReact = await this.reactService.updateOne(reactId, emojiOfReactDto);
-            this.server.emit(`${emit_1.ReactSocketEmit.UPDATE}/${reactId}`, updatedReact);
-        }
-        catch (e) {
-            this.logger.error(e);
-            return e;
-        }
-    }
-    async delete(reactId) {
-        try {
-            this.reactService.deleteOne({ reactId });
-            this.server.emit(`${emit_1.ReactSocketEmit.DELETE}/${reactId}`, reactId);
+            const reactMessage = await this.reactService.reactToMessage(createReactDto);
+            if (reactMessage.type === 'create') {
+                this.server.emit(`${reactMessage.react.action.actionId}/${namespace_1.SocketNamespace.REACT}/${emit_1.ReactSocketEmit.CREATE}`, reactMessage.react);
+            }
+            else if (reactMessage.type === 'delete') {
+                this.server.emit(`${reactMessage.react.action.actionId}/${namespace_1.SocketNamespace.REACT}/${emit_1.ReactSocketEmit.DELETE}`, reactMessage.react);
+            }
         }
         catch (e) {
             this.logger.error(e);
@@ -67,9 +48,6 @@ __decorate([
     __metadata("design:type", socket_io_1.Server)
 ], ReactGateway.prototype, "server", void 0);
 __decorate([
-    (0, common_1.UseGuards)(jwtWSUser_guard_1.JwtUserWsGuard),
-    (0, role_permission_decorator_1.RolePermissions)(['CUD_REACT']),
-    (0, common_1.UseGuards)(permission_guard_1.GuildPermissionGuard),
     (0, websockets_1.SubscribeMessage)(event_1.ReactSocketEvent.CREATE),
     (0, common_1.UsePipes)(new common_1.ValidationPipe()),
     __param(0, (0, websockets_1.MessageBody)()),
@@ -77,28 +55,6 @@ __decorate([
     __metadata("design:paramtypes", [createReact_dto_1.CreateReactDto]),
     __metadata("design:returntype", Promise)
 ], ReactGateway.prototype, "create", null);
-__decorate([
-    (0, common_1.UseGuards)(jwtWSUser_guard_1.JwtUserWsGuard),
-    (0, role_permission_decorator_1.RolePermissions)(['CUD_REACT']),
-    (0, common_1.UseGuards)(permission_guard_1.GuildPermissionGuard),
-    (0, websockets_1.SubscribeMessage)(event_1.ReactSocketEvent.UPDATE),
-    (0, common_1.UsePipes)(new common_1.ValidationPipe()),
-    __param(0, (0, websockets_1.MessageBody)('reactId')),
-    __param(1, (0, websockets_1.MessageBody)('emoji')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, dtos_1.EmojiDto]),
-    __metadata("design:returntype", Promise)
-], ReactGateway.prototype, "update", null);
-__decorate([
-    (0, common_1.UseGuards)(jwtWSUser_guard_1.JwtUserWsGuard),
-    (0, role_permission_decorator_1.RolePermissions)(['CUD_REACT']),
-    (0, common_1.UseGuards)(permission_guard_1.GuildPermissionGuard),
-    (0, websockets_1.SubscribeMessage)(event_1.ReactSocketEvent.DELETE),
-    __param(0, (0, websockets_1.MessageBody)('reactId')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], ReactGateway.prototype, "delete", null);
 ReactGateway = ReactGateway_1 = __decorate([
     (0, websockets_1.WebSocketGateway)({ cors: { origin: '*' }, namespace: namespace_1.SocketNamespace.REACT }),
     __metadata("design:paramtypes", [react_service_1.ReactService])

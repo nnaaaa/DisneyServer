@@ -15,6 +15,7 @@ const class_validator_1 = require("class-validator");
 const dtos_1 = require("../../../../shared/dtos");
 const createButton_dto_1 = require("../../button/dto/createButton.dto");
 const createReact_dto_1 = require("../../react/dtos/createReact.dto");
+const createSelect_dto_1 = require("../../select/dtos/createSelect.dto");
 class CreateActionDto {
 }
 __decorate([
@@ -34,5 +35,11 @@ __decorate([
     (0, class_transformer_1.Type)(() => createReact_dto_1.CreateReactDto),
     __metadata("design:type", Array)
 ], CreateActionDto.prototype, "reacts", void 0);
+__decorate([
+    (0, class_validator_1.ValidateNested)({ each: true }),
+    (0, class_validator_1.IsArray)(),
+    (0, class_transformer_1.Type)(() => createSelect_dto_1.CreateSelectDto),
+    __metadata("design:type", Array)
+], CreateActionDto.prototype, "selects", void 0);
 exports.CreateActionDto = CreateActionDto;
 //# sourceMappingURL=createAction.dto.js.map

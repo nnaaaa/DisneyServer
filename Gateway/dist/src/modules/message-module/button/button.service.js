@@ -29,8 +29,6 @@ let ButtonService = class ButtonService {
     }
     async create(createButtonDto, action) {
         const newButton = this.buttonRepository.create(Object.assign(Object.assign({}, createButtonDto), { action }));
-        if (!newButton.customId)
-            newButton.customId = createButtonDto.name;
         return newButton;
     }
     async findOne(findCondition) {

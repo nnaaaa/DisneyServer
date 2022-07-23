@@ -19,17 +19,29 @@ const message_entity_1 = require("../../../entities/message.entity");
 const message_repository_1 = require("../../../repositories/message.repository");
 const action_service_1 = require("../action/action.service");
 const button_service_1 = require("../button/button.service");
+const react_service_1 = require("../react/react.service");
+const select_service_1 = require("../select/select.service");
 let MessageService = class MessageService {
-    constructor(messageRepository, actionService, buttonService) {
+    constructor(messageRepository, actionService, buttonService, reactService, selectService) {
         this.messageRepository = messageRepository;
         this.actionService = actionService;
         this.buttonService = buttonService;
+        this.reactService = reactService;
+        this.selectService = selectService;
         this.messageRelations = {
             author: true,
             channel: true,
             action: {
                 buttons: true,
-                reacts: true,
+                reacts: {
+                    author: true,
+                    emoji: true,
+                    action: true
+                },
+                selects: {
+                    options: true,
+                    action: true
+                }
             },
             replies: true,
             replyTo: true,
@@ -47,6 +59,14 @@ let MessageService = class MessageService {
             for (const button of createMessageDto.action.buttons) {
                 const createdButton = await this.buttonService.create(button, savedAction);
                 savedAction.buttons.push(createdButton);
+            }
+            for (const react of createMessageDto.action.reacts) {
+                const createdReact = await this.reactService.create(Object.assign(Object.assign({}, react), { action: savedAction, author }));
+                savedAction.reacts.push(createdReact);
+            }
+            for (const select of createMessageDto.action.selects) {
+                const createdSelect = await this.selectService.create(select, savedAction);
+                savedAction.selects.push(createdSelect);
             }
         }
         newMessage.action = savedAction;
@@ -106,6 +126,9 @@ let MessageService = class MessageService {
     async deleteOne(findCondition) {
         try {
             const message = await this.findOneWithRelation(findCondition);
+            if (message) {
+                await this.actionService.deleteOne({ message: { messageId: message.messageId } });
+            }
             return message;
         }
         catch (e) {
@@ -115,8 +138,13 @@ let MessageService = class MessageService {
     async deleteMany(findCondition) {
         try {
             const messages = await this.findMany(findCondition);
-            const reacts = [];
-            await Promise.all(reacts);
+            const actions = [];
+            for (const message of messages) {
+                actions.push(this.actionService.deleteOne({
+                    message: { messageId: message.messageId },
+                }));
+            }
+            await Promise.all(actions);
             await this.messageRepository.remove(messages);
         }
         catch (e) {
@@ -129,7 +157,9 @@ MessageService = __decorate([
     __param(0, (0, typeorm_1.InjectRepository)(message_entity_1.MessageEntity)),
     __metadata("design:paramtypes", [message_repository_1.MessageRepository,
         action_service_1.ActionService,
-        button_service_1.ButtonService])
+        button_service_1.ButtonService,
+        react_service_1.ReactService,
+        select_service_1.SelectService])
 ], MessageService);
 exports.MessageService = MessageService;
 //# sourceMappingURL=message.service.js.map

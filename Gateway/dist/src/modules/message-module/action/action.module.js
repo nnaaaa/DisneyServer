@@ -15,6 +15,8 @@ const button_module_1 = require("../button/button.module");
 const button_service_1 = require("../button/button.service");
 const react_module_1 = require("../react/react.module");
 const react_service_1 = require("../react/react.service");
+const select_module_1 = require("../select/select.module");
+const select_service_1 = require("../select/select.service");
 const action_gateway_1 = require("./action.gateway");
 const action_service_1 = require("./action.service");
 let ActionModule = class ActionModule {
@@ -25,10 +27,11 @@ ActionModule = __decorate([
             typeorm_1.TypeOrmModule.forFeature([action_entity_1.ActionEntity]),
             button_module_1.ButtonModule,
             react_module_1.ReactModule,
+            select_module_1.SelectModule,
             auth_module_1.AuthModule,
         ],
-        providers: [button_service_1.ButtonService, react_service_1.ReactService, action_service_1.ActionService, action_gateway_1.ActionGateway],
-        exports: [typeorm_1.TypeOrmModule, action_service_1.ActionService, button_module_1.ButtonModule, react_module_1.ReactModule],
+        providers: [select_service_1.SelectService, button_service_1.ButtonService, react_service_1.ReactService, action_service_1.ActionService, action_gateway_1.ActionGateway],
+        exports: [typeorm_1.TypeOrmModule, action_service_1.ActionService, button_module_1.ButtonModule, react_module_1.ReactModule, select_module_1.SelectModule],
     })
 ], ActionModule);
 exports.ActionModule = ActionModule;

@@ -10,6 +10,9 @@ export class EmojiEntity {
     @Column()
     imageUrl: string
 
+    @Column()
+    name: string
+
     @ManyToOne(() => GuildEntity, (type) => type.emojis)
     guild: GuildEntity
 

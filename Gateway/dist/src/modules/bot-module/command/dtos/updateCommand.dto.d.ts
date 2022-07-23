@@ -1,5 +1,5 @@
 export declare class UpdateCommandDto {
-    name?: string
-    description?: string
-    args?: string[]
+    name?: string;
+    description?: string;
+    args?: string[];
 }

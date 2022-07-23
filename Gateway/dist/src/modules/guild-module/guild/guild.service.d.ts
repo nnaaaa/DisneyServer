@@ -11,7 +11,7 @@ import { CreateGuildDto } from './dtos/createGuild.dto';
 import { MessageEntity } from 'src/entities/message.entity';
 export declare class GuildService {
     private channelCtgService;
-    readonly roleService: RoleService;
+    private roleService;
     private memberService;
     private emojiService;
     private guildRepository;

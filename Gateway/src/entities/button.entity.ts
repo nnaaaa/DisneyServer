@@ -1,4 +1,5 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { MemberEntity } from './member.entity';
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { ActionEntity } from './action.entity'
 
 export enum ButtonStyle{
@@ -14,7 +15,7 @@ export class ButtonEntity {
     @PrimaryGeneratedColumn('uuid')
     buttonId: string
 
-    @Column()
+    @Column({default:''})
     customId: string
 
     @Column()
@@ -28,4 +29,7 @@ export class ButtonEntity {
 
     @ManyToOne(() => ActionEntity, (react) => react.buttons)
     action: ActionEntity
+
+    @ManyToMany(() => MemberEntity)
+    clickers: MemberEntity[]
 }

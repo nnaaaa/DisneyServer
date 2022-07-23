@@ -12,17 +12,21 @@ import { CreateReactDto } from './dtos/createReact.dto'
 
 @Injectable()
 export class ReactService {
-    public readonly emojiRelations: FindOptionsRelations<ReactEntity> = {}
+    public readonly reactRelations: FindOptionsRelations<ReactEntity> = {
+        action: true,
+        emoji: true,
+        author: true
+    }
 
     constructor(
         @InjectRepository(ReactEntity) private reactRepository: ReactRepository
-    ) {}
+    ) { }
 
     async save(react: ReactEntity) {
         return await this.reactRepository.save(react)
     }
 
-    create(react: DeepPartial<ReactEntity>) {
+    async create(react: DeepPartial<ReactEntity>) {
         const newReact = this.reactRepository.create(react)
 
         return newReact
@@ -30,7 +34,7 @@ export class ReactService {
 
     async findOneWithRelation(findCondition: FindOptionsWhere<ReactEntity>) {
         return await this.reactRepository.findOne({
-            relations: this.emojiRelations,
+            relations: this.reactRelations,
             where: findCondition,
         })
     }
@@ -66,8 +70,16 @@ export class ReactService {
     }
 
     async reactToMessage(createReactDto: CreateReactDto) {
-        const react = this.create(createReactDto)
-
-        return await this.save(react)
+        const existedReact = await this.findOneWithRelation({
+            author: { memberId: createReactDto.author.memberId }, emoji: { emojiId: createReactDto.emoji.emojiId }
+        })
+        if (existedReact) {
+            await this.deleteOne({ reactId: existedReact.reactId })
+            return { react: existedReact, type: 'delete' }
+        }
+        else {
+            const react = await this.create(createReactDto)
+            return { react: await this.save(react), type: 'create' }
+        }
     }
 }

@@ -1,7 +1,11 @@
-import { IsNotEmpty, IsOptional, IsUrl, IsUUID } from 'class-validator'
+import { IsNotEmpty, IsString, IsUrl } from 'class-validator'
 
 export class CreateEmojiDto {
     @IsUrl()
-    @IsOptional()
+    @IsNotEmpty()
     imageUrl: string
+
+    @IsNotEmpty()
+    @IsString()
+    name: string
 }

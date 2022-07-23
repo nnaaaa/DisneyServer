@@ -1,11 +1,8 @@
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator'
+import { IsNotEmpty, IsUUID } from 'class-validator'
+import { CreateEmojiDto } from './createEmoji.dto'
 
-export class UpdateEmojiDto {
+export class UpdateEmojiDto extends CreateEmojiDto{
     @IsUUID()
     @IsNotEmpty()
     emojiId: string
-
-    @IsString()
-    @IsOptional()
-    imageUrl: string
 }

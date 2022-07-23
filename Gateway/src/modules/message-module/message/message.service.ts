@@ -6,6 +6,8 @@ import { ChannelDto, MemberDto } from 'src/shared/dtos'
 import { FindOptionsRelations, FindOptionsWhere } from 'typeorm'
 import { ActionService } from '../action/action.service'
 import { ButtonService } from '../button/button.service'
+import { ReactService } from '../react/react.service'
+import { SelectService } from '../select/select.service'
 import { CreateMessageDto } from './dtos/createMessage.dto'
 import { UpdateMessageDto } from './dtos/updateMessage.dto'
 
@@ -16,7 +18,15 @@ export class MessageService {
         channel: true,
         action: {
             buttons: true,
-            reacts: true,
+            reacts: {
+                author: true,
+                emoji: true,
+                action: true
+            },
+            selects: {
+                options: true,
+                action: true
+            }
         },
         replies: true,
         replyTo: true,
@@ -25,8 +35,10 @@ export class MessageService {
     constructor(
         @InjectRepository(MessageEntity) private messageRepository: MessageRepository,
         private actionService: ActionService,
-        private buttonService: ButtonService
-    ) {}
+        private buttonService: ButtonService,
+        private reactService: ReactService,
+        private selectService: SelectService
+    ) { }
 
     async save(message: MessageEntity) {
         return await this.messageRepository.save(message)
@@ -52,6 +64,14 @@ export class MessageService {
             for (const button of createMessageDto.action.buttons) {
                 const createdButton = await this.buttonService.create(button, savedAction)
                 savedAction.buttons.push(createdButton)
+            }
+            for (const react of createMessageDto.action.reacts) {
+                const createdReact = await this.reactService.create({ ...react, action: savedAction, author, })
+                savedAction.reacts.push(createdReact)
+            }
+            for (const select of createMessageDto.action.selects) {
+                const createdSelect = await this.selectService.create(select,savedAction)
+                savedAction.selects.push(createdSelect)
             }
         }
         newMessage.action = savedAction
@@ -124,15 +144,10 @@ export class MessageService {
     async deleteOne(findCondition: FindOptionsWhere<MessageEntity>) {
         try {
             const message = await this.findOneWithRelation(findCondition)
-            // if (message) {
-            //     const reacts = []
-            //     for (const react of message.reacts) {
-            //         reacts.push(this.reactService.deleteOne({ reactId: react.reactId }))
-            //     }
-            //     await Promise.all(reacts)
 
-            //     await this.messageRepository.remove(message)
-            // }
+            if (message) {
+                await this.actionService.deleteOne({ message: { messageId: message.messageId } })
+            }
             return message
         } catch (e) {
             throw new InternalServerErrorException(e)
@@ -143,15 +158,15 @@ export class MessageService {
         try {
             const messages = await this.findMany(findCondition)
 
-            const reacts = []
-            // for (const message of messages) {
-            //     reacts.push(
-            //         this.reactService.deleteMany({
-            //             message: { messageId: message.messageId },
-            //         })
-            //     )
-            // }
-            await Promise.all(reacts)
+            const actions = []
+            for (const message of messages) {
+                actions.push(
+                    this.actionService.deleteOne({
+                        message: { messageId: message.messageId },
+                    })
+                )
+            }
+            await Promise.all(actions)
 
             await this.messageRepository.remove(messages)
         } catch (e) {

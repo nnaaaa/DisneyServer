@@ -26,6 +26,8 @@ const message_module_1 = require("./modules/message-module/message/message.modul
 const react_module_1 = require("./modules/message-module/react/react.module");
 const action_module_1 = require("./modules/message-module/action/action.module");
 const button_module_1 = require("./modules/message-module/button/button.module");
+const file_module_1 = require("./modules/auth-module/file/file.module");
+const select_module_1 = require("./modules/message-module/select/select.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -83,6 +85,8 @@ AppModule = __decorate([
             command_module_1.CommandModule,
             action_module_1.ActionModule,
             button_module_1.ButtonModule,
+            file_module_1.FileModule,
+            select_module_1.SelectModule,
         ],
         providers: [],
     })

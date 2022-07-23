@@ -1,3 +1,3 @@
 export declare class MessageDto {
-    messageId: string
+    messageId: string;
 }

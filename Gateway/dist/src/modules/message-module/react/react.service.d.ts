@@ -5,13 +5,16 @@ import { DeepPartial, FindOptionsRelations, FindOptionsWhere } from 'typeorm';
 import { CreateReactDto } from './dtos/createReact.dto';
 export declare class ReactService {
     private reactRepository;
-    readonly emojiRelations: FindOptionsRelations<ReactEntity>;
+    readonly reactRelations: FindOptionsRelations<ReactEntity>;
     constructor(reactRepository: ReactRepository);
     save(react: ReactEntity): Promise<ReactEntity>;
-    create(react: DeepPartial<ReactEntity>): ReactEntity;
+    create(react: DeepPartial<ReactEntity>): Promise<ReactEntity>;
     findOneWithRelation(findCondition: FindOptionsWhere<ReactEntity>): Promise<ReactEntity>;
     updateOne(reactId: string, emojiOfReactDto: EmojiDto): Promise<ReactEntity>;
     deleteOne(findCondition: FindOptionsWhere<ReactEntity>): Promise<void>;
     deleteMany(findCondition: FindOptionsWhere<ReactEntity>): Promise<void>;
-    reactToMessage(createReactDto: CreateReactDto): Promise<ReactEntity>;
+    reactToMessage(createReactDto: CreateReactDto): Promise<{
+        react: ReactEntity;
+        type: string;
+    }>;
 }

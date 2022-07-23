@@ -15,6 +15,7 @@ export class ActionService {
     public readonly actionRelations: FindOptionsRelations<ActionEntity> = {
         buttons: true,
         reacts: true,
+        selects: true
     }
 
     constructor(
@@ -31,6 +32,7 @@ export class ActionService {
         const newAction = this.actionRepository.create({
             buttons: [],
             reacts: [],
+            selects:[],
             ...action,
         })
 
@@ -94,28 +96,28 @@ export class ActionService {
         }
     }
 
-    async deleteMany(findCondition: FindOptionsWhere<ActionEntity>) {
-        try {
-            const actions = await this.findMany(findCondition)
+    // async deleteMany(findCondition: FindOptionsWhere<ActionEntity>) {
+    //     try {
+    //         const actions = await this.findMany(findCondition)
 
-            const removeChildren = []
-            for (const action of actions) {
-                removeChildren.push(
-                    this.reactService.deleteMany({
-                        action: { actionId: action.actionId },
-                    })
-                )
-                removeChildren.push(
-                    this.buttonService.deleteMany({
-                        action: { actionId: action.actionId },
-                    })
-                )
-            }
-            await Promise.all(removeChildren)
+    //         const removeChildren = []
+    //         for (const action of actions) {
+    //             removeChildren.push(
+    //                 this.reactService.deleteMany({
+    //                     action: { actionId: action.actionId },
+    //                 })
+    //             )
+    //             removeChildren.push(
+    //                 this.buttonService.deleteMany({
+    //                     action: { actionId: action.actionId },
+    //                 })
+    //             )
+    //         }
+    //         await Promise.all(removeChildren)
 
-            await this.actionRepository.remove(actions)
-        } catch (e) {
-            throw new InternalServerErrorException(e)
-        }
-    }
+    //         await this.actionRepository.remove(actions)
+    //     } catch (e) {
+    //         throw new InternalServerErrorException(e)
+    //     }
+    // }
 }

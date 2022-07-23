@@ -10,16 +10,17 @@ export class MailService {
     async registerConfirm(user: UserRegisterDto, digitCode: number) {
         await this.mailerService.sendMail({
             to: user.account,
-            subject: 'Welcome to Disney App! Confirm your Email',
-            template: join(__dirname, 'templates/registerConfirm.pug'),
+            subject: 'Disney Registration Confirmation',
+            template: 'registerConfirm',
             attachments: [
                 {
-                    filename: 'logo.jpg',
-                    path: join(__dirname, 'templates/logo.jpg'),
+                    // filename: 'logo.png',
+                    path: join(process.cwd(), 'dist/templates/mail/logo.png'),
                     cid: 'logo',
                 },
             ],
             context: {
+                name: user.name,
                 digitCode,
             },
         })
@@ -28,12 +29,11 @@ export class MailService {
     async changePasswordConfirm(account: string, digitCode: number) {
         await this.mailerService.sendMail({
             to: account,
-            subject: 'Let confirm to change your password',
-            template: join(__dirname, 'templates/changePwdConfirm.pug'),
+            subject: 'Disney Password Reset Confirmation',
+            template: 'changePwdConfirm',
             attachments: [
                 {
-                    filename: 'logo.jpg',
-                    path: join(__dirname, 'templates/logo.jpg'),
+                    path: join(process.cwd(), 'dist/templates/mail/logo.png'),
                     cid: 'logo',
                 },
             ],

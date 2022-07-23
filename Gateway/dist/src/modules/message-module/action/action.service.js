@@ -27,13 +27,14 @@ let ActionService = class ActionService {
         this.actionRelations = {
             buttons: true,
             reacts: true,
+            selects: true
         };
     }
     async save(action) {
         return await this.actionRepository.save(action);
     }
     async create(action) {
-        const newAction = this.actionRepository.create(Object.assign({ buttons: [], reacts: [] }, action));
+        const newAction = this.actionRepository.create(Object.assign({ buttons: [], reacts: [], selects: [] }, action));
         return newAction;
     }
     async findOneWithRelation(findCondition) {
@@ -84,25 +85,6 @@ let ActionService = class ActionService {
                 await this.actionRepository.remove(action);
             }
             return action;
-        }
-        catch (e) {
-            throw new common_1.InternalServerErrorException(e);
-        }
-    }
-    async deleteMany(findCondition) {
-        try {
-            const actions = await this.findMany(findCondition);
-            const removeChildren = [];
-            for (const action of actions) {
-                removeChildren.push(this.reactService.deleteMany({
-                    action: { actionId: action.actionId },
-                }));
-                removeChildren.push(this.buttonService.deleteMany({
-                    action: { actionId: action.actionId },
-                }));
-            }
-            await Promise.all(removeChildren);
-            await this.actionRepository.remove(actions);
         }
         catch (e) {
             throw new common_1.InternalServerErrorException(e);

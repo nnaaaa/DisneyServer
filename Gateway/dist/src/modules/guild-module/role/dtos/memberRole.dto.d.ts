@@ -1,4 +1,4 @@
 export declare class MemberRoleDto {
-    roleId: string
-    memberId: string
+    roleId: string;
+    memberId: string;
 }

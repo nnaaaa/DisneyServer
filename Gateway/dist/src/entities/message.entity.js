@@ -39,7 +39,6 @@ __decorate([
 ], MessageEntity.prototype, "updatedAt", void 0);
 __decorate([
     (0, typeorm_1.OneToOne)(() => action_entity_1.ActionEntity, (type) => type.message),
-    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", action_entity_1.ActionEntity)
 ], MessageEntity.prototype, "action", void 0);
 __decorate([

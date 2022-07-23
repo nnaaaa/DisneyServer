@@ -1,3 +1,3 @@
 export declare class GuildDto {
-    guildId: string
+    guildId: string;
 }

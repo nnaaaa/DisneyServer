@@ -28,8 +28,6 @@ export class ButtonService {
             action,
         })
 
-        if (!newButton.customId) newButton.customId = createButtonDto.name
-
         return newButton
     }
 

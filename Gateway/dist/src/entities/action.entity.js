@@ -14,6 +14,7 @@ const typeorm_1 = require("typeorm");
 const button_entity_1 = require("./button.entity");
 const message_entity_1 = require("./message.entity");
 const react_entity_1 = require("./react.entity");
+const select_entity_1 = require("./select.entity");
 let ActionEntity = class ActionEntity {
 };
 __decorate([
@@ -29,7 +30,12 @@ __decorate([
     __metadata("design:type", Array)
 ], ActionEntity.prototype, "buttons", void 0);
 __decorate([
+    (0, typeorm_1.OneToMany)(() => select_entity_1.SelectEntity, (type) => type.action, { cascade: true }),
+    __metadata("design:type", Array)
+], ActionEntity.prototype, "selects", void 0);
+__decorate([
     (0, typeorm_1.OneToOne)(() => message_entity_1.MessageEntity, (type) => type.action, { cascade: true }),
+    (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", message_entity_1.MessageEntity)
 ], ActionEntity.prototype, "message", void 0);
 ActionEntity = __decorate([

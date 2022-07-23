@@ -16,5 +16,4 @@ export declare class ActionService {
     findMany(findCondition: FindOptionsWhere<ActionEntity>): Promise<ActionEntity[]>;
     updateOne(updateActionDto: DeepPartial<ActionEntity>): Promise<ActionEntity>;
     deleteOne(findCondition: FindOptionsWhere<ActionEntity>): Promise<ActionEntity>;
-    deleteMany(findCondition: FindOptionsWhere<ActionEntity>): Promise<void>;
 }
