@@ -27,68 +27,68 @@ export class ButtonGateway {
 
     constructor(private buttonService: ButtonService) {}
 
-    @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['CREATE_MESSAGE'])
-    @UseGuards(GuildPermissionGuard)
-    @SubscribeMessage(ButtonSocketEvent.CREATE)
-    @UsePipes(new ValidationPipe())
-    async create(
-        @MessageBody('action') actionOfButton: ActionDto,
-        @MessageBody('button') buttonOfButtonDto: CreateButtonDto
-    ) {
-        try {
-            const button = await this.buttonService.create(
-                buttonOfButtonDto,
-                actionOfButton
-            )
+    // @UseGuards(JwtUserWsGuard)
+    // @RolePermissions(['CREATE_MESSAGE'])
+    // @UseGuards(GuildPermissionGuard)
+    // @SubscribeMessage(ButtonSocketEvent.CREATE)
+    // @UsePipes(new ValidationPipe())
+    // async create(
+    //     @MessageBody('action') actionOfButton: ActionDto,
+    //     @MessageBody('button') buttonOfButtonDto: CreateButtonDto
+    // ) {
+    //     try {
+    //         const button = await this.buttonService.create(
+    //             buttonOfButtonDto,
+    //             actionOfButton
+    //         )
 
-            const savedButton = await this.buttonService.save(button)
+    //         const savedButton = await this.buttonService.save(button)
 
-            this.server.emit(
-                `${actionOfButton.actionId}/${ButtonSocketEmit.CREATE}`,
-                savedButton
-            )
-        } catch (e) {
-            this.logger.error(e)
-            return e
-        }
-    }
+    //         this.server.emit(
+    //             `${actionOfButton.actionId}/${ButtonSocketEmit.CREATE}`,
+    //             savedButton
+    //         )
+    //     } catch (e) {
+    //         this.logger.error(e)
+    //         return e
+    //     }
+    // }
 
-    @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['UPDATE_MESSAGE'])
-    @UseGuards(GuildPermissionGuard)
-    @SubscribeMessage(ButtonSocketEvent.UPDATE)
-    @UsePipes(new ValidationPipe())
-    async update(@MessageBody('button') updateButtonDto: UpdateButtonDto) {
-        try {
-            const updatedButton = await this.buttonService.updateOne(updateButtonDto)
+    // @UseGuards(JwtUserWsGuard)
+    // @RolePermissions(['UPDATE_MESSAGE'])
+    // @UseGuards(GuildPermissionGuard)
+    // @SubscribeMessage(ButtonSocketEvent.UPDATE)
+    // @UsePipes(new ValidationPipe())
+    // async update(@MessageBody('button') updateButtonDto: UpdateButtonDto) {
+    //     try {
+    //         const updatedButton = await this.buttonService.updateOne(updateButtonDto)
 
-            this.server.emit(
-                `${ButtonSocketEmit.UPDATE}/${updateButtonDto.buttonId}`,
-                updatedButton
-            )
+    //         this.server.emit(
+    //             `${ButtonSocketEmit.UPDATE}/${updateButtonDto.buttonId}`,
+    //             updatedButton
+    //         )
 
-            return updatedButton
-        } catch (e) {
-            this.logger.error(e)
-            return e
-        }
-    }
+    //         return updatedButton
+    //     } catch (e) {
+    //         this.logger.error(e)
+    //         return e
+    //     }
+    // }
 
-    @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['DELETE_MESSAGE'])
-    @UseGuards(GuildPermissionGuard)
-    @SubscribeMessage(ButtonSocketEvent.DELETE)
-    async delete(@MessageBody('buttonId') buttonId: string) {
-        try {
-            await this.buttonService.deleteOne({ buttonId })
+    // @UseGuards(JwtUserWsGuard)
+    // @RolePermissions(['DELETE_MESSAGE'])
+    // @UseGuards(GuildPermissionGuard)
+    // @SubscribeMessage(ButtonSocketEvent.DELETE)
+    // async delete(@MessageBody('buttonId') buttonId: string) {
+    //     try {
+    //         await this.buttonService.deleteOne({ buttonId })
 
-            this.server.emit(`${ButtonSocketEmit.DELETE}/${buttonId}`, buttonId)
-        } catch (e) {
-            this.logger.error(e)
-            return e
-        }
-    }
+    //         this.server.emit(`${ButtonSocketEmit.DELETE}/${buttonId}`, buttonId)
+    //     } catch (e) {
+    //         this.logger.error(e)
+    //         return e
+    //     }
+    // }
 
     @UseGuards(JwtUserWsGuard)
     @SubscribeMessage(ButtonSocketEvent.CLICK)

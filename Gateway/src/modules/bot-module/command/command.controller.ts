@@ -6,9 +6,11 @@ import {
     Param,
     Post,
     Put,
+    UseGuards,
     UseInterceptors,
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
+import { JwtUserGuard } from 'src/modules/auth-module/auth/guards/jwtUser.guard'
 import { CommandService } from './command.service'
 import { CreateCommandDto } from './dtos/createCommand.dto'
 import { UpdateCommandDto } from './dtos/updateCommand.dto'
@@ -20,6 +22,7 @@ export class CommandController {
     constructor(private commandService: CommandService) {}
 
     @Post('/:botId')
+    @UseGuards(JwtUserGuard)
     async execute(
         @Param('botId') botId: string,
         @Body() createCommandDto: CreateCommandDto
@@ -35,6 +38,7 @@ export class CommandController {
     }
 
     @Put('/:commandId')
+    @UseGuards(JwtUserGuard)
     async update(
         @Param('commandId') commandId: string,
         @Body() updateCommandDto: UpdateCommandDto
@@ -48,6 +52,7 @@ export class CommandController {
     }
 
     @Delete('/:commandId')
+    @UseGuards(JwtUserGuard)
     async delete(@Param('commandId') commandId: string) {
         const command = await this.commandService.deleteOne({ commandId })
 

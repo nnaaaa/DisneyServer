@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ButtonSocketEmit = exports.ActionSocketEmit = exports.ReactSocketEmit = exports.EmojiSocketEmit = exports.MessageSocketEmit = exports.RoleSocketEmit = exports.ChannelSocketEmit = exports.ChannelCtgSocketEmit = exports.MemberSocketEmit = exports.GuildSocketEmit = exports.UserSocketEmit = void 0;
+exports.SelectSocketEmit = exports.ButtonSocketEmit = exports.ActionSocketEmit = exports.ReactSocketEmit = exports.EmojiSocketEmit = exports.MessageSocketEmit = exports.RoleSocketEmit = exports.ChannelSocketEmit = exports.ChannelCtgSocketEmit = exports.MemberSocketEmit = exports.GuildSocketEmit = exports.UserSocketEmit = void 0;
 var UserSocketEmit;
 (function (UserSocketEmit) {
     UserSocketEmit["ONLINE"] = "online";
@@ -76,4 +76,10 @@ var ButtonSocketEmit;
     ButtonSocketEmit["DELETE"] = "delete";
     ButtonSocketEmit["CLICK"] = "click";
 })(ButtonSocketEmit = exports.ButtonSocketEmit || (exports.ButtonSocketEmit = {}));
+var SelectSocketEmit;
+(function (SelectSocketEmit) {
+    SelectSocketEmit["CREATE"] = "create";
+    SelectSocketEmit["UPDATE"] = "update";
+    SelectSocketEmit["SELECT"] = "select";
+})(SelectSocketEmit = exports.SelectSocketEmit || (exports.SelectSocketEmit = {}));
 //# sourceMappingURL=emit.js.map

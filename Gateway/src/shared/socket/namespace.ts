@@ -12,4 +12,5 @@ export enum SocketNamespace {
     MESSAGE = 'message',
     ACTION = 'action',
     BUTTON = 'button',
+    SELECT = 'select',
 }

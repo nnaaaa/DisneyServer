@@ -14,5 +14,6 @@ var SocketNamespace;
     SocketNamespace["MESSAGE"] = "message";
     SocketNamespace["ACTION"] = "action";
     SocketNamespace["BUTTON"] = "button";
+    SocketNamespace["SELECT"] = "select";
 })(SocketNamespace = exports.SocketNamespace || (exports.SocketNamespace = {}));
 //# sourceMappingURL=namespace.js.map

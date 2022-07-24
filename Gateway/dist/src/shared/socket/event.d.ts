@@ -65,6 +65,10 @@ export declare enum ActionSocketEvent {
 export declare enum ButtonSocketEvent {
     CREATE = "create",
     UPDATE = "update",
-    DELETE = "delete",
     CLICK = "click"
+}
+export declare enum SelectSocketEvent {
+    CREATE = "create",
+    UPDATE = "update",
+    SELECT = "select"
 }

@@ -29,7 +29,4 @@ export class ButtonEntity {
 
     @ManyToOne(() => ActionEntity, (react) => react.buttons)
     action: ActionEntity
-
-    @ManyToMany(() => MemberEntity)
-    clickers: MemberEntity[]
 }

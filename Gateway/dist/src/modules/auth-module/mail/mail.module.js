@@ -30,7 +30,7 @@ MailModule = __decorate([
                             },
                         },
                         defaults: {
-                            from: '"Disney" <noreply@example.com>',
+                            from: '"Disney" disney@gmail.com',
                         },
                         preview: true,
                         template: {

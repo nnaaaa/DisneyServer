@@ -62,3 +62,8 @@ export declare enum ButtonSocketEmit {
     DELETE = "delete",
     CLICK = "click"
 }
+export declare enum SelectSocketEmit {
+    CREATE = "create",
+    UPDATE = "update",
+    SELECT = "select"
+}

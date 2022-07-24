@@ -19,12 +19,12 @@ import { MailService } from './mail.service'
                         },
                     },
                     defaults: {
-                        from: '"Disney" <noreply@example.com>',
+                        from: '"Disney" disney@gmail.com',
                     },
                     preview: true,
                     template: {
                         dir: join(process.cwd(), 'dist/templates/mail'),
-                        adapter: new PugAdapter({ inlineCssEnabled: true }), // or new PugAdapter() or new EjsAdapter()
+                        adapter: new PugAdapter({ inlineCssEnabled: true }),
                         options: {
                             strict: true,
                         },

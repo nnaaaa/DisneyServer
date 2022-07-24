@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ButtonSocketEvent = exports.ActionSocketEvent = exports.ReactSocketEvent = exports.EmojiSocketEvent = exports.MessageSocketEvent = exports.RoleSocketEvent = exports.ChannelSocketEvent = exports.ChannelCtgSocketEvent = exports.MemberSocketEvent = exports.GuildSocketEvent = exports.UserSocketEvent = void 0;
+exports.SelectSocketEvent = exports.ButtonSocketEvent = exports.ActionSocketEvent = exports.ReactSocketEvent = exports.EmojiSocketEvent = exports.MessageSocketEvent = exports.RoleSocketEvent = exports.ChannelSocketEvent = exports.ChannelCtgSocketEvent = exports.MemberSocketEvent = exports.GuildSocketEvent = exports.UserSocketEvent = void 0;
 var UserSocketEvent;
 (function (UserSocketEvent) {
     UserSocketEvent["ONLINE"] = "online";
@@ -79,7 +79,12 @@ var ButtonSocketEvent;
 (function (ButtonSocketEvent) {
     ButtonSocketEvent["CREATE"] = "create";
     ButtonSocketEvent["UPDATE"] = "update";
-    ButtonSocketEvent["DELETE"] = "delete";
     ButtonSocketEvent["CLICK"] = "click";
 })(ButtonSocketEvent = exports.ButtonSocketEvent || (exports.ButtonSocketEvent = {}));
+var SelectSocketEvent;
+(function (SelectSocketEvent) {
+    SelectSocketEvent["CREATE"] = "create";
+    SelectSocketEvent["UPDATE"] = "update";
+    SelectSocketEvent["SELECT"] = "select";
+})(SelectSocketEvent = exports.SelectSocketEvent || (exports.SelectSocketEvent = {}));
 //# sourceMappingURL=event.js.map

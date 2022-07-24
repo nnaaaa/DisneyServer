@@ -9,5 +9,6 @@ export declare enum SocketNamespace {
     REACT = "react",
     MESSAGE = "message",
     ACTION = "action",
-    BUTTON = "button"
+    BUTTON = "button",
+    SELECT = "select"
 }

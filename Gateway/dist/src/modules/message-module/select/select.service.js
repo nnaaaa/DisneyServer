@@ -36,6 +36,12 @@ let SelectService = class SelectService {
         }
         return this.save(savedSelect);
     }
+    async findOneWithRelation(findCondition) {
+        return await this.optionRepository.findOne({
+            where: findCondition,
+            relations: { select: { action: true } },
+        });
+    }
 };
 SelectService = __decorate([
     (0, common_1.Injectable)(),

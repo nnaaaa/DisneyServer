@@ -5,6 +5,7 @@ import { OptionEntity } from 'src/entities/option.entity';
 import { SelectEntity } from 'src/entities/select.entity';
 import { OptionRepository } from 'src/repositories/option.repository';
 import { SelectRepository } from 'src/repositories/select.repository';
+import { FindOptionsWhere } from 'typeorm';
 import { CreateSelectDto } from './dtos/createSelect.dto';
 
 @Injectable()
@@ -21,17 +22,24 @@ export class SelectService {
     async create(createSelectDto: CreateSelectDto, action: ActionEntity) {
         const newSelect = this.selectRepository.create({
             ...createSelectDto,
-            options:[],
+            options: [],
             action,
         });
 
         const savedSelect = await this.save(newSelect);
 
         for (const option of createSelectDto.options) {
-            const newOption = this.optionRepository.create({...option, select: savedSelect});
+            const newOption = this.optionRepository.create({ ...option, select: savedSelect });
             savedSelect.options.push(newOption);
         }
 
         return this.save(savedSelect)
+    }
+
+    async findOneWithRelation(findCondition: FindOptionsWhere<OptionEntity>) {
+        return await this.optionRepository.findOne({
+            where: findCondition,
+            relations: { select: { action: true } },
+        })
     }
 }

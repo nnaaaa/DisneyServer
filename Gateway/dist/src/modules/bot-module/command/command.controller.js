@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommandController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
+const jwtUser_guard_1 = require("../../auth-module/auth/guards/jwtUser.guard");
 const command_service_1 = require("./command.service");
 const createCommand_dto_1 = require("./dtos/createCommand.dto");
 const updateCommand_dto_1 = require("./dtos/updateCommand.dto");
@@ -38,6 +39,7 @@ let CommandController = class CommandController {
 };
 __decorate([
     (0, common_1.Post)('/:botId'),
+    (0, common_1.UseGuards)(jwtUser_guard_1.JwtUserGuard),
     __param(0, (0, common_1.Param)('botId')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -46,6 +48,7 @@ __decorate([
 ], CommandController.prototype, "execute", null);
 __decorate([
     (0, common_1.Put)('/:commandId'),
+    (0, common_1.UseGuards)(jwtUser_guard_1.JwtUserGuard),
     __param(0, (0, common_1.Param)('commandId')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -54,6 +57,7 @@ __decorate([
 ], CommandController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)('/:commandId'),
+    (0, common_1.UseGuards)(jwtUser_guard_1.JwtUserGuard),
     __param(0, (0, common_1.Param)('commandId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
