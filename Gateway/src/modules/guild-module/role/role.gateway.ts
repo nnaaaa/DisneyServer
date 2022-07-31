@@ -8,7 +8,7 @@ import {
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
 import { RoleEntity } from 'src/entities/role.entity'
-import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
+import { RoleGuard } from 'src/shared/decorators'
 import { GuildDto } from 'src/shared/dtos'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { RoleSocketEmit } from 'src/shared/socket/emit'
@@ -27,11 +27,11 @@ export class RoleGateway {
     @WebSocketServer()
     server: Server
 
-    constructor(private roleService: RoleService) {}
+    constructor(private roleService: RoleService) { }
 
     @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['CREATE_ROLE'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['CREATE_ROLE'])
+
     @UsePipes(new ValidationPipe())
     @SubscribeMessage(RoleSocketEvent.CREATE)
     async create(
@@ -53,8 +53,8 @@ export class RoleGateway {
     }
 
     @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['UPDATE_ROLE'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['UPDATE_ROLE'])
+
     @UsePipes(new ValidationPipe())
     @SubscribeMessage(RoleSocketEvent.UPDATE)
     async update(@MessageBody('role') updateRoleDto: UpdateRoleDto) {
@@ -71,8 +71,8 @@ export class RoleGateway {
     }
 
     @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['DELETE_ROLE'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['DELETE_ROLE'])
+
     @SubscribeMessage(RoleSocketEvent.DELETE)
     async delete(@MessageBody('roleId') roleId: string) {
         try {
@@ -85,8 +85,8 @@ export class RoleGateway {
     }
 
     @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['UPDATE_ROLE'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['UPDATE_ROLE'])
+
     @UsePipes(new ValidationPipe())
     @SubscribeMessage(RoleSocketEvent.ADD_TO_MEMBER)
     async addToMember(@MessageBody('role') memberRoleDto: MemberRoleDto) {
@@ -106,8 +106,8 @@ export class RoleGateway {
     }
 
     @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['UPDATE_ROLE'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['UPDATE_ROLE'])
+
     @SubscribeMessage(RoleSocketEvent.REMOVE_FROM_MEMBER)
     async removeFromMember(@MessageBody('role') memberRoleDto: MemberRoleDto) {
         try {
@@ -125,8 +125,8 @@ export class RoleGateway {
     }
 
     @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['UPDATE_ROLE'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['UPDATE_ROLE'])
+
     @UsePipes(new ValidationPipe())
     @SubscribeMessage(RoleSocketEvent.ADD_TO_CHANNEL)
     async addToChannel(@MessageBody('role') channelRoleDto: ChannelRoleDto) {
@@ -144,8 +144,8 @@ export class RoleGateway {
     }
 
     @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['UPDATE_ROLE'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['UPDATE_ROLE'])
+
     @SubscribeMessage(RoleSocketEvent.REMOVE_FROM_CHANNEL)
     async removeFromChannel(@MessageBody('role') channelRoleDto: ChannelRoleDto) {
         try {

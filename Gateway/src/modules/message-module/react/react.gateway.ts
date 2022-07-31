@@ -6,7 +6,7 @@ import {
     WebSocketServer,
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
-import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
+import { RoleGuard } from 'src/shared/decorators'
 import { EmojiDto } from 'src/shared/dtos'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { ReactSocketEmit } from 'src/shared/socket/emit'
@@ -26,14 +26,14 @@ export class ReactGateway {
     constructor(private reactService: ReactService) { }
 
     // @UseGuards(JwtUserWsGuard)
-    // @RolePermissions(['CUD_REACT'])
-    // @UseGuards(GuildPermissionGuard)
+    // @RoleGuard(['CUD_REACT'])
+    // 
     @SubscribeMessage(ReactSocketEvent.CREATE)
     @UsePipes(new ValidationPipe())
     async create(@MessageBody() createReactDto: CreateReactDto) {
         try {
             const reactMessage = await this.reactService.reactToMessage(createReactDto)
-            
+
             if (reactMessage.type === 'create') {
                 this.server.emit(
                     `${reactMessage.react.action.actionId}/${SocketNamespace.REACT}/${ReactSocketEmit.CREATE}`,
@@ -53,8 +53,8 @@ export class ReactGateway {
     }
 
     // @UseGuards(JwtUserWsGuard)
-    // @RolePermissions(['CUD_REACT'])
-    // @UseGuards(GuildPermissionGuard)
+    // @RoleGuard(['CUD_REACT'])
+    // 
     // @SubscribeMessage(ReactSocketEvent.UPDATE)
     // @UsePipes(new ValidationPipe())
     // async update(
@@ -75,8 +75,8 @@ export class ReactGateway {
     // }
 
     // @UseGuards(JwtUserWsGuard)
-    // @RolePermissions(['CUD_REACT'])
-    // @UseGuards(GuildPermissionGuard)
+    // @RoleGuard(['CUD_REACT'])
+    // 
     // @SubscribeMessage(ReactSocketEvent.DELETE)
     // async delete(@MessageBody('reactId') reactId: string) {
     //     try {

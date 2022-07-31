@@ -6,7 +6,7 @@ import {
     WebSocketServer,
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
-import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
+import { RoleGuard } from 'src/shared/decorators'
 import { MessageDto } from 'src/shared/dtos'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { ActionSocketEmit } from 'src/shared/socket/emit'
@@ -22,11 +22,11 @@ export class ActionGateway {
     @WebSocketServer()
     server: Server
 
-    constructor(private actionService: ActionService) {}
+    constructor(private actionService: ActionService) { }
 
     @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['CREATE_MESSAGE'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['CREATE_MESSAGE'])
+
     @SubscribeMessage(ActionSocketEvent.CREATE)
     @UsePipes(new ValidationPipe())
     async create(@MessageBody('message') messageOfActionDto: MessageDto) {
@@ -48,8 +48,8 @@ export class ActionGateway {
     }
 
     // @UseGuards(JwtUserWsGuard)
-    // @RolePermissions(['UPDATE_MESSAGE'])
-    // @UseGuards(GuildPermissionGuard)
+    // @RoleGuard(['UPDATE_MESSAGE'])
+    // 
     // @SubscribeMessage(ActionSocketEvent.UPDATE)
     // @UsePipes(new ValidationPipe())
     // async update(
@@ -70,8 +70,8 @@ export class ActionGateway {
     // }
 
     // @UseGuards(JwtUserWsGuard)
-    // @RolePermissions(['CUD_Action'])
-    // @UseGuards(GuildPermissionGuard)
+    // @RoleGuard(['CUD_Action'])
+    // 
     // @SubscribeMessage(ActionSocketEvent.DELETE)
     // async delete(@MessageBody('ActionId') ActionId: string) {
     //   try {

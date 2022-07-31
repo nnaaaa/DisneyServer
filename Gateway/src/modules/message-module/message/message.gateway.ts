@@ -12,7 +12,7 @@ import { JwtWsGuard } from 'src/modules/auth-module/auth/guards/jwtWS.guard'
 import { BotService } from 'src/modules/bot-module/bot/bot.service'
 import { GuildService } from 'src/modules/guild-module/guild/guild.service'
 import { AuthWSUser } from 'src/shared/decorators/auth-user.decorator'
-import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
+import { RoleGuard } from 'src/shared/decorators'
 import { ChannelDto, MemberDto } from 'src/shared/dtos'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { MessageSocketEmit } from 'src/shared/socket/emit'
@@ -36,7 +36,7 @@ export class MessageGateway {
         private messageService: MessageService,
         @Inject(GuildService) private guildService: GuildService,
         @Inject(BotService) private botService: BotService
-    ) {}
+    ) { }
 
     @UseGuards(JwtUserWsGuard)
     @UsePipes(new ValidationPipe())
@@ -56,8 +56,7 @@ export class MessageGateway {
     }
 
     @UseGuards(JwtWsGuard)
-    @RolePermissions(['CREATE_MESSAGE'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['CREATE_MESSAGE'])
     @SubscribeMessage(MessageSocketEvent.CREATE)
     @UsePipes(new ValidationPipe())
     async create(
@@ -114,8 +113,7 @@ export class MessageGateway {
 
             //emit to bot manager
             this.server.emit(
-                `botManager/${(userOrBot as BotEntity)?.botId}/${
-                    SocketNamespace.MESSAGE
+                `botManager/${(userOrBot as BotEntity)?.botId}/${SocketNamespace.MESSAGE
                 }/${MessageSocketEmit.CREATE}`,
                 message
             )
@@ -128,8 +126,7 @@ export class MessageGateway {
     }
 
     @UseGuards(JwtWsGuard)
-    @RolePermissions(['UPDATE_MESSAGE'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['UPDATE_MESSAGE'])
     @SubscribeMessage(MessageSocketEvent.UPDATE)
     @UsePipes(new ValidationPipe())
     async update(
@@ -146,8 +143,7 @@ export class MessageGateway {
 
             //emit to bot manager
             this.server.emit(
-                `botManager/${(userOrBot as BotEntity)?.botId}/${
-                    SocketNamespace.MESSAGE
+                `botManager/${(userOrBot as BotEntity)?.botId}/${SocketNamespace.MESSAGE
                 }/${MessageSocketEmit.UPDATE}`,
                 updatedMessage
             )
@@ -160,8 +156,7 @@ export class MessageGateway {
     }
 
     @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['DELETE_MESSAGE'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['DELETE_MESSAGE'])
     @SubscribeMessage(MessageSocketEvent.DELETE)
     async delete(@MessageBody('messageId') messageId: string) {
         try {

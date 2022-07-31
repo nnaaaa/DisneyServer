@@ -3,19 +3,14 @@ import {
     MessageBody,
     SubscribeMessage,
     WebSocketGateway,
-    WebSocketServer,
+    WebSocketServer
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
-import { ButtonEntity } from 'src/entities/button.entity'
-import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
-import { ActionDto } from 'src/shared/dtos/action.dto'
-import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { ButtonSocketEmit } from 'src/shared/socket/emit'
 import { ButtonSocketEvent } from 'src/shared/socket/event'
 import { SocketNamespace } from 'src/shared/socket/namespace'
 import { JwtUserWsGuard } from '../../auth-module/auth/guards/jwtWSUser.guard'
 import { ButtonService } from './button.service'
-import { CreateButtonDto } from './dto/createButton.dto'
 import { UpdateButtonDto } from './dto/updateButton.dto'
 
 @WebSocketGateway({ cors: { origin: '*' }, namespace: SocketNamespace.BUTTON })
@@ -25,11 +20,11 @@ export class ButtonGateway {
     @WebSocketServer()
     server: Server
 
-    constructor(private buttonService: ButtonService) {}
+    constructor(private buttonService: ButtonService) { }
 
     // @UseGuards(JwtUserWsGuard)
-    // @RolePermissions(['CREATE_MESSAGE'])
-    // @UseGuards(GuildPermissionGuard)
+    // @RoleGuard(['CREATE_MESSAGE'])
+    // 
     // @SubscribeMessage(ButtonSocketEvent.CREATE)
     // @UsePipes(new ValidationPipe())
     // async create(
@@ -55,8 +50,8 @@ export class ButtonGateway {
     // }
 
     // @UseGuards(JwtUserWsGuard)
-    // @RolePermissions(['UPDATE_MESSAGE'])
-    // @UseGuards(GuildPermissionGuard)
+    // @RoleGuard(['UPDATE_MESSAGE'])
+    // 
     // @SubscribeMessage(ButtonSocketEvent.UPDATE)
     // @UsePipes(new ValidationPipe())
     // async update(@MessageBody('button') updateButtonDto: UpdateButtonDto) {
@@ -76,8 +71,8 @@ export class ButtonGateway {
     // }
 
     // @UseGuards(JwtUserWsGuard)
-    // @RolePermissions(['DELETE_MESSAGE'])
-    // @UseGuards(GuildPermissionGuard)
+    // @RoleGuard(['DELETE_MESSAGE'])
+    // 
     // @SubscribeMessage(ButtonSocketEvent.DELETE)
     // async delete(@MessageBody('buttonId') buttonId: string) {
     //     try {

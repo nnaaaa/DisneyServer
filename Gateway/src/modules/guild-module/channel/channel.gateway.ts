@@ -8,7 +8,7 @@ import {
 import { Server } from 'socket.io'
 import { MemberEntity } from 'src/entities/member.entity'
 import { JwtWsGuard } from 'src/modules/auth-module/auth/guards/jwtWS.guard'
-import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
+import { RoleGuard } from 'src/shared/decorators'
 import { MemberDto } from 'src/shared/dtos'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { ChannelSocketEmit } from 'src/shared/socket/emit'
@@ -27,12 +27,12 @@ export class ChannelGateway {
     @WebSocketServer()
     server: Server
 
-    constructor(private channelService: ChannelService) {}
+    constructor(private channelService: ChannelService) { }
 
     @SubscribeMessage(ChannelSocketEvent.CREATE)
     @UseGuards(JwtWsGuard)
-    @RolePermissions(['CREATE_CHANNEL'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['CREATE_CHANNEL'])
+
     @UsePipes(new ValidationPipe())
     async create(
         @MessageBody('channel') createChannelDto: CreateChannelDto,
@@ -61,8 +61,8 @@ export class ChannelGateway {
 
     @SubscribeMessage(ChannelSocketEvent.UPDATE)
     @UseGuards(JwtWsGuard)
-    @RolePermissions(['UPDATE_CHANNEL'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['UPDATE_CHANNEL'])
+
     @UsePipes(new ValidationPipe())
     async update(@MessageBody('channel') updateChannelDto: UpdateChannelDto) {
         try {
@@ -82,8 +82,8 @@ export class ChannelGateway {
     }
     @SubscribeMessage(ChannelSocketEvent.DELETE)
     @UseGuards(JwtWsGuard)
-    @RolePermissions(['DELETE_CHANNEL'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['DELETE_CHANNEL'])
+
     async delete(@MessageBody('channelId') channelId: string) {
         try {
             await this.channelService.deleteOne({ channelId })
@@ -97,8 +97,8 @@ export class ChannelGateway {
 
     @SubscribeMessage(ChannelSocketEvent.ADD_MEMBER)
     @UseGuards(JwtWsGuard)
-    @RolePermissions(['UPDATE_CHANNEL'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['UPDATE_CHANNEL'])
+
     @UsePipes(new ValidationPipe())
     async addMember(@MessageBody('channel') memberChannelDto: MemberChannelDto) {
         try {
@@ -118,8 +118,8 @@ export class ChannelGateway {
 
     @SubscribeMessage(ChannelSocketEvent.REMOVE_MEMBER)
     @UseGuards(JwtWsGuard)
-    @RolePermissions(['UPDATE_CHANNEL'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['UPDATE_CHANNEL'])
+
     @UsePipes(new ValidationPipe())
     async removeMember(@MessageBody('channel') memberChannelDto: MemberChannelDto) {
         try {

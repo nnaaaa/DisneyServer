@@ -30,7 +30,7 @@ import { SelectModule } from './modules/message-module/select/select.module';
                 username: configService.get('DB_USER'),
                 password: configService.get('DB_PASSWORD'),
                 database: configService.get('DB_DB'),
-                type: 'postgres',
+                type: 'mysql',
                 // logging:true,
                 synchronize: true,
                 dropSchema: false,

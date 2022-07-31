@@ -7,7 +7,7 @@ import {
     WsException,
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
-import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
+import { RoleGuard } from 'src/shared/decorators'
 import { GuildDto } from 'src/shared/dtos'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { ChannelCtgSocketEmit } from 'src/shared/socket/emit'
@@ -25,12 +25,12 @@ export class ChannelCategoryGateway {
     @WebSocketServer()
     server: Server
 
-    constructor(private channelCtgService: ChannelCategoryService) {}
+    constructor(private channelCtgService: ChannelCategoryService) { }
 
     @SubscribeMessage(ChannelCtgSocketEvent.CREATE)
     @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['CREATE_CHANNEL'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['CREATE_CHANNEL'])
+
     @UsePipes(new ValidationPipe())
     async create(
         @MessageBody('category') createChannelCtgDto: CreateChannelCtgDto,
@@ -58,8 +58,8 @@ export class ChannelCategoryGateway {
 
     @SubscribeMessage(ChannelCtgSocketEvent.UPDATE)
     @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['UPDATE_CHANNEL'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['UPDATE_CHANNEL'])
+
     @UsePipes(new ValidationPipe())
     async update(@MessageBody('categoryId') updateChannelCtgDto: UpdateChannelCtgDto) {
         try {
@@ -80,8 +80,8 @@ export class ChannelCategoryGateway {
 
     @SubscribeMessage(ChannelCtgSocketEvent.DELETE)
     @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['DELETE_CHANNEL'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['DELETE_CHANNEL'])
+
     async delete(@MessageBody() categoryId: string) {
         try {
             await this.channelCtgService.deleteOne({ categoryId })

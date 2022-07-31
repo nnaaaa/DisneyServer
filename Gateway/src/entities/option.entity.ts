@@ -9,7 +9,7 @@ export class OptionEntity{
     @Column()
     value: string
 
-    @Column({ type: 'longtext' })
+    @Column({ default:'' })
     description: string
 
     @ManyToOne(() => SelectEntity, type => type.options)

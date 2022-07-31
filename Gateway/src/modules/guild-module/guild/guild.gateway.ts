@@ -18,7 +18,7 @@ import { CreateGuildDto } from './dtos/createGuild.dto'
 import { UpdateGuildDto } from './dtos/updateGuild.dto'
 import { GuildService } from './guild.service'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
-import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
+import { RoleGuard } from 'src/shared/decorators'
 import { SocketNamespace } from 'src/shared/socket/namespace'
 
 @WebSocketGateway({ cors: { origin: '*' }, namespace: SocketNamespace.GUILD })
@@ -30,7 +30,7 @@ export class GuildGateway {
     constructor(
         private guildService: GuildService,
         private memberService: MemberService // private roleService: RoleService
-    ) {}
+    ) { }
 
     /** @return GuildEntity after save */
     @UseGuards(JwtUserWsGuard)
@@ -49,8 +49,8 @@ export class GuildGateway {
     }
 
     @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['UPDATE_GUILD'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['UPDATE_GUILD'])
+
     @SubscribeMessage(GuildSocketEvent.UPDATE)
     @UsePipes(new ValidationPipe())
     async update(@MessageBody() updateGuildDto: UpdateGuildDto) {
@@ -124,8 +124,8 @@ export class GuildGateway {
     }
 
     @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['DELETE_GUILD'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['DELETE_GUILD'])
+
     @SubscribeMessage(GuildSocketEvent.DELETE)
     async delete(@MessageBody('guildId') guildId: string) {
         try {

@@ -7,7 +7,7 @@ import {
     WsException,
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
-import { RolePermissions } from 'src/shared/decorators/role-permission.decorator'
+import { RoleGuard } from 'src/shared/decorators'
 import { GuildDto } from 'src/shared/dtos'
 import { GuildPermissionGuard } from 'src/shared/guards/permission.guard'
 import { EmojiSocketEmit } from 'src/shared/socket/emit'
@@ -25,11 +25,11 @@ export class EmojiGateway {
     @WebSocketServer()
     server: Server
 
-    constructor(private emojiService: EmojiService) {}
+    constructor(private emojiService: EmojiService) { }
 
     @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['CREATE_EMOJI'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['CREATE_EMOJI'])
+
     @SubscribeMessage(EmojiSocketEvent.CREATE)
     @UsePipes(new ValidationPipe())
     async create(
@@ -52,8 +52,8 @@ export class EmojiGateway {
     }
 
     @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['UPDATE_EMOJI'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['UPDATE_EMOJI'])
+
     @SubscribeMessage(EmojiSocketEvent.UPDATE)
     @UsePipes(new ValidationPipe())
     async update(@MessageBody() updateEmojiDto: UpdateEmojiDto) {
@@ -71,8 +71,8 @@ export class EmojiGateway {
     }
 
     @UseGuards(JwtUserWsGuard)
-    @RolePermissions(['DELETE_EMOJI'])
-    @UseGuards(GuildPermissionGuard)
+    @RoleGuard(['DELETE_EMOJI'])
+
     @SubscribeMessage(EmojiSocketEvent.DELETE)
     async delete(@MessageBody('emojiId') emojiId: string) {
         try {
