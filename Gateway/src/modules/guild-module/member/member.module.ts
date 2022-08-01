@@ -1,4 +1,4 @@
-import { Global, Module } from '@nestjs/common'
+import { forwardRef, Global, Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { MemberEntity } from 'src/entities/member.entity'
 import { AuthModule } from '../../auth-module/auth/auth.module'
@@ -14,7 +14,7 @@ import { MemberService } from './member.service'
     imports: [
         TypeOrmModule.forFeature([MemberEntity]),
         AuthModule,
-        MessageModule,
+        forwardRef(() => MessageModule),
         ReactModule,
     ],
     providers: [MessageService, ReactService, MemberService, MemberGateway],

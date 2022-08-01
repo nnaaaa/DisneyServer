@@ -25,12 +25,11 @@ export class ChannelCategoryGateway {
     @WebSocketServer()
     server: Server
 
-    constructor(private channelCtgService: ChannelCategoryService) { }
+    constructor(private channelCtgService: ChannelCategoryService) {}
 
     @SubscribeMessage(ChannelCtgSocketEvent.CREATE)
     @UseGuards(JwtUserWsGuard)
     @RoleGuard(['CREATE_CHANNEL'])
-
     @UsePipes(new ValidationPipe())
     async create(
         @MessageBody('category') createChannelCtgDto: CreateChannelCtgDto,
@@ -59,7 +58,6 @@ export class ChannelCategoryGateway {
     @SubscribeMessage(ChannelCtgSocketEvent.UPDATE)
     @UseGuards(JwtUserWsGuard)
     @RoleGuard(['UPDATE_CHANNEL'])
-
     @UsePipes(new ValidationPipe())
     async update(@MessageBody('categoryId') updateChannelCtgDto: UpdateChannelCtgDto) {
         try {
@@ -81,7 +79,6 @@ export class ChannelCategoryGateway {
     @SubscribeMessage(ChannelCtgSocketEvent.DELETE)
     @UseGuards(JwtUserWsGuard)
     @RoleGuard(['DELETE_CHANNEL'])
-
     async delete(@MessageBody() categoryId: string) {
         try {
             await this.channelCtgService.deleteOne({ categoryId })

@@ -17,8 +17,8 @@ import { MessageModule } from './modules/message-module/message/message.module'
 import { ReactModule } from './modules/message-module/react/react.module'
 import { ActionModule } from './modules/message-module/action/action.module'
 import { ButtonModule } from './modules/message-module/button/button.module'
-import { FileModule } from './modules/auth-module/file/file.module';
-import { SelectModule } from './modules/message-module/select/select.module';
+import { FileModule } from './modules/auth-module/file/file.module'
+import { SelectModule } from './modules/message-module/select/select.module'
 
 @Module({
     imports: [

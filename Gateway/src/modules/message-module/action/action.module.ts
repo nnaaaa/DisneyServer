@@ -22,4 +22,4 @@ import { ActionService } from './action.service'
     providers: [SelectService, ButtonService, ReactService, ActionService, ActionGateway],
     exports: [TypeOrmModule, ActionService, ButtonModule, ReactModule, SelectModule],
 })
-export class ActionModule { }
+export class ActionModule {}

@@ -5,8 +5,7 @@ import { NestExpressApplication } from '@nestjs/platform-express'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { AppModule } from './app.module'
 import * as morgan from 'morgan'
-declare const module: any;
-
+declare const module: any
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule)

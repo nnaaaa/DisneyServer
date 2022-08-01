@@ -1,29 +1,29 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm"
-import { ActionEntity } from "./action.entity"
-import { OptionEntity } from "./option.entity"
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { ActionEntity } from './action.entity'
+import { OptionEntity } from './option.entity'
 
-export enum SelectStyle{
+export enum SelectStyle {
     PRIMARY = 'primary',
     SECONDARY = 'secondary',
 }
 
 @Entity()
-export class SelectEntity{
+export class SelectEntity {
     @PrimaryGeneratedColumn('uuid')
     selectId: string
 
-    @Column({type:'bool',default:false})
+    @Column({ type: 'bool', default: false })
     isDisabled: boolean
 
-    @Column({default:''})
+    @Column({ default: '' })
     customId: string
 
-    @Column({ type:'enum',enum:SelectStyle,default:SelectStyle.PRIMARY})
+    @Column({ type: 'enum', enum: SelectStyle, default: SelectStyle.PRIMARY })
     style: SelectStyle
 
-    @ManyToOne(()=> ActionEntity,type=>type.selects)
+    @ManyToOne(() => ActionEntity, (type) => type.selects)
     action: ActionEntity
 
-    @OneToMany(() => OptionEntity, type => type.select, { cascade: true })
+    @OneToMany(() => OptionEntity, (type) => type.select, { cascade: true })
     options: OptionEntity[]
 }

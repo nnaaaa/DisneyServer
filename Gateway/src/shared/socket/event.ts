@@ -80,10 +80,8 @@ export enum ButtonSocketEvent {
     CLICK = 'click',
 }
 
-export enum SelectSocketEvent{
+export enum SelectSocketEvent {
     CREATE = 'create',
     UPDATE = 'update',
-    SELECT = 'select'
+    SELECT = 'select',
 }
-
-

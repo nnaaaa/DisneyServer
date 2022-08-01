@@ -3,9 +3,13 @@ import {
     MessageBody,
     SubscribeMessage,
     WebSocketGateway,
-    WebSocketServer
+    WebSocketServer,
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
+import { ButtonEntity } from 'src/entities/button.entity'
+import { UserEntity } from 'src/entities/user.entity'
+import { MemberService } from 'src/modules/guild-module/member/member.service'
+import { AuthWSUser } from 'src/shared/decorators'
 import { ButtonSocketEmit } from 'src/shared/socket/emit'
 import { ButtonSocketEvent } from 'src/shared/socket/event'
 import { SocketNamespace } from 'src/shared/socket/namespace'
@@ -20,11 +24,14 @@ export class ButtonGateway {
     @WebSocketServer()
     server: Server
 
-    constructor(private buttonService: ButtonService) { }
+    constructor(
+        private buttonService: ButtonService,
+        private memberService: MemberService
+    ) {}
 
     // @UseGuards(JwtUserWsGuard)
     // @RoleGuard(['CREATE_MESSAGE'])
-    // 
+    //
     // @SubscribeMessage(ButtonSocketEvent.CREATE)
     // @UsePipes(new ValidationPipe())
     // async create(
@@ -51,7 +58,7 @@ export class ButtonGateway {
 
     // @UseGuards(JwtUserWsGuard)
     // @RoleGuard(['UPDATE_MESSAGE'])
-    // 
+    //
     // @SubscribeMessage(ButtonSocketEvent.UPDATE)
     // @UsePipes(new ValidationPipe())
     // async update(@MessageBody('button') updateButtonDto: UpdateButtonDto) {
@@ -72,7 +79,7 @@ export class ButtonGateway {
 
     // @UseGuards(JwtUserWsGuard)
     // @RoleGuard(['DELETE_MESSAGE'])
-    // 
+    //
     // @SubscribeMessage(ButtonSocketEvent.DELETE)
     // async delete(@MessageBody('buttonId') buttonId: string) {
     //     try {
@@ -88,12 +95,24 @@ export class ButtonGateway {
     @UseGuards(JwtUserWsGuard)
     @SubscribeMessage(ButtonSocketEvent.CLICK)
     @UsePipes(new ValidationPipe())
-    async click(@MessageBody() buttonDto: UpdateButtonDto) {
+    async click(
+        @MessageBody() buttonDto: UpdateButtonDto,
+        @AuthWSUser() user: UserEntity
+    ) {
         try {
             const button = await this.buttonService.findOneWithRelation(buttonDto)
+
+            const member = await this.memberService.findByUserAndButton(
+                user,
+                buttonDto as ButtonEntity
+            )
+
             this.server.emit(
                 `${button.action.actionId}/${SocketNamespace.BUTTON}/${ButtonSocketEmit.CLICK}`,
-                button
+                {
+                    button,
+                    clicker: member,
+                }
             )
         } catch (e) {
             this.logger.error(e)

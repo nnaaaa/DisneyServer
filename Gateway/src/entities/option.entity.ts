@@ -1,17 +1,17 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
-import { SelectEntity } from "./select.entity"
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { SelectEntity } from './select.entity'
 
 @Entity()
-export class OptionEntity{
+export class OptionEntity {
     @PrimaryGeneratedColumn('uuid')
     optionId: string
 
     @Column()
     value: string
 
-    @Column({ default:'' })
+    @Column({ default: '' })
     description: string
 
-    @ManyToOne(() => SelectEntity, type => type.options)
+    @ManyToOne(() => SelectEntity, (type) => type.options)
     select: SelectEntity
 }

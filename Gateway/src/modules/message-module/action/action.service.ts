@@ -1,3 +1,4 @@
+import { SelectService } from './../select/select.service'
 import {
     Injectable,
     InternalServerErrorException,
@@ -15,13 +16,14 @@ export class ActionService {
     public readonly actionRelations: FindOptionsRelations<ActionEntity> = {
         buttons: true,
         reacts: true,
-        selects: true
+        selects: true,
     }
 
     constructor(
         @InjectRepository(ActionEntity) private actionRepository: ActionRepository,
         private reactService: ReactService,
-        private buttonService: ButtonService
+        private buttonService: ButtonService,
+        private selectService: SelectService
     ) {}
 
     async save(action: ActionEntity) {
@@ -32,7 +34,7 @@ export class ActionService {
         const newAction = this.actionRepository.create({
             buttons: [],
             reacts: [],
-            selects:[],
+            selects: [],
             ...action,
         })
 
@@ -84,6 +86,11 @@ export class ActionService {
                 for (const button of action.buttons) {
                     removeChildren.push(
                         this.buttonService.deleteOne({ buttonId: button.buttonId })
+                    )
+                }
+                for (const select of action.selects) {
+                    removeChildren.push(
+                        this.selectService.deleteOne({ selectId: select.selectId })
                     )
                 }
                 await Promise.all(removeChildren)

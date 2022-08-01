@@ -23,11 +23,11 @@ export class ReactGateway {
     @WebSocketServer()
     server: Server
 
-    constructor(private reactService: ReactService) { }
+    constructor(private reactService: ReactService) {}
 
     // @UseGuards(JwtUserWsGuard)
     // @RoleGuard(['CUD_REACT'])
-    // 
+    //
     @SubscribeMessage(ReactSocketEvent.CREATE)
     @UsePipes(new ValidationPipe())
     async create(@MessageBody() createReactDto: CreateReactDto) {
@@ -39,8 +39,7 @@ export class ReactGateway {
                     `${reactMessage.react.action.actionId}/${SocketNamespace.REACT}/${ReactSocketEmit.CREATE}`,
                     reactMessage.react
                 )
-            }
-            else if (reactMessage.type === 'delete') {
+            } else if (reactMessage.type === 'delete') {
                 this.server.emit(
                     `${reactMessage.react.action.actionId}/${SocketNamespace.REACT}/${ReactSocketEmit.DELETE}`,
                     reactMessage.react
@@ -54,7 +53,7 @@ export class ReactGateway {
 
     // @UseGuards(JwtUserWsGuard)
     // @RoleGuard(['CUD_REACT'])
-    // 
+    //
     // @SubscribeMessage(ReactSocketEvent.UPDATE)
     // @UsePipes(new ValidationPipe())
     // async update(
@@ -76,7 +75,7 @@ export class ReactGateway {
 
     // @UseGuards(JwtUserWsGuard)
     // @RoleGuard(['CUD_REACT'])
-    // 
+    //
     // @SubscribeMessage(ReactSocketEvent.DELETE)
     // async delete(@MessageBody('reactId') reactId: string) {
     //     try {

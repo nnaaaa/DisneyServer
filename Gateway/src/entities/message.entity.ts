@@ -6,7 +6,7 @@ import {
     OneToMany,
     OneToOne,
     PrimaryGeneratedColumn,
-    UpdateDateColumn
+    UpdateDateColumn,
 } from 'typeorm'
 import { ActionEntity } from './action.entity'
 import { ChannelEntity } from './channel.entity'

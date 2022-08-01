@@ -38,8 +38,9 @@ export class BotService {
             commands: [],
             ...createBotDto,
         })
+        const savedBot = await this.botRepository.save(bot)
 
-        bot.secretKey = await this.authService.getBotAccessToken(bot.botId)
+        savedBot.secretKey = await this.authService.getBotAccessToken(savedBot.botId)
 
         return bot
     }

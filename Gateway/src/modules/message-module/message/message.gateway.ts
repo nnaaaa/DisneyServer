@@ -36,7 +36,7 @@ export class MessageGateway {
         private messageService: MessageService,
         @Inject(GuildService) private guildService: GuildService,
         @Inject(BotService) private botService: BotService
-    ) { }
+    ) {}
 
     @UseGuards(JwtUserWsGuard)
     @UsePipes(new ValidationPipe())
@@ -113,7 +113,8 @@ export class MessageGateway {
 
             //emit to bot manager
             this.server.emit(
-                `botManager/${(userOrBot as BotEntity)?.botId}/${SocketNamespace.MESSAGE
+                `botManager/${(userOrBot as BotEntity)?.botId}/${
+                    SocketNamespace.MESSAGE
                 }/${MessageSocketEmit.CREATE}`,
                 message
             )
@@ -143,7 +144,8 @@ export class MessageGateway {
 
             //emit to bot manager
             this.server.emit(
-                `botManager/${(userOrBot as BotEntity)?.botId}/${SocketNamespace.MESSAGE
+                `botManager/${(userOrBot as BotEntity)?.botId}/${
+                    SocketNamespace.MESSAGE
                 }/${MessageSocketEmit.UPDATE}`,
                 updatedMessage
             )

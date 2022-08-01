@@ -27,12 +27,11 @@ export class ChannelGateway {
     @WebSocketServer()
     server: Server
 
-    constructor(private channelService: ChannelService) { }
+    constructor(private channelService: ChannelService) {}
 
     @SubscribeMessage(ChannelSocketEvent.CREATE)
     @UseGuards(JwtWsGuard)
     @RoleGuard(['CREATE_CHANNEL'])
-
     @UsePipes(new ValidationPipe())
     async create(
         @MessageBody('channel') createChannelDto: CreateChannelDto,
@@ -62,7 +61,6 @@ export class ChannelGateway {
     @SubscribeMessage(ChannelSocketEvent.UPDATE)
     @UseGuards(JwtWsGuard)
     @RoleGuard(['UPDATE_CHANNEL'])
-
     @UsePipes(new ValidationPipe())
     async update(@MessageBody('channel') updateChannelDto: UpdateChannelDto) {
         try {
@@ -83,7 +81,6 @@ export class ChannelGateway {
     @SubscribeMessage(ChannelSocketEvent.DELETE)
     @UseGuards(JwtWsGuard)
     @RoleGuard(['DELETE_CHANNEL'])
-
     async delete(@MessageBody('channelId') channelId: string) {
         try {
             await this.channelService.deleteOne({ channelId })
@@ -98,7 +95,6 @@ export class ChannelGateway {
     @SubscribeMessage(ChannelSocketEvent.ADD_MEMBER)
     @UseGuards(JwtWsGuard)
     @RoleGuard(['UPDATE_CHANNEL'])
-
     @UsePipes(new ValidationPipe())
     async addMember(@MessageBody('channel') memberChannelDto: MemberChannelDto) {
         try {
@@ -119,7 +115,6 @@ export class ChannelGateway {
     @SubscribeMessage(ChannelSocketEvent.REMOVE_MEMBER)
     @UseGuards(JwtWsGuard)
     @RoleGuard(['UPDATE_CHANNEL'])
-
     @UsePipes(new ValidationPipe())
     async removeMember(@MessageBody('channel') memberChannelDto: MemberChannelDto) {
         try {

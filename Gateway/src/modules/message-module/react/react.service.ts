@@ -15,12 +15,12 @@ export class ReactService {
     public readonly reactRelations: FindOptionsRelations<ReactEntity> = {
         action: true,
         emoji: true,
-        author: true
+        author: true,
     }
 
     constructor(
         @InjectRepository(ReactEntity) private reactRepository: ReactRepository
-    ) { }
+    ) {}
 
     async save(react: ReactEntity) {
         return await this.reactRepository.save(react)
@@ -71,13 +71,13 @@ export class ReactService {
 
     async reactToMessage(createReactDto: CreateReactDto) {
         const existedReact = await this.findOneWithRelation({
-            author: { memberId: createReactDto.author.memberId }, emoji: { emojiId: createReactDto.emoji.emojiId }
+            author: { memberId: createReactDto.author.memberId },
+            emoji: { emojiId: createReactDto.emoji.emojiId },
         })
         if (existedReact) {
             await this.deleteOne({ reactId: existedReact.reactId })
             return { react: existedReact, type: 'delete' }
-        }
-        else {
+        } else {
             const react = await this.create(createReactDto)
             return { react: await this.save(react), type: 'create' }
         }

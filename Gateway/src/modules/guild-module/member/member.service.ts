@@ -6,7 +6,10 @@ import {
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { BotEntity } from 'src/entities/bot.entity'
+import { ButtonEntity } from 'src/entities/button.entity'
+import { GuildEntity } from 'src/entities/guild.entity'
 import { MemberEntity } from 'src/entities/member.entity'
+import { OptionEntity } from 'src/entities/option.entity'
 import { UserEntity } from 'src/entities/user.entity'
 import { MemberRepository } from 'src/repositories/userJoinGuild.repository'
 import { BotDto } from 'src/shared/dtos/bot.dto'
@@ -81,6 +84,58 @@ export class MemberService {
             where: findCondition,
         })
     }
+
+    async findByUserAndButton(user: UserEntity, button: ButtonEntity) {
+        const member = await this.memberRepository
+            .createQueryBuilder('member')
+            .leftJoinAndSelect('member.guild', 'guild')
+            .leftJoinAndSelect('member.user', 'user')
+            .where((qb) => {
+                const guildId = qb
+                    .subQuery()
+                    .select('guild.guildId')
+                    .from(GuildEntity, 'guild')
+                    .leftJoin('guild.members', 'member')
+                    .leftJoin('member.sentMessages', 'message')
+                    .leftJoin('message.action', 'action')
+                    .leftJoin('action.buttons', 'buttons')
+                    .where('buttons.buttonId = :buttonId')
+                    .getQuery()
+                return 'guild.guildId IN ' + guildId
+            })
+            .andWhere('user.userId = :userId', { userId: user.userId })
+            .setParameter('buttonId', button.buttonId)
+            .getOne()
+
+        return member
+    }
+
+    async findByUserAndSelect(user: UserEntity, option: OptionEntity) {
+        const member = await this.memberRepository
+            .createQueryBuilder('member')
+            .leftJoinAndSelect('member.guild', 'guild')
+            .leftJoinAndSelect('member.user', 'user')
+            .where((qb) => {
+                const guildId = qb
+                    .subQuery()
+                    .select('guild.guildId')
+                    .from(GuildEntity, 'guild')
+                    .leftJoin('guild.members', 'member')
+                    .leftJoin('member.sentMessages', 'message')
+                    .leftJoin('message.action', 'action')
+                    .leftJoin('action.selects', 'select')
+                    .leftJoin('select.options', 'option')
+                    .where('option.optionId = :optionId')
+                    .getQuery()
+                return 'guild.guildId IN ' + guildId
+            })
+            .andWhere('user.userId = :userId', { userId: user.userId })
+            .setParameter('optionId', option.optionId)
+            .getOne()
+
+        return member
+    }
+
     async updateOne(
         findCondition: FindOptionsWhere<MemberEntity>,
         updateCondition: QueryDeepPartialEntity<MemberEntity>

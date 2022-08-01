@@ -6,7 +6,7 @@ import { CommandController } from './command.controller'
 import { AuthModule } from 'src/modules/auth-module/auth/auth.module'
 
 @Module({
-    imports: [TypeOrmModule.forFeature([CommandEntity]),AuthModule],
+    imports: [TypeOrmModule.forFeature([CommandEntity]), AuthModule],
     providers: [CommandService],
     exports: [TypeOrmModule],
     controllers: [CommandController],

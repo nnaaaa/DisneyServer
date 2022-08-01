@@ -25,11 +25,10 @@ export class EmojiGateway {
     @WebSocketServer()
     server: Server
 
-    constructor(private emojiService: EmojiService) { }
+    constructor(private emojiService: EmojiService) {}
 
     @UseGuards(JwtUserWsGuard)
     @RoleGuard(['CREATE_EMOJI'])
-
     @SubscribeMessage(EmojiSocketEvent.CREATE)
     @UsePipes(new ValidationPipe())
     async create(
@@ -53,7 +52,6 @@ export class EmojiGateway {
 
     @UseGuards(JwtUserWsGuard)
     @RoleGuard(['UPDATE_EMOJI'])
-
     @SubscribeMessage(EmojiSocketEvent.UPDATE)
     @UsePipes(new ValidationPipe())
     async update(@MessageBody() updateEmojiDto: UpdateEmojiDto) {
@@ -72,7 +70,6 @@ export class EmojiGateway {
 
     @UseGuards(JwtUserWsGuard)
     @RoleGuard(['DELETE_EMOJI'])
-
     @SubscribeMessage(EmojiSocketEvent.DELETE)
     async delete(@MessageBody('emojiId') emojiId: string) {
         try {

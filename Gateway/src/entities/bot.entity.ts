@@ -19,7 +19,7 @@ export class BotEntity {
     @Column({ type: 'text' })
     description: string
 
-    @Column()
+    @Column({ default: '' })
     secretKey: string
 
     @Column({ default: false, type: 'bool' })

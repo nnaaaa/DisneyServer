@@ -4,7 +4,7 @@ import {
     CreateDateColumn,
     Entity,
     OneToMany,
-    PrimaryGeneratedColumn
+    PrimaryGeneratedColumn,
 } from 'typeorm'
 import { BotEntity } from './bot.entity'
 import { MemberEntity } from './member.entity'

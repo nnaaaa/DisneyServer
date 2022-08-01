@@ -1,10 +1,16 @@
-import { Type } from "class-transformer"
-import { IsArray, IsBoolean, IsEnum, IsOptional, IsString, ValidateNested } from "class-validator"
-import { SelectStyle } from "src/entities/select.entity"
-import { CreateOptionDto } from "./createOption.dto"
+import { Type } from 'class-transformer'
+import {
+    IsArray,
+    IsBoolean,
+    IsEnum,
+    IsOptional,
+    IsString,
+    ValidateNested,
+} from 'class-validator'
+import { SelectStyle } from 'src/entities/select.entity'
+import { CreateOptionDto } from './createOption.dto'
 
-
-export class CreateSelectDto{
+export class CreateSelectDto {
     @IsString()
     @IsOptional()
     customId?: string

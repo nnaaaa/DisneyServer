@@ -1,8 +1,16 @@
-import { MemberEntity } from './member.entity';
-import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { MemberEntity } from './member.entity'
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToMany,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from 'typeorm'
 import { ActionEntity } from './action.entity'
 
-export enum ButtonStyle{
+export enum ButtonStyle {
     PRIMARY = 'primary',
     SECONDARY = 'secondary',
     SUCCESS = 'success',
@@ -15,7 +23,7 @@ export class ButtonEntity {
     @PrimaryGeneratedColumn('uuid')
     buttonId: string
 
-    @Column({default:''})
+    @Column({ default: '' })
     customId: string
 
     @Column()
@@ -24,7 +32,7 @@ export class ButtonEntity {
     @Column({ type: 'bool', default: false })
     isDisabled: boolean
 
-    @Column({ type:'enum', enum: ButtonStyle, default: ButtonStyle.PRIMARY })
+    @Column({ type: 'enum', enum: ButtonStyle, default: ButtonStyle.PRIMARY })
     style: ButtonStyle
 
     @ManyToOne(() => ActionEntity, (react) => react.buttons)

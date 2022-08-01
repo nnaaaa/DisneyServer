@@ -1,4 +1,13 @@
-import { IsAlphanumeric, IsEmail, IsNotEmpty, IsOptional, IsString, IsUrl, MaxLength, MinLength } from 'class-validator'
+import {
+    IsAlphanumeric,
+    IsEmail,
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+    IsUrl,
+    MaxLength,
+    MinLength,
+} from 'class-validator'
 
 export class UserRegisterDto {
     @IsEmail()

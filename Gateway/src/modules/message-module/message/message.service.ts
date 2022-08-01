@@ -21,12 +21,12 @@ export class MessageService {
             reacts: {
                 author: true,
                 emoji: true,
-                action: true
+                action: true,
             },
             selects: {
                 options: true,
-                action: true
-            }
+                action: true,
+            },
         },
         replies: true,
         replyTo: true,
@@ -38,7 +38,7 @@ export class MessageService {
         private buttonService: ButtonService,
         private reactService: ReactService,
         private selectService: SelectService
-    ) { }
+    ) {}
 
     async save(message: MessageEntity) {
         return await this.messageRepository.save(message)
@@ -66,11 +66,15 @@ export class MessageService {
                 savedAction.buttons.push(createdButton)
             }
             for (const react of createMessageDto.action.reacts) {
-                const createdReact = await this.reactService.create({ ...react, action: savedAction, author, })
+                const createdReact = await this.reactService.create({
+                    ...react,
+                    action: savedAction,
+                    author,
+                })
                 savedAction.reacts.push(createdReact)
             }
             for (const select of createMessageDto.action.selects) {
-                const createdSelect = await this.selectService.create(select,savedAction)
+                const createdSelect = await this.selectService.create(select, savedAction)
                 savedAction.selects.push(createdSelect)
             }
         }
@@ -146,7 +150,9 @@ export class MessageService {
             const message = await this.findOneWithRelation(findCondition)
 
             if (message) {
-                await this.actionService.deleteOne({ message: { messageId: message.messageId } })
+                await this.actionService.deleteOne({
+                    message: { messageId: message.messageId },
+                })
             }
             return message
         } catch (e) {

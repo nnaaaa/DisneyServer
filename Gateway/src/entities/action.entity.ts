@@ -1,4 +1,11 @@
-import { Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
+import {
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    OneToOne,
+    PrimaryGeneratedColumn,
+} from 'typeorm'
 import { ButtonEntity } from './button.entity'
 import { MessageEntity } from './message.entity'
 import { ReactEntity } from './react.entity'

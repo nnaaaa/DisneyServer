@@ -27,11 +27,10 @@ export class RoleGateway {
     @WebSocketServer()
     server: Server
 
-    constructor(private roleService: RoleService) { }
+    constructor(private roleService: RoleService) {}
 
     @UseGuards(JwtUserWsGuard)
     @RoleGuard(['CREATE_ROLE'])
-
     @UsePipes(new ValidationPipe())
     @SubscribeMessage(RoleSocketEvent.CREATE)
     async create(
@@ -54,7 +53,6 @@ export class RoleGateway {
 
     @UseGuards(JwtUserWsGuard)
     @RoleGuard(['UPDATE_ROLE'])
-
     @UsePipes(new ValidationPipe())
     @SubscribeMessage(RoleSocketEvent.UPDATE)
     async update(@MessageBody('role') updateRoleDto: UpdateRoleDto) {
@@ -72,7 +70,6 @@ export class RoleGateway {
 
     @UseGuards(JwtUserWsGuard)
     @RoleGuard(['DELETE_ROLE'])
-
     @SubscribeMessage(RoleSocketEvent.DELETE)
     async delete(@MessageBody('roleId') roleId: string) {
         try {
@@ -86,7 +83,6 @@ export class RoleGateway {
 
     @UseGuards(JwtUserWsGuard)
     @RoleGuard(['UPDATE_ROLE'])
-
     @UsePipes(new ValidationPipe())
     @SubscribeMessage(RoleSocketEvent.ADD_TO_MEMBER)
     async addToMember(@MessageBody('role') memberRoleDto: MemberRoleDto) {
@@ -107,7 +103,6 @@ export class RoleGateway {
 
     @UseGuards(JwtUserWsGuard)
     @RoleGuard(['UPDATE_ROLE'])
-
     @SubscribeMessage(RoleSocketEvent.REMOVE_FROM_MEMBER)
     async removeFromMember(@MessageBody('role') memberRoleDto: MemberRoleDto) {
         try {
@@ -126,7 +121,6 @@ export class RoleGateway {
 
     @UseGuards(JwtUserWsGuard)
     @RoleGuard(['UPDATE_ROLE'])
-
     @UsePipes(new ValidationPipe())
     @SubscribeMessage(RoleSocketEvent.ADD_TO_CHANNEL)
     async addToChannel(@MessageBody('role') channelRoleDto: ChannelRoleDto) {
@@ -145,7 +139,6 @@ export class RoleGateway {
 
     @UseGuards(JwtUserWsGuard)
     @RoleGuard(['UPDATE_ROLE'])
-
     @SubscribeMessage(RoleSocketEvent.REMOVE_FROM_CHANNEL)
     async removeFromChannel(@MessageBody('role') channelRoleDto: ChannelRoleDto) {
         try {

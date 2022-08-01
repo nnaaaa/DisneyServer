@@ -30,7 +30,7 @@ export class GuildGateway {
     constructor(
         private guildService: GuildService,
         private memberService: MemberService // private roleService: RoleService
-    ) { }
+    ) {}
 
     /** @return GuildEntity after save */
     @UseGuards(JwtUserWsGuard)
@@ -50,7 +50,6 @@ export class GuildGateway {
 
     @UseGuards(JwtUserWsGuard)
     @RoleGuard(['UPDATE_GUILD'])
-
     @SubscribeMessage(GuildSocketEvent.UPDATE)
     @UsePipes(new ValidationPipe())
     async update(@MessageBody() updateGuildDto: UpdateGuildDto) {
@@ -125,7 +124,6 @@ export class GuildGateway {
 
     @UseGuards(JwtUserWsGuard)
     @RoleGuard(['DELETE_GUILD'])
-
     @SubscribeMessage(GuildSocketEvent.DELETE)
     async delete(@MessageBody('guildId') guildId: string) {
         try {
