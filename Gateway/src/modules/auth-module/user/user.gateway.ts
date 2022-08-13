@@ -15,7 +15,7 @@ import {
 } from '@nestjs/websockets'
 import { Server } from 'socket.io'
 import { AuthWSUser } from 'src/shared/decorators/auth-user.decorator'
-import { UserEntity } from 'src/entities/user.entity'
+import { UserEntity, UserStatus } from 'src/entities/user.entity'
 import { UserBeFriendEntity } from 'src/entities/userBeFriend.entity'
 import { UserSocketEmit } from 'src/shared/socket/emit'
 import { UserSocketEvent } from 'src/shared/socket/event'
@@ -38,7 +38,7 @@ export class UserGateway {
         try {
             const user = await this.userService.updateOne(
                 { userId: authUser.userId },
-                { isOnline: true }
+                { status: UserStatus.ONLINE }
             )
 
             this.server.emit(`${UserSocketEmit.ONLINE}/${user.userId}`, user)

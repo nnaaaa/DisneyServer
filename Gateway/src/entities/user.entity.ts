@@ -10,6 +10,11 @@ import { BotEntity } from './bot.entity'
 import { MemberEntity } from './member.entity'
 import { UserBeFriendEntity } from './userBeFriend.entity'
 
+export enum UserStatus {
+    ONLINE = 'ONLINE',
+    OFFLINE = 'OFFLINE',
+}
+
 @Entity('user')
 export class UserEntity {
     @PrimaryGeneratedColumn('uuid')
@@ -27,8 +32,8 @@ export class UserEntity {
     @CreateDateColumn()
     lastLogin: Date
 
-    @Column({ default: true, type: 'bool' })
-    isOnline: boolean
+    @Column({ type:'enum',enum:UserStatus,default:UserStatus.OFFLINE })
+    status: UserStatus
 
     /**
      * @exclude fields can't be send to client have to slice
