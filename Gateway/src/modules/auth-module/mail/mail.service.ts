@@ -14,7 +14,7 @@ export class MailService {
             template: 'registerConfirm',
             attachments: [
                 {
-                    // filename: 'logo.png',
+                    filename: 'logo.png',
                     path: join(process.cwd(), 'dist/templates/mail/logo.png'),
                     cid: 'logo',
                 },
@@ -33,6 +33,7 @@ export class MailService {
             template: 'changePwdConfirm',
             attachments: [
                 {
+                    filename: 'logo.png',
                     path: join(process.cwd(), 'dist/templates/mail/logo.png'),
                     cid: 'logo',
                 },

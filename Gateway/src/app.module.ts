@@ -32,7 +32,7 @@ import { SelectModule } from './modules/message-module/select/select.module'
                 database: configService.get('DB_DB'),
                 type: 'mysql',
                 // logging:true,
-                synchronize: true,
+                synchronize: false,
                 dropSchema: false,
                 autoLoadEntities: true,
             }),
