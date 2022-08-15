@@ -12,7 +12,7 @@ import { FriendStatus, UserBeFriendEntity } from 'src/entities/userBeFriend.enti
 import { UserRegisterDto } from 'src/modules/auth-module/auth/dtos/userRegister.dto'
 import { UserRepository } from 'src/repositories/user.repository'
 import { UserBeFriendRepository } from 'src/repositories/userBeFriend.repository'
-import { FindOptionsRelations, FindOptionsSelect, FindOptionsWhere } from 'typeorm'
+import { FindOptionsRelations, FindOptionsSelect, FindOptionsWhere, Like } from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
 import {
     NewPassordWithSMSDto,
@@ -77,6 +77,12 @@ export class UserService {
             where: findCondition,
             select: selectFields,
         })
+    }
+    async findManyByName(
+        name: string
+    ) {
+        return await this.userRepository.createQueryBuilder().where({account: Like(`%${name}%`)})
+            .orWhere({name: Like(`%${name}%`)}).getMany()
     }
 
     async changePassword(newPasswordDto: NewPasswordDto, user: UserEntity) {

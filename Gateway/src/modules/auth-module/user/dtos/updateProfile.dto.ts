@@ -1,4 +1,5 @@
-import { IsBoolean, IsOptional, IsString, IsUrl } from 'class-validator'
+import { IsBoolean, IsEnum, IsOptional, IsString, IsUrl } from 'class-validator'
+import { UserStatus } from 'src/entities/user.entity'
 
 export class UpdateProfileDto {
     @IsOptional()
@@ -10,6 +11,6 @@ export class UpdateProfileDto {
     name?: string
 
     @IsOptional()
-    @IsBoolean()
-    isOnline?: boolean
+    @IsEnum(UserStatus)
+    status?: UserStatus
 }
